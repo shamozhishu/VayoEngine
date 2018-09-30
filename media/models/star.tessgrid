@@ -1,0 +1,29 @@
+#gridding
+@prop
+star examples/sphere 5 1
+@end_prop
+@place
+xy 0.00 -16.00 2.00 0.00 0.00 0.00 1.00 1.00 1.00
+@end_place
+@polygon
+5 0 0
+0  0.0  30.0 0.0 0 0
+0 -10.0  0.0 0.0 0 1
+0  10.6 19.0 0.0 0 1
+0 -10.6 19.0 0.0 0 1
+0  10.0  0.0 0.0 0 0
+@end_polygon
+@top_cap
+1
+0 examples/sphere 0.00 0.00 1.00  index -1
+@end_cap
+@stretching_body
+1
+0 examples/°å×Ó²àÃæ 1  index 0
+0.00 0.00 -4.00 0.00 0.00 0.00 1.00 1.00 1.00
+@end_stretching_body
+@bottom_cap
+1
+1 examples/sphere 0.00 0.00 -1.00  index -1
+@end_cap
+#end_gridding

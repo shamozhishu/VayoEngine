@@ -1,0 +1,26 @@
+<animSet>
+	<anim ID="0">
+	    <keyframe srcImageSetID="0" iconName="down1" scale="1.0" xoffset="0" yoffset="0" time="0" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="down2" scale="1.0" xoffset="0" yoffset="0" time="200" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="down3" scale="1.0" xoffset="0" yoffset="0" time="400" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="down4" scale="1.0" xoffset="0" yoffset="0" time="600" scaleByCenter="0"/>
+	</anim>
+	<anim ID="1">
+	    <keyframe srcImageSetID="0" iconName="left1" scale="1.0" xoffset="0" yoffset="0" time="0" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="left2" scale="1.0" xoffset="0" yoffset="0" time="200" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="left3" scale="1.0" xoffset="0" yoffset="0" time="400" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="left4" scale="1.0" xoffset="0" yoffset="0" time="600" scaleByCenter="0"/>
+	</anim>
+	<anim ID="2">
+	    <keyframe srcImageSetID="0" iconName="right1" scale="1.0" xoffset="0" yoffset="0" time="0" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="right2" scale="1.0" xoffset="0" yoffset="0" time="200" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="right3" scale="1.0" xoffset="0" yoffset="0" time="400" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="right4" scale="1.0" xoffset="0" yoffset="0" time="600" scaleByCenter="0"/>
+	</anim>
+	<anim ID="3">
+	    <keyframe srcImageSetID="0" iconName="up1" scale="1.0" xoffset="0" yoffset="0" time="0" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="up2" scale="1.0" xoffset="0" yoffset="0" time="200" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="up3" scale="1.0" xoffset="0" yoffset="0" time="400" scaleByCenter="0"/>
+		<keyframe srcImageSetID="0" iconName="up4" scale="1.0" xoffset="0" yoffset="0" time="600" scaleByCenter="0"/>
+	</anim>
+</animSet>

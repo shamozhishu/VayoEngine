@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="tu_43" tilewidth="32" tileheight="32" tilecount="256" columns="16">
+  <image source="tu_43.png" width="512" height="512"/>
+ </tileset>
+ <layer name="块层 1" width="10" height="10">
+  <data encoding="csv">
+1,2,3,4,5,6,7,8,9,10,
+11,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,256
+</data>
+ </layer>
+</map>

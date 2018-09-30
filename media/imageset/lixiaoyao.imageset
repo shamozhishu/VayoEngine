@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<imageset image="lixiaoyao.png" width="128" height="64">
+	<icon name="MGO2-0" x="98" y="2" w="22" h="50"/>
+	<icon name="MGO2-1" x="74" y="2" w="22" h="50"/>
+	<icon name="MGO2-2" x="50" y="2" w="22" h="50"/>
+	<icon name="MGO2-3" x="26" y="2" w="22" h="50"/>
+	<icon name="MGO2-4" x="2" y="2" w="22" h="50"/>
+</imageset>

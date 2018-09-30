@@ -1,0 +1,583 @@
+<Scene name="测试场景">
+	<SceneNode name="灯光场景节点" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<FPSCamera name="第一人称摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45"  zn="1" zf="1000" moveSpeed="100"/>
+		<OrbitCamera name="轨道摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45" zn="1" zf="1000" moveSpeed="10" zoomSpeed="2"/>
+		<DirectionalLight name="主方向光" ambientColor="0xff808080" diffuseColor="0xffffffff" specularColor="ffcccccc" direction="-0.57735,0.57735,0.57735"/>
+		<SceneNode name="太阳节点" relTranslation="-288.675,288.675,288.675" relRotation="0,0,0" relScale="1,1,1" canVisit="false">
+			<Entity name="太阳实体" model="Sphere,examples/太阳,10,20,20"/>
+		</SceneNode>
+		<DirectionalLight name="辅助方向光1" ambientColor="0xff000000" diffuseColor="0xff666666" specularColor="ff333333" direction="0.707,-0.707,0.0"/>
+		<SceneNode name="月亮节点" relTranslation="141.4,-141.4,0.0" relRotation="0,0,0" relScale="1,1,1" canVisit="false">
+			<Entity name="月亮实体" model="Sphere,examples/月亮,4,20,20"/>
+		</SceneNode>
+		<DirectionalLight name="辅助方向光2" ambientColor="0xff000000" diffuseColor="0xff666666" specularColor="ff333333" direction="0.0,0.0,-1.0"/>
+		<SceneNode name="星星节点" relTranslation="0.0,0.0,-100" relRotation="0,0,0" relScale="1,1,1" canVisit="false">
+			<Entity name="星星实体" model="Sphere,examples/星星,2,10,10"/>
+		</SceneNode>
+	</SceneNode>
+	<SceneNode name="" relTranslation="0,-10,0" relRotation="0,0,0" relScale="1,1,1" canVisit="false">
+		<ManualObject name="平面" model="Plane,examples/plane,20,20"/>
+		<SceneNode name="" relTranslation="5,10,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="圆环" model="Torus,examples/torus,20,2,100,50"/>
+			<SceneNode name="" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+				<ManualObject name="球" model="Sphere,examples/sphere,5,100,100"/>
+			</SceneNode>
+		</SceneNode>
+	</SceneNode>
+	<SceneNode name="立方体" relTranslation="5,0,-10" relRotation="0,0,0" relScale="1,1,1" canVisit="false">
+		<Entity name="立方体" model="Cube,examples/cube,10,10,10"/>
+	</SceneNode>
+	<SceneNode name="球体" relTranslation="5,-20,0" relRotation="0,0,0" relScale="1,1,1" canVisit="false">
+		<Entity name="球体" model="Sphere,examples/cube,8,50,50"/>
+		<SceneNode name="圆柱" relTranslation="20,20,0" relRotation="0,0,0" relScale="1,1,1">
+			<Entity name="圆柱" model="Cylinder,examples/cube,5,10,50,0xffffffff,true,0"/>
+			<SceneNode name="圆锥" relTranslation="-40,0,0" relRotation="0,0,0" relScale="1,1,1">
+				<Entity name="圆锥" model="Cone,examples/cube,8,16,50,0xffffffff,0xffffffff,0"/>
+			</SceneNode>
+		</SceneNode>
+	</SceneNode>
+	<SceneNode name="" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="false">
+		<ManualObject name="板子"/>
+	</SceneNode>
+	<SceneNode name="" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="star"/>
+	</SceneNode>
+	<SceneNode name="" relTranslation="-15,-5,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<Entity name="箱子"/>
+		<Entity name="描边"/>
+	</SceneNode>
+	<SceneNode name="" relTranslation="-5,-20,3" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<Entity name="另一个箱子"/>
+		<Entity name="另一个描边"/>
+	</SceneNode>
+	<SceneNode name="" relTranslation="15,5,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="球体"/>
+		<ManualObject name="球体描边"/>
+	</SceneNode>
+	<SceneNode name="" relTranslation="5,20,3" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="另一个球体"/>
+		<ManualObject name="另一个球体描边"/>
+	</SceneNode>
+	<SceneNode name="连接器1" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J599I/26FG41SHN"/>
+	</SceneNode>
+	<SceneNode name="连接器2" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J599I/26FH55PHN"/>
+	</SceneNode>
+	<SceneNode name="连接器3" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J599I/26FJ61PA"/>
+	</SceneNode>
+	<SceneNode name="连接器4" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J599I/26FJ61PN"/>
+	</SceneNode>
+	<SceneNode name="连接器5" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J599I/26FJ61SA"/>
+	</SceneNode>
+	<SceneNode name="连接器6" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J599I/26FJ61SHN"/>
+	</SceneNode>
+	<SceneNode name="连接器7" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J599I/26FJ61SN"/>
+	</SceneNode>
+	<SceneNode name="尾罩1" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J1784A/18B-21N08"/>
+	</SceneNode>
+	<SceneNode name="尾罩2" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J1784A/18B-23N09"/>
+	</SceneNode>
+	<SceneNode name="尾罩3" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="J1784A/18B-25N10"/>
+	</SceneNode>
+	<SceneNode name="导线1" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="AF-250"/>
+	</SceneNode>
+	<SceneNode name="导线2" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="609C55A0812-22-6"/>
+	</SceneNode>
+	<SceneNode name="" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+		<ManualObject name="testmodel"/>
+	</SceneNode>
+	<SceneNode name="" relTranslation="-171.45,-139.70,1.3005" relRotation="0,0,0" relScale="1,1,1" canVisit="false">
+		<ManualObject name="board"/>
+		<SceneNode name="" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="XFMR_TRF-8580_PE-65779NL"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="336.0000,14.0000,-2.6010" relRotation="180,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="FDMARK"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="7.0000,14.0000,-2.6010" relRotation="180,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="FDMARK,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="7.0000,266.0000,-2.6010" relRotation="180,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="FDMARK,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="336.0000,264.0000,-2.6010" relRotation="180,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="FDMARK,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="336.0000,264.0000,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="FDMARK,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="7.0000,266.0000,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="FDMARK,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="336.0000,14.0000,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="FDMARK,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="7.0000,14.0000,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="FDMARK,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="336.5500,6.3500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="TOOL32"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="6.3500,6.3500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="TOOL32,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="330.2000,2.5400,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="TOOL15"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="12.7000,2.5400,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="TOOL15,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="54.6100,71.1200,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="TO_220_3H_NPT_LM7910CT"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="15.2400,71.1200,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="TO_220_3H_NPT_LM7905CT"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="15.2400,88.9000,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="TO_220_3H_NPT_LM7905CT,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="210.8200,225.4250,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="SO285_14_300H"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="233.6800,225.4250,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="SO285_14_300H,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="256.5400,225.4250,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="SO285_14_300H,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="279.4000,225.4250,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="SO285_14_300H,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="302.2600,225.4250,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="SO285_14_300H,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="325.1200,225.4250,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="SO285_14_300H,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="142.2400,78.7400,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="NWZ701_WZ-1PIN"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="106.6800,163.8300,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="40.6400,163.8300,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="147.3200,93.3450,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="137.1600,69.8500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="119.3800,130.8100,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="137.1600,78.7400,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="335.9150,27.9400,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="77.1525,261.9375,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="287.0200,271.7800,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="182.8800,69.8500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="182.8800,80.0100,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="30.4800,250.1900,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="158.7500,50.8000,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="295.9100,271.7800,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="274.3200,237.4900,0.0000" relRotation="0,0,270" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="334.0100,237.4900,0.0000" relRotation="0,0,270" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="158.7500,78.7400,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="132.0800,53.3400,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="158.7500,69.8500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="268.6050,214.6300,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="299.7200,237.4900,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="325.1200,237.4900,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="139.7000,85.0900,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="190.5000,60.9600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="113.0300,130.8100,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="118.1100,219.7100,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="52.0700,219.7100,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="8.8900,210.8200,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="129.5400,144.7800,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="148.5900,226.0600,0.0000" relRotation="0,0,270" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="27.9400,147.3200,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="8.8900,231.1400,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="144.1450,139.7000,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="80.6450,218.4400,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="69.8500,233.6800,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="9.5250,51.4350,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="157.4800,226.0600,0.0000" relRotation="0,0,270" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="142.2400,69.8500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="101.6000,125.7300,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="80.6450,233.0450,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="13.9700,238.7600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="132.0800,236.2200,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="64.7700,233.6800,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="8.8900,220.9800,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="76.2000,55.8800,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="132.0800,210.8200,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="66.0400,210.8200,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="116.8400,246.3800,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="8.8900,198.1200,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="8.8900,185.4200,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="80.0100,185.4200,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="13.9700,185.4200,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="85.0900,33.0200,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="162.5600,271.7800,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="45.7200,46.3550,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="101.6000,10.1600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="147.3200,86.3600,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="106.6800,130.8100,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="127.0000,163.8300,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="139.7000,198.1200,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="175.2600,60.9600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="190.5000,69.8500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="190.5000,80.0100,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="80.6450,226.0600,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="27.9400,163.1950,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="8.8900,250.1900,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="158.7500,60.9600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="132.0800,60.9600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="307.3400,271.7800,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="335.9150,35.5600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="129.5400,149.8600,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="27.9400,156.2100,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="101.6000,134.6200,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="78.1050,118.1100,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="182.8800,60.9600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="127.0000,60.9600,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="127.0000,69.8500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="250.1900,251.4600,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="144.1450,150.4950,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="127.0000,53.3400,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="154.9400,85.0900,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="102.2350,48.8950,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="102.2350,40.6400,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="149.8600,271.7800,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="96.5200,190.5000,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="30.4800,190.5000,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="335.9150,43.1800,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="127.0000,155.5750,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="132.0800,69.8500,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="132.0800,185.4200,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="66.6750,185.4200,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NWZ701_WZ-1PIN,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="50.8000,129.5400,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<ManualObject name="NVR870_REFLOW"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="66.0400,129.5400,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NVR870_REFLOW,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="96.5200,132.0800,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<ManualObject name="IVD702A_REFLOW"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="134.6200,40.6400,0.0000" relRotation="0,0,270" relScale="1,1,1" canVisit="true">
+			<ManualObject name="NTSSP4830050A_SSOP"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="149.8600,40.6400,0.0000" relRotation="0,0,270" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NTSSP4830050A_SSOP,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="165.1000,40.6400,0.0000" relRotation="0,0,270" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NTSSP4830050A_SSOP,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="149.8600,73.6600,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<ManualObject name="NTSOP28500P55_TSOP"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="203.2000,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<ManualObject name="ITR2-5K1A_TR"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="209.5500,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="215.9000,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="212.0900,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="218.4400,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="226.0600,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="231.1400,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="232.4100,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="237.4900,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="243.8400,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="250.1900,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="238.7600,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="256.5400,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="247.6500,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="254.0000,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="260.3500,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="271.7800,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="278.1300,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="284.4800,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="281.3050,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="287.0200,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="295.9100,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="297.1800,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="302.2600,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="303.5300,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="309.8800,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="316.2300,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="308.6100,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="322.5800,208.2800,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="316.2300,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="322.5800,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="328.9300,224.7900,-2.6010" relRotation="180,0,90" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="ITR2-5K1A_TR,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="172.0850,73.6600,0.0000" relRotation="0,0,90" relScale="1,1,1" canVisit="true">
+			<ManualObject name="NSSP20-300P65_SSOP"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="41.3080,38.7290,0.0000" relRotation="0,0,270" relScale="1,1,1" canVisit="true">
+			<ManualObject name="WM30-32478_SHIELD"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="26.0350,45.0850,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="NSSOP5P_SSOP"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="85.7250,250.1900,-2.6010" relRotation="180,0,0" relScale="1,1,1" canVisit="true">
+			<ManualObject name="NRN321608_REFLOW"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="85.7250,250.1900,0.0000" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NRN321608_REFLOW,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="111.7600,250.1900,-2.6010" relRotation="180,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NRN321608_REFLOW,1"/>
+		</SceneNode>
+		<SceneNode name="" relTranslation="111.7600,250.1900,0.0000" relRotation="0,0,180" relScale="1,1,1" canVisit="true">
+			<Entity name="" model="NRN321608_REFLOW,1"/>
+		</SceneNode>
+	</SceneNode>
+</Scene>

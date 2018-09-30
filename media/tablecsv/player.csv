@@ -1,0 +1,4 @@
+玩家职业编号,是否是动画,图源ID,图片名称,序列帧动画ID
+player_id,is_anim,imgset_id,icon_name,sequenceanim_id
+1,1,0,down1,0
+"""aa""",",",,,

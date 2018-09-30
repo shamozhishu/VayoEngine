@@ -1,0 +1,297 @@
+material examples/plane
+{
+	ambient_color 104 204 50 255
+	diffuse_color 153 153 153 255
+	specular_color 102 102 102 255
+	emissive_color 0 0 0 0
+	shininess 16
+	//wireframe on
+	gouraud_shading on
+	lighting on
+	zbuffer on
+	zwrite_enable on
+	backface_culling off
+	fog_enable off
+	
+	//texture_unit
+	//{
+		//texture 格子.png
+		//filtering bilinear_filter
+		//tex_address_mode texture_clamp_repeat
+	//}
+}
+
+material examples/torus
+{
+	ambient_color 0 204 204 255
+	diffuse_color 102 102 102 255
+	specular_color 255 255 255 255
+	emissive_color 0 0 0 0
+	shininess 32
+	wireframe off
+	gouraud_shading on
+	lighting on
+	zbuffer on
+	zwrite_enable on
+	backface_culling on
+	fog_enable off
+}
+
+material examples/sphere
+{
+	ambient_color 77 102 128 255
+	diffuse_color 51 77 102 255
+	specular_color 230 230 230 255
+	emissive_color 0 0 0 0
+	shininess 16
+	wireframe off
+	gouraud_shading on
+	lighting on
+	zbuffer on
+	zwrite_enable on
+	backface_culling on
+	fog_enable off
+}
+
+material examples/cube
+{
+	ambient_color 100 0 0 255
+	diffuse_color 204 0 0 255
+	specular_color 230 230 230 255
+	emissive_color 0 0 0 0
+	shininess 32
+	gouraud_shading off
+}
+
+material examples/板子
+{
+	ambient_color 0 64 0 255
+	diffuse_color 0 128 0 255
+	specular_color 80 80 80 255
+	emissive_color 0 0 0 0
+	lighting on
+	shininess 16
+}
+
+material examples/板子侧面
+{
+	ambient_color 128 64 0 255
+	diffuse_color 128 64 0 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	lighting on
+	shininess 32
+}
+
+material examples/outline
+{
+	ambient_color 0 64 0 255
+	diffuse_color 0 128 0 255
+	specular_color 80 80 80 255
+	emissive_color 0 0 0 0
+	lighting on
+	shininess 16
+	//wireframe on
+}
+
+material examples/圆台
+{
+	ambient_color 100 100 100 255
+	diffuse_color 192 192 192 255
+	specular_color 100 100 100 255
+	emissive_color 0 0 0 0
+	lighting on
+	shininess 16
+	//gouraud_shading off
+	//clockwise on
+	//backface_culling off
+	//wireframe on
+}
+
+material examples/圆台高亮
+{
+	ambient_color 100 100 100 255
+	diffuse_color 192 192 192 255
+	specular_color 100 100 100 255
+	emissive_color 100 100 100 255
+	lighting on
+	shininess 16
+	//gouraud_shading off
+	//clockwise on
+	//backface_culling off
+	//wireframe on
+}
+
+material examples/底座
+{
+	ambient_color 150 150 15 255
+	diffuse_color 225 225 30 255
+	specular_color 20 20 20 255
+	emissive_color 0 0 0 0
+	//wireframe on
+}
+
+material examples/aabb
+{
+	lighting off
+}
+
+material examples/太阳
+{
+	ambient_color 0 0 0 255
+	diffuse_color 0 0 0 255
+	specular_color 0 0 0 255
+	emissive_color 255 0 0 0
+	shininess 0
+}
+
+material examples/月亮
+{
+	ambient_color 0 0 0 255
+	diffuse_color 0 0 0 255
+	specular_color 0 0 0 255
+	emissive_color 255 255 0 0
+	shininess 0
+}
+
+material examples/星星
+{
+	ambient_color 0 0 0 255
+	diffuse_color 0 0 0 255
+	specular_color 0 0 0 255
+	emissive_color 0 255 255 0
+	shininess 0
+}
+
+material examples/TextureQuad
+{
+	vertex_program GLSL330/texture.vs
+	fragment_program GLSL330/texture.fs
+	shader_constant_set_callback 0
+	lighting on
+	//zbuffer off
+	//wireframe on
+	
+	texture_unit
+	{
+		texture awesomeface.png
+		filtering bilinear_filter
+		tex_address_mode texture_clamp_mirror
+	}
+}
+
+material examples/TextureCube
+{
+	vertex_program GLSL330/multiple_lights.vs
+	fragment_program GLSL330/multiple_lights.fs
+	shader_constant_set_callback 1
+	lighting on
+	//wireframe on
+	
+	texture_unit 0
+	{
+		texture container2.png
+		filtering trilinear_filter
+		tex_address_mode texture_clamp_repeat
+	}
+	
+	texture_unit 1
+	{
+		texture bricks2_disp.jpg
+		filtering trilinear_filter
+		tex_address_mode texture_clamp_repeat
+	}
+}
+
+material examples/尾罩
+{
+	ambient_color 100 100 100 255
+	diffuse_color 192 192 192 255
+	specular_color 0 0 0 255
+	emissive_color 0 0 0 0
+	shininess 16
+	//wireframe on
+}
+
+material examples/纤芯
+{
+	ambient_color 255 100 100 255
+	diffuse_color 255 192 192 255
+	specular_color 0 0 0 255
+	emissive_color 0 0 0 0
+	shininess 16
+	//wireframe on
+}
+
+material examples/线束
+{
+	ambient_color 100 100 255 255
+	diffuse_color 192 192 255 255
+	specular_color 0 0 0 255
+	emissive_color 0 0 0 0
+	shininess 16
+	//wireframe on
+}
+
+material examples/焊杯
+{
+	ambient_color 220 100 10 255
+	diffuse_color 220 192 192 255
+	specular_color 0 0 0 255
+	emissive_color 0 0 0 0
+	shininess 16
+	//wireframe on
+}
+
+material examples/点云
+{
+	lighting off
+	thickness 3
+}
+
+material examples/箱子
+{
+	ambient_color 104 204 50 255
+	diffuse_color 153 153 153 255
+	specular_color 102 102 102 255
+	emissive_color 0 0 0 0
+	shininess 16
+	gouraud_shading on
+	lighting on
+	zbuffer on
+	zwrite_enable on
+	backface_culling off
+	fog_enable off
+	stencil_buffer on
+	stencil_depth_pass 2
+	stencil_func 7
+	stencil_ref 1
+	stencil_mask 255
+	
+	texture_unit
+	{
+		texture awesomeface.png
+		filtering bilinear_filter
+		tex_address_mode texture_clamp_repeat
+	}
+}
+
+material examples/描边
+{
+	ambient_color 0 0 0 255
+	diffuse_color 0 0 0 255
+	specular_color 0 0 0 255
+	emissive_color 0 255 0 255
+	shininess 16
+	gouraud_shading on
+	lighting on
+	zbuffer on
+	zwrite_enable on
+	backface_culling off
+	fog_enable off
+	stencil_buffer on
+	stencil_depth_pass 2
+	stencil_func 6
+	stencil_ref 1
+	stencil_mask 0
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="32" tileheight="32" nextobjectid="5">
+ <tileset firstgid="1" name="tu_43" tilewidth="32" tileheight="32" tilecount="256" columns="16">
+  <image source="tu_43.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="257" name="tu_23" tilewidth="32" tileheight="32" tilecount="256" columns="16">
+  <image source="tu_23.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="513" name="tu_32" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+  <image source="tu_32.png" width="128" height="128"/>
+ </tileset>
+ <layer name="块层 1" width="10" height="10">
+  <data encoding="csv">
+1,1,2,2,3,3,0,0,0,0,
+17,0,0,0,0,0,0,0,0,0,
+0,0,256,0,0,0,0,0,277,0,
+0,0,0,0,0,256,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,256,0,0,0,0,277,
+0,0,0,0,0,0,0,256,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+257,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup name="对象层 1">
+  <object id="1" name="a" type="aa" x="200" y="72" width="38" height="40"/>
+  <object id="2" name="b" type="bb" x="35" y="123" width="50" height="44"/>
+  <object id="3" name="c" type="cc" x="116" y="214" width="140" height="52"/>
+ </objectgroup>
+ <objectgroup name="对象层 2"/>
+ <layer name="块层 2" width="10" height="10">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="块层 3" width="10" height="10">
+  <data encoding="csv">
+37,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+522,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,258
+</data>
+ </layer>
+</map>

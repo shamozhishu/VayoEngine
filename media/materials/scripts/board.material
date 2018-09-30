@@ -1,0 +1,172 @@
+material board/板子
+{
+	ambient_color 10 64 10 255
+	diffuse_color 20 204 20 255
+	specular_color 80 80 80 255
+	emissive_color 0 0 0 0
+	lighting on
+	shininess 16
+}
+
+material board/板子侧面
+{
+	ambient_color 128 64 5 255
+	diffuse_color 128 64 5 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	lighting on
+	shininess 32
+}
+
+material board/XFMR_TRF-8580_PE-65779NL
+{
+	ambient_color 0 204 204 255
+	diffuse_color 102 102 102 255
+	specular_color 255 255 255 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/FDMARK
+{
+	ambient_color 128 10 128 255
+	diffuse_color 128 30 128 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/TOOL32
+{
+	ambient_color 100 100 100 255
+	diffuse_color 128 196 196 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/TOOL15
+{
+	ambient_color 50 50 50 255
+	diffuse_color 128 196 196 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/TO_220_3H_NPT_LM7910CT
+{
+	ambient_color 5 5 100 255
+	diffuse_color 5 5 200 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/TO_220_3H_NPT_LM7905CT
+{
+	ambient_color 5 5 100 255
+	diffuse_color 5 5 128 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/SO285_14_300H
+{
+	ambient_color 100 100 10 255
+	diffuse_color 100 100 50 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/NWZ701_WZ-1PIN
+{
+	ambient_color 20 20 20 255
+	diffuse_color 50 50 50 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/NVR870_REFLOW
+{
+	ambient_color 100 10 10 255
+	diffuse_color 100 50 50 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/IVD702A_REFLOW
+{
+	ambient_color 10 10 128 255
+	diffuse_color 50 50 204 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/NTSSP4830050A_SSOP
+{
+	ambient_color 10 128 128 255
+	diffuse_color 50 128 204 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/NTSOP28500P55_TSOP
+{
+	ambient_color 128 128 10 255
+	diffuse_color 204 128 50 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/ITR2-5K1A_TR
+{
+	ambient_color 20 20 20 255
+	diffuse_color 50 50 50 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/NSSP20-300P65_SSOP
+{
+	ambient_color 128 128 20 255
+	diffuse_color 196 196 50 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/WM30-32478_SHIELD
+{
+	ambient_color 128 64 20 255
+	diffuse_color 196 128 50 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/NSSOP5P_SSOP
+{
+	ambient_color 128 64 128 255
+	diffuse_color 196 128 196 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}
+
+material board/NRN321608_REFLOW
+{
+	ambient_color 100 100 0 255
+	diffuse_color 204 204 0 255
+	specular_color 150 150 150 255
+	emissive_color 0 0 0 0
+	shininess 16
+}

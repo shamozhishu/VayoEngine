@@ -1,0 +1,30 @@
+#gridding
+@prop
+AF-250 examples/ÏËÐ¾ 120 2
+@end_prop
+@place
+xy 0.0 0.0 5.00 0.00 0.00 0.00 1.00 1.00 1.00
+@end_place
+@circle
+2 0 0
+0.5046 0.00 0.00 60 0
+1.4000 0.00 0.00 60 0
+@end_circle
+@top_cap
+2
+0 examples/ÏßÊø 0.00 0.00 1.00 index -1
+0 examples/ÏËÐ¾ 0.00 0.00 1.00 index 0
+@end_cap
+@stretching_body
+2
+0 examples/ÏËÐ¾ 1 index 0
+0.00 0.00 -10.00 0.00 0.00 0.00 1.00 1.00 1.00
+0 examples/ÏßÊø 1 index 1
+0.00 0.00 -8.00 0.00 0.00 0.00 1.00 1.00 1.00
+@end_stretching_body
+@bottom_cap
+2
+1 examples/ÏËÐ¾ 0.00 0.00 -1.00 index 0
+1 examples/ÏßÊø 0.00 0.00 -1.00 index 1
+@end_cap
+#end_gridding

@@ -1,0 +1,87 @@
+<UISkin UseGradient="1">
+	<colors>
+		<color DarkShadow3D="0x60767982"/>
+		<color Shadow3D="0x50e4e8f1"/>
+		<color Face3D="0xc0cbd2d9"/>
+		<color Highlight3D="0x40c7ccdc"/>
+		<color Light3D="0x802e313a"/>
+		<color ActiveBorder="0x80404040"/>
+		<color ActiveCaption="0xffd0d0d0"/>
+		<color AppWorkspace="0xc0646464"/>
+		<color ButtonText="0xd0161616"/>
+		<color GrayText="0x3c141414"/>
+		<color Highlight="0x6c606060"/>
+		<color HighlightText="0xd0e0e0e0"/>
+		<color InactiveBorder="0xf0a5a5a5"/>
+		<color InactiveCaption="0xffd2d2d2"/>
+		<color ToolTip="0xf00f2033"/>
+		<color ToolTipBackground="0xc0cbd2d9"/>
+		<color ScrollBar="0xf0e0e0e0"/>
+		<color Window="0xf0f0f0f0"/>
+		<color WindowSymbol="0xd0161616"/>
+		<color Icon="0xd0161616"/>
+		<color IconHighlight="0xd0606060"/>
+		<color GrayWindowSymbol="0x3c101010"/>
+		<color Editable="0xf0ffffff"/>
+		<color GrayEditable="0xf0cccccc"/>
+		<color FocusedEditable="0xf0fffff0"/>
+	</colors>
+	<sizes>
+		<size ScrollBarSize="14"/>
+		<size MenuHeight="48"/>
+		<size WindowButtonWidth="15"/>
+		<size CheckBoxWidth="18"/>
+		<size MessageBoxWidth="500"/>
+		<size MessageBoxHeight="200"/>
+		<size ButtonWidth="80"/>
+		<size ButtonHeight="30"/>
+		<size TextDistanceX="3"/>
+		<size TextDistanceY="2"/>
+		<size TitleBarTextX="3"/>
+		<size TitleBarTextY="2"/>
+		<size MessageBoxGapSpace="15"/>
+		<size MessageBoxMinTextWidth="0"/>
+		<size MessageBoxMaxTextWidth="500"/>
+		<size MessageBoxMinTextHeight="0"/>
+		<size MessageBoxMaxTextHeight="99999"/>
+		<size ButtonPressedImageOffsetX="1"/>
+		<size ButtonPressedImageOffsetY="1"/>
+		<size ButtonPressedTextOffsetX="0"/>
+		<size ButtonPressedTextOffsetY="2"/>
+	</sizes>
+	<texts>
+		<text MessageBoxOkay="OK"/>
+		<text MessageBoxCancel="Cancel"/>
+		<text MessageBoxYes="Yes"/>
+		<text MessageBoxNo="No"/>
+		<text WindowButtonClose="Close"/>
+		<text WindowButtonMaximize="Maximize"/>
+		<text WindowButtonMinimize="Minimize"/>
+		<text WindowButtonRestore="Restore"/>
+	</texts>
+	<icons>
+		<icon WindowMaximize="225"/>
+		<icon WindowRestore="226"/>
+		<icon WindowClose="227"/>
+		<icon WindowMinimize="228"/>
+		<icon WindowResize="242"/>
+		<icon CursorUp="9650"/>
+		<icon CursorDown="9660"/>
+		<icon CursorLeft="231"/>
+		<icon CursorRight="232"/>
+		<icon MenuMore="232"/>
+		<icon CheckBoxChecked="9679"/>
+		<icon DropDown="234"/>
+		<icon SmallCursorUp="235"/>
+		<icon SmallCursorDown="236"/>
+		<icon RadioButtonChecked="237"/>
+		<icon MoreLeft="238"/>
+		<icon MoreRight="239"/>
+		<icon MoreUp="240"/>
+		<icon MoreDown="241"/>
+		<icon Expand="243"/>
+		<icon Collapse="244"/>
+		<icon File="245"/>
+		<icon Directory="246"/>
+	</icons>
+</UISkin>

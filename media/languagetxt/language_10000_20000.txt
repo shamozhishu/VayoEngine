@@ -1,0 +1,9 @@
+10000,button
+10001,计算机图形学(Computer Graphics，简称CG)是一种使用数学算法将二维或三维图形转化为计算机显示器的栅格形式的科学。
+10002,简单地说，计算机图形学的主要研究内容就是研究如何在计算机中表示图形、以及利用计算机进行图形的计算、处理和显示的相关原理与算法。
+10003,测 试
+10004,小子儿哒
+10005,A number of changes have been made to the Intermediate Data Format for Version 3.0:
+10006,A new optional file, the Panel File, was added to allow the exchange of manufacturing panel information.
+10007,The Panel File may contain any of the sections supported by the Board File. This allows panels to have keepouts, keepins, and drilled holes, for example.
+10008,A new record was added to the routing outline section to allow routing outlines to be defined per layer.
