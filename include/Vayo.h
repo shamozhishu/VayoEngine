@@ -67,6 +67,7 @@
 #include "VayoTiledMap.h"
 #include "VayoManualObject.h"
 #include "VayoNode.h"
+#include "VayoNodeAnimator.h"
 #include "VayoSceneNode.h"
 #include "VayoSceneManager.h"
 #include "VayoVertex.h"

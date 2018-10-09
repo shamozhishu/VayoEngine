@@ -42,6 +42,12 @@ public:
 	void                    destroyObject(const wstring& name);
 	void                    destroyAllObjects();
 
+	template<typename T> T* findAnimator(const wstring& name);
+	template<typename T> T* createAnimator(const wstring& name = L"");
+	void                    destroyAnimator(NodeAnimator* anim);
+	void                    destroyAnimator(const wstring& name);
+	void                    destroyAllAnimators();
+
 private:
 	friend class Root;
 	bool xmlParseSceneRecursion(XMLElement* xml, SceneNode* pParent);
@@ -54,6 +60,7 @@ private:
 	RenderQueueGroup                _renderQueues;
 	map<wstring, SceneNode*>        _sceneNodesPool;
 	map<wstring, MovableObject*>    _objectsPool;
+	map<wstring, NodeAnimator*>     _animatorsPool;
 };
 
 template<typename T>
@@ -84,6 +91,37 @@ T* SceneManager::createObject(const wstring& name /*= L""*/)
 	}
 
 	_objectsPool[pObj->getName()] = pObj;
+	return ret;
+}
+
+template<typename T>
+T* SceneManager::findAnimator(const wstring& name)
+{
+	T* ret = NULL;
+	map<wstring, NodeAnimator*>::iterator it = _animatorsPool.find(name);
+	if (it != _animatorsPool.end())
+		ret = dynamic_cast<T*>(it->second);
+	return ret;
+}
+
+template<typename T>
+T* SceneManager::createAnimator(const wstring& name /*= L""*/)
+{
+	T* ret = new T(name);
+	NodeAnimator* pAnim = dynamic_cast<NodeAnimator*>(ret);
+	if (NULL == pAnim)
+	{
+		SAFE_DELETE(ret);
+		return NULL;
+	}
+
+	NodeAnimator* pFindedAnim = findObject<NodeAnimator>(pAnim->getName());
+	if (pFindedAnim)
+	{
+		SAFE_DELETE(pFindedAnim);
+	}
+
+	_animatorsPool[pAnim->getName()] = pAnim;
 	return ret;
 }
 

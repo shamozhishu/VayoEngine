@@ -21,11 +21,11 @@
     <Filter Include="thirdparty\zlib">
       <UniqueIdentifier>{309f4472-9ab0-4c09-b393-1f83be0f770d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\inc">
-      <UniqueIdentifier>{a20fd65f-2fb0-4c01-add1-79db50baac9d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="thirdparty\stb_image">
       <UniqueIdentifier>{1876f59d-ced8-4553-8770-5994be6120f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\headers">
+      <UniqueIdentifier>{a20fd65f-2fb0-4c01-add1-79db50baac9d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -219,6 +219,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\source\VayoScriptSystem.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\VayoNodeAnimator.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -449,16 +452,16 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\source\VayoFontManager.h">
-      <Filter>source\inc</Filter>
+      <Filter>source\headers</Filter>
     </ClInclude>
     <ClInclude Include="..\source\VayoUIFactory.h">
-      <Filter>source\inc</Filter>
+      <Filter>source\headers</Filter>
     </ClInclude>
     <ClInclude Include="..\source\VayoWireBoundingBox.h">
-      <Filter>source\inc</Filter>
+      <Filter>source\headers</Filter>
     </ClInclude>
     <ClInclude Include="..\source\VayoWin32Device.h">
-      <Filter>source\inc</Filter>
+      <Filter>source\headers</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\stb_image\stb_image.h">
       <Filter>thirdparty\stb_image</Filter>
@@ -497,6 +500,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoScriptSystem.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoNodeAnimator.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

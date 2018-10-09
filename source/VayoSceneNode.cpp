@@ -38,9 +38,9 @@ SceneNode::~SceneNode()
 
 void SceneNode::visit(float dt)
 {
-	if (_canVisit)
+	if (isCanVisit())
 	{
-		updateAbsPosition();
+		animating(dt);
 		updateWorldAABB();
 		if (!_sceneMgr->isCulled(this))
 		{

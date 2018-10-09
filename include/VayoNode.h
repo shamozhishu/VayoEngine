@@ -50,11 +50,16 @@ public:
 	virtual const Vector3df&    getPosition() const;
 	virtual void                setPosition(const Vector3df& newpos);
 	virtual Vector3df           getAbsPosition() const;
+	virtual void                animating(float dt);
+	virtual void                addAnimator(NodeAnimator* animator);
+	virtual bool                removeAnimator(NodeAnimator* animator);
+	virtual void                removeAnimators();
 	
+	const list<Node*>&          getChildren() const { return _children; }
+	const list<NodeAnimator*>&  getAnimators() const { return _animators; }
 	const Matrix4x4&    getAbsTransformation() const { return _absTransformation; }
-	const list<Node*>&  getChildren() const { return _children; }
-	UserDataBind&       getUserDataBind() { return _userDataBind; }
 	const UserDataBind& getUserDataBind() const { return _userDataBind; }
+	UserDataBind&       getUserDataBind() { return _userDataBind; }
 
 protected:
 	virtual void updateAbsPosition();
@@ -67,6 +72,7 @@ protected:
 	SpatialInfo           _relSpace;
 	Node*                 _parent;
 	list<Node*>           _children;
+	list<NodeAnimator*>   _animators;
 	UserDataBind          _userDataBind;
 	SceneManager*         _sceneMgr;
 };

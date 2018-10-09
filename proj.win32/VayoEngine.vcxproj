@@ -172,6 +172,7 @@
     <ClCompile Include="..\source\VayoMeshManager.cpp" />
     <ClCompile Include="..\source\VayoMovableObject.cpp" />
     <ClCompile Include="..\source\VayoNode.cpp" />
+    <ClCompile Include="..\source\VayoNodeAnimator.cpp" />
     <ClCompile Include="..\source\VayoRenderable.cpp" />
     <ClCompile Include="..\source\VayoRenderQueue.cpp" />
     <ClCompile Include="..\source\VayoRenderSystem.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="..\include\VayoMeshManager.h" />
     <ClInclude Include="..\include\VayoMovableObject.h" />
     <ClInclude Include="..\include\VayoNode.h" />
+    <ClInclude Include="..\include\VayoNodeAnimator.h" />
     <ClInclude Include="..\include\VayoPlane3d.h" />
     <ClInclude Include="..\include\VayoPlugin.h" />
     <ClInclude Include="..\include\VayoQuaternion.h" />

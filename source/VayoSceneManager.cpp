@@ -8,6 +8,7 @@
 #include "VayoManualObject.h"
 #include "VayoEntity.h"
 #include "VayoRoot.h"
+#include "VayoNodeAnimator.h"
 
 #define ELSE_IF_CREATE_OBJECT(OBJ_TYPE)                                            \
 else if (strTmp == #OBJ_TYPE)                                                      \
@@ -236,6 +237,30 @@ void SceneManager::destroyAllObjects()
 	for (; it != _objectsPool.end(); ++it)
 		delete it->second;
 	_objectsPool.clear();
+}
+
+void SceneManager::destroyAnimator(NodeAnimator* anim)
+{
+	if (anim)
+		destroyAnimator(anim->getName());
+}
+
+void SceneManager::destroyAnimator(const wstring& name)
+{
+	map<wstring, NodeAnimator*>::iterator it = _animatorsPool.find(name);
+	if (it != _animatorsPool.end())
+	{
+		delete it->second;
+		_animatorsPool.erase(it);
+	}
+}
+
+void SceneManager::destroyAllAnimators()
+{
+	map<wstring, NodeAnimator*>::iterator it = _animatorsPool.begin();
+	for (; it != _animatorsPool.end(); ++it)
+		delete it->second;
+	_animatorsPool.clear();
 }
 
 NS_VAYO_END

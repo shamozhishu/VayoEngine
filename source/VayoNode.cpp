@@ -3,6 +3,7 @@
 #include "VayoMath.h"
 #include "tinyxml2/tinyxml2.h"
 #include "VayoUtils.h"
+#include "VayoNodeAnimator.h"
 
 NS_VAYO_BEGIN
 
@@ -81,7 +82,7 @@ Node::~Node()
 
 void Node::visit(float dt)
 {
-	if (_canVisit)
+	if (isCanVisit())
 	{
 		list<Node*>::iterator it = _children.begin();
 		for (; it != _children.end(); ++it)
@@ -211,6 +212,46 @@ void Node::setPosition(const Vector3df& newpos)
 Vector3df Node::getAbsPosition() const
 {
 	return _absTransformation.getTranslation();
+}
+
+void Node::animating(float dt)
+{
+	if (isCanVisit())
+	{
+		list<NodeAnimator*>::iterator ait = _animators.begin();
+		while (ait != _animators.end())
+		{
+			NodeAnimator* anim = *ait;
+			++ait;
+			anim->animateNode(this, dt);
+		}
+
+		updateAbsPosition();
+	}
+}
+
+void Node::addAnimator(NodeAnimator* animator)
+{
+	list<NodeAnimator*>::iterator it = std::find(_animators.begin(), _animators.end(), animator);
+	if (it == _animators.end())
+		_animators.push_back(animator);
+}
+
+bool Node::removeAnimator(NodeAnimator* animator)
+{
+	list<NodeAnimator*>::iterator it = std::find(_animators.begin(), _animators.end(), animator);
+	if (it != _animators.end())
+	{
+		_animators.erase(it);
+		return true;
+	}
+
+	return false;
+}
+
+void Node::removeAnimators()
+{
+	_animators.clear();
 }
 
 void Node::updateAbsPosition()

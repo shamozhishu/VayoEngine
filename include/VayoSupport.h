@@ -53,6 +53,7 @@ namespace Vayo
 	class SpriteBox;
 	class MovableObject;
 	class Node;
+	class NodeAnimator;
 	class SceneNode;
 	class SceneManager;
 	class KeypadDispatcher;
