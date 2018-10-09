@@ -88,6 +88,7 @@ SceneManager::SceneManager(const wstring& sceneName)
 
 SceneManager::~SceneManager()
 {
+	destroyAllAnimators();
 	destroyAllObjects();
 	destroyAllSceneNodes();
 }

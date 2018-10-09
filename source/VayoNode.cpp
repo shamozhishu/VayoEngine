@@ -76,6 +76,7 @@ Node::Node(const wstring& name, Node* parent, SceneManager* mgr)
 
 Node::~Node()
 {
+	removeAnimators();
 	remove();
 	removeChildren();
 }
