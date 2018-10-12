@@ -80,6 +80,8 @@ void ManualObject::beginUpdate(unsigned int idx)
 	}
 
 	_opSubMesh = _meshData->getSubMesh(idx);
+	_opSubMesh->clearVertexList();
+	_opSubMesh->clearIndexList();
 	_lastVertNum = _opSubMesh->getVertexCount();
 	_lastIdxNum = _opSubMesh->getIndexCount();
 }
@@ -186,6 +188,11 @@ MeshPtr ManualObject::convertToMesh(EHardwareMapping mappingHint /*= EHM_NEVER*/
 				pCurSubMesh->setMaterialName(_material->_materialName);
 		}
 	}
+	return _meshData;
+}
+
+MeshPtr ManualObject::getMesh() const
+{
 	return _meshData;
 }
 

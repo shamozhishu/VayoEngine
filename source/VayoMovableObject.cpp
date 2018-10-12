@@ -4,6 +4,7 @@
 #include "VayoRenderSystem.h"
 #include "VayoMaterialManager.h"
 #include "VayoRenderQueue.h"
+#include "VayoMesh.h"
 
 NS_VAYO_BEGIN
 
@@ -17,6 +18,8 @@ MovableObject::MovableObject(const wstring& name)
 	, _parentNode(NULL)
 	, _visible(true)
 	, _queueID(ERQ_MAIN_SOLID)
+	, _collideMask(0)
+	, _triContainer(NULL)
 {
 	static unsigned short idx = 0;
 	if (0 == _name.compare(L""))
@@ -52,9 +55,9 @@ void MovableObject::setVisible(bool visible)
 	_visible = visible;
 }
 
-const Aabbox3df MovableObject::getLocalAABB() const
+MeshPtr MovableObject::getMesh() const
 {
-	return _localAABB;
+	return NULL;
 }
 
 Aabbox3df MovableObject::getWorldAABB() const
@@ -63,6 +66,28 @@ Aabbox3df MovableObject::getWorldAABB() const
 	if (_parentNode && !worldAABB.isEmpty())
 		_parentNode->getAbsTransformation().transformBox(worldAABB);
 	return worldAABB;
+}
+
+const Aabbox3df& MovableObject::getLocalAABB() const
+{
+	return _localAABB;
+}
+
+void MovableObject::refreshLocalAABB()
+{
+	Mesh* mesh = getMesh().get();
+	if (NULL == mesh)
+		_localAABB.setEmpty();
+	else
+	{
+		mesh->recalculateBoundingBox();
+		_localAABB = mesh->getBoundingBox();
+	}
+}
+
+BitState& MovableObject::getCollideMask()
+{
+	return _collideMask;
 }
 
 UserDataBind& MovableObject::getUserDataBind()

@@ -30,8 +30,12 @@ public:
 
 	bool isAutomaticCulling() const { return _isAutomaticCulling; }
 	void setAutomaticCulling(bool isCulling) { _isAutomaticCulling = isCulling; }
+	const map<wstring, MovableObject*>& getObjects() { return _objects; }
+
 private:
 	void updateWorldAABB();
+	void updateLocalAABB();
+
 private:
 	Aabbox3df                    _worldAABB;
 	Renderable*                  _wireBoundingBox;

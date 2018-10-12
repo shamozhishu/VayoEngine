@@ -19,12 +19,20 @@ NS_VAYO_BEGIN
 class _VayoExport Camera : public TouchDelegate, public KeypadDelegate
 {
 public:
+	enum EType
+	{
+		ET_PERSPECTIVE,
+		ET_ORTHOGONAL
+	};
+
 	Camera();
 	virtual ~Camera();
-	virtual void refresh();
-	virtual void setNeedUpdate(bool isUpdate);
+	virtual void  refresh();
+	virtual void  setNeedUpdate(bool isUpdate);
+	virtual EType getType() { return ET_PERSPECTIVE; }
+	virtual bool  getWorldPos(Vector3df& outWorldPos) const;
+	virtual bool  getWorldLook(Vector3df& outWorldLook) const;
 
-	virtual Vector3df        getWorldPos() const;
 	virtual const Vector3df& getRight() const;
 	virtual const Vector3df& getUp() const;
 	virtual const Vector3df& getLook() const;
@@ -155,22 +163,23 @@ class _VayoExport EagleEyeCamera : public OrbitCamera
 public:
 	EagleEyeCamera(const wstring& name);
 	~EagleEyeCamera();
-	void update(float dt);
-	void setZoomFactor(float zoom);
-	void setLens(float widthOfViewVolume, float heightOfViewVolume, float zn, float zf);
+	void  update(float dt);
+	EType getType() { return ET_ORTHOGONAL; }
+	void  setZoomFactor(float zoom);
+	void  setLens(float widthOfViewVolume, float heightOfViewVolume, float zn, float zf);
 	float getFovY() const;
 	float getFovX() const;
 	float getNearWindowWidth() const;
 	float getNearWindowHeight() const;
 	float getFarWindowWidth() const;
 	float getFarWindowHeight() const;
-	bool touchBegan(const Touch& touch, EMouseKeys key);
-	void touchMoved(const Touch& touch, EMouseKeys key);
-	void touchEnded(const Touch& touch, EMouseKeys key);
-	bool touchWheel(const Touch& touch, float wheel);
-	bool keyClicked(const tagKeyInput& keyInput);
-	void createViewMemento(const wstring& name);
-	void restoreViewMemento(const wstring& name);
+	bool  touchBegan(const Touch& touch, EMouseKeys key);
+	void  touchMoved(const Touch& touch, EMouseKeys key);
+	void  touchEnded(const Touch& touch, EMouseKeys key);
+	bool  touchWheel(const Touch& touch, float wheel);
+	bool  keyClicked(const tagKeyInput& keyInput);
+	void  createViewMemento(const wstring& name);
+	void  restoreViewMemento(const wstring& name);
 
 protected:
 	float    _zoomFactor;

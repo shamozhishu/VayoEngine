@@ -40,6 +40,7 @@ void SceneNode::visit(float dt)
 {
 	if (isCanVisit())
 	{
+		updateLocalAABB();
 		animating(dt);
 		updateWorldAABB();
 		if (!_sceneMgr->isCulled(this))
@@ -86,6 +87,15 @@ void SceneNode::updateWorldAABB()
 		_worldAABB.addInternalBox(it->second->getWorldAABB());
 	}
 	((WireBoundingBox*)_wireBoundingBox)->setAABB(_worldAABB);
+}
+
+void SceneNode::updateLocalAABB()
+{
+	map<wstring, MovableObject*>::iterator it = _objects.begin();
+	for (; it != _objects.end(); ++it)
+	{
+		it->second->refreshLocalAABB();
+	}
 }
 
 void SceneNode::attachObject(MovableObject* obj)

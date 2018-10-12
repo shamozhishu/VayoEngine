@@ -88,6 +88,13 @@ public:
 		return *this;
 	}
 
+	Dimension2d<T>& set(const T& width, const T& height)
+	{
+		_width = width;
+		_height = height;
+		return *this;
+	}
+
 	T _width, _height;
 };
 

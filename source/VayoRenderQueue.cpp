@@ -120,7 +120,8 @@ RenderQueue::tagTransparentSolid::tagTransparentSolid(Renderable* r, SceneManage
 	Camera* cam = relatedSceneMgr->getActiveCamera();
 	if (cam)
 	{
-		Vector3df cameraPos = cam->getWorldPos();
+		Vector3df cameraPos;
+		cam->getWorldPos(cameraPos);
 		Matrix4x4 mat;
 		Rend->getWorldTransform(mat);
 		Distance = mat.getTranslation().getDistanceFromSQ(cameraPos);

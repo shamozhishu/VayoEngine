@@ -68,6 +68,7 @@
 #include "VayoManualObject.h"
 #include "VayoNode.h"
 #include "VayoNodeAnimator.h"
+#include "VayoCollision.h"
 #include "VayoSceneNode.h"
 #include "VayoSceneManager.h"
 #include "VayoVertex.h"

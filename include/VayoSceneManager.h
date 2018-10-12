@@ -51,9 +51,10 @@ public:
 private:
 	friend class Root;
 	bool xmlParseSceneRecursion(XMLElement* xml, SceneNode* pParent);
-	PROPERTY_R(wstring,    _name,          Name)
+	PROPERTY_R(wstring, _name, Name)
 	PROPERTY_R(SceneNode*, _rootSceneNode, RootSceneNode)
-	PROPERTY_R(Camera*,    _activeCamera,  ActiveCamera)
+	PROPERTY_R(Camera*, _activeCamera, ActiveCamera)
+	PROPERTY_R(CollisionDetector*, _collDetector, CollDetector)
 	DISALLOW_COPY_AND_ASSIGN(SceneManager)
 
 private:
@@ -115,7 +116,7 @@ T* SceneManager::createAnimator(const wstring& name /*= L""*/)
 		return NULL;
 	}
 
-	NodeAnimator* pFindedAnim = findObject<NodeAnimator>(pAnim->getName());
+	NodeAnimator* pFindedAnim = findAnimator<NodeAnimator>(pAnim->getName());
 	if (pFindedAnim)
 	{
 		SAFE_DELETE(pFindedAnim);

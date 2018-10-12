@@ -9,6 +9,7 @@
 #include "VayoSupport.h"
 #include "VayoMaterial.h"
 #include "VayoAabbox3d.h"
+#include "VayoBitState.h"
 #include "VayoUserDataBind.h"
 
 namespace tinyxml2
@@ -31,22 +32,27 @@ public:
 	virtual void             update(float dt) {}
 	virtual bool             isVisible() const;
 	virtual void             setVisible(bool visible);
-	virtual const Aabbox3df  getLocalAABB() const;
+	virtual MeshPtr          getMesh() const;
 	virtual Aabbox3df        getWorldAABB() const;
+	virtual const Aabbox3df& getLocalAABB() const;
+	virtual void             refreshLocalAABB();
+	BitState&                getCollideMask();
 	UserDataBind&            getUserDataBind();
 	const UserDataBind&      getUserDataBind() const;
 
 protected:
 	virtual bool parseXML(XMLElement* xml) = 0;
 	DISALLOW_COPY_AND_ASSIGN(MovableObject)
-	PROPERTY_RW(unsigned int, _queueID, QueueID)
+	PROPERTY_RW(unsigned int,  _queueID,      QueueID)
+	PROPERTY_RW(TriContainer*, _triContainer, TriContainer)
 
 protected:
-	wstring      _name;
-	SceneNode*   _parentNode;
-	bool         _visible;
-	Aabbox3df    _localAABB;
-	UserDataBind _userDataBind;
+	wstring       _name;
+	SceneNode*    _parentNode;
+	bool          _visible;
+	Aabbox3df     _localAABB;
+	BitState      _collideMask;
+	UserDataBind  _userDataBind;
 };
 
 NS_VAYO_END

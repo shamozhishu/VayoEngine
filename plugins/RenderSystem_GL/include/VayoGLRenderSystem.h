@@ -27,6 +27,7 @@ public:
 	bool endScene();
 	const Matrix4x4& getTransform(ETransformationState state) const;
 	void setTransform(ETransformationState state, const Matrix4x4& mat);
+	const Dimension2di& getCurrentRenderTargetSize() const;
 	void setViewpot(const Recti& area);
 	void setAmbientLight(const Colour& color);
 	void setMaterial(const Material& material);
@@ -77,7 +78,6 @@ public:
 	void fillingDisplayList(bool isFilling) { _isFillDisplayList = isFilling; }
 
 protected:
-	const Dimension2di& getCurrentRenderTargetSize();
 	void drawVertexPrimitiveList(const void* vertices, unsigned int vertexCount,
 		const unsigned int* indexList, unsigned int primitiveCount, EPrimitiveType primType);
 

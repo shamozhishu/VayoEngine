@@ -151,6 +151,7 @@
     <ClCompile Include="..\source\VayoApp.cpp" />
     <ClCompile Include="..\source\VayoArcball.cpp" />
     <ClCompile Include="..\source\VayoCamera.cpp" />
+    <ClCompile Include="..\source\VayoCollision.cpp" />
     <ClCompile Include="..\source\VayoConfigManager.cpp" />
     <ClCompile Include="..\source\VayoDatabaseCSV.cpp" />
     <ClCompile Include="..\source\VayoDevice.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="..\include\VayoArcball.h" />
     <ClInclude Include="..\include\VayoBitState.h" />
     <ClInclude Include="..\include\VayoCamera.h" />
+    <ClInclude Include="..\include\VayoCollision.h" />
     <ClInclude Include="..\include\VayoColour.h" />
     <ClInclude Include="..\include\VayoCommon.h" />
     <ClInclude Include="..\include\VayoConfigManager.h" />

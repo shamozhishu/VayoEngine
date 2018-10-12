@@ -8,6 +8,7 @@
 
 #include "VayoSupport.h"
 #include "VayoVertex.h"
+#include "VayoAabbox3d.h"
 NS_VAYO_BEGIN
 
 class _VayoExport SubMesh
@@ -45,11 +46,14 @@ public:
 	void                    clearIndexList();
 	void                    resizeList(unsigned vertSize, unsigned idxSize);
 	void                    reserveList(unsigned vertSize, unsigned idxSize);
+	void                    recalculateBoundingBox();
 	void                    setDirty(EBufferType bufferType = EBT_VERTEX_AND_INDEX);
 	void                    setHardwareMappingHint(EHardwareMapping newMappingHint, EBufferType bufferType = EBT_VERTEX_AND_INDEX);
 
 protected:
-	PROPERTY_RW(EPrimitiveType,  _primType,         PrimType)
+	PROPERTY_R(EPrimitiveType,   _primType,         PrimType)
+	PROPERTY_R(Aabbox3df,        _boundingBox,      BoundingBox)
+	PROPERTY_R(bool,             _needUpdateAABB,   NeedUpdateAABB)
 	PROPERTY_R(unsigned int,     _changedVertexID,  ChangedVertexID)
 	PROPERTY_R(unsigned int,     _changedIndexID,   ChangedIndexID)
 	PROPERTY_R(EHardwareMapping, _mappedVertexHint, MappedVertexHint)
@@ -82,8 +86,12 @@ public:
 	void                    nameSubMesh(const wstring& name, unsigned int index);
 	void                    unnameSubMesh(const wstring& name);
 	bool                    isEmptyMesh() const;
+	void                    recalculateBoundingBox();
 	void                    setDirty();
 	unsigned int            getChangedID() const;
+
+protected:
+	PROPERTY_R(Aabbox3df, _boundingBox, BoundingBox)
 
 private:
 	wstring                              _name;

@@ -114,7 +114,7 @@ public:
 	// returns the inversed matrix of this one
 	// \param Target, where result matrix is written to.
 	// \return Returns false if there is no inverse matrix.
-	bool getInverse(Matrix4x4& out);
+	bool getInverse(Matrix4x4& out) const;
 
 	// Builds a right-handed perspective projection matrix based on a field of view
 	void buildProjectionMatrixPerspectiveFovRH(float fieldOfViewRadians, float aspectRatio, float zNear, float zFar);
@@ -575,7 +575,7 @@ inline void Matrix4x4::translateVect(Vector3df& vect) const
 	vect._z = vect._z+_m[14];
 }
 
-inline bool Matrix4x4::getInverse(Matrix4x4& out)
+inline bool Matrix4x4::getInverse(Matrix4x4& out) const
 {
 	/// Calculates the inverse of this Matrix 
 	/// The inverse is calculated using Cramers rule.

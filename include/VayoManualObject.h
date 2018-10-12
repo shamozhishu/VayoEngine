@@ -38,6 +38,7 @@ public:
 	void              triangle(unsigned int i1, unsigned int i2, unsigned int i3);
 	void              quad(unsigned int i1, unsigned int i2, unsigned int i3, unsigned int i4);
 	MeshPtr           convertToMesh(EHardwareMapping mappingHint = EHM_NEVER) const;
+	MeshPtr           getMesh() const;
 	SubMesh*          getOpSubMesh() const;
 
 public:

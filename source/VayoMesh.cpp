@@ -10,6 +10,7 @@ Mesh* SubMesh::getParent() const
 
 SubMesh::SubMesh(Mesh* parent, EPrimitiveType primType)
 	: _parent(parent)
+	, _needUpdateAABB(false)
 	, _primType(primType)
 	, _changedVertexID(0)
 	, _changedIndexID(0)
@@ -211,10 +212,31 @@ void SubMesh::reserveList(unsigned vertSize, unsigned idxSize)
 		_indices.reserve(idxSize);
 }
 
+void SubMesh::recalculateBoundingBox()
+{
+	if (!_needUpdateAABB)
+		return;
+
+	if (_vertices.empty())
+		_boundingBox.reset(0, 0, 0);
+	else
+	{
+		_boundingBox.reset(_vertices[0]._position);
+		for (unsigned int i = 1; i < _vertices.size(); ++i)
+			_boundingBox.addInternalPoint(_vertices[i]._position);
+	}
+
+	_needUpdateAABB = false;
+}
+
 void SubMesh::setDirty(EBufferType bufferType /*= EBT_VERTEX_AND_INDEX*/)
 {
 	if (bufferType == EBT_VERTEX_AND_INDEX || bufferType == EBT_VERTEX)
+	{
 		++_changedVertexID;
+		_needUpdateAABB = true;
+	}
+
 	if (bufferType == EBT_VERTEX_AND_INDEX || bufferType == EBT_INDEX)
 		++_changedIndexID;
 }
@@ -369,6 +391,22 @@ bool Mesh::isEmptyMesh() const
 	}
 
 	return isEmpty;
+}
+
+void Mesh::recalculateBoundingBox()
+{
+	if (_subMeshList.size())
+	{
+		_subMeshList[0]->recalculateBoundingBox();
+		_boundingBox = _subMeshList[0]->getBoundingBox();
+		for (unsigned int i = 1; i < _subMeshList.size(); ++i)
+		{
+			_subMeshList[i]->recalculateBoundingBox();
+			_boundingBox.addInternalBox(_subMeshList[i]->getBoundingBox());
+		}
+	}
+	else
+		_boundingBox.reset(0.0f, 0.0f, 0.0f);
 }
 
 void Mesh::setDirty()

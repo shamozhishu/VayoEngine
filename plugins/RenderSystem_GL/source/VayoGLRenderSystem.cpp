@@ -550,9 +550,10 @@ void GLRenderSystem::gainColorBuffer(const void* vertices, unsigned int vertexCo
 	}
 }
 
-const Dimension2di& GLRenderSystem::getCurrentRenderTargetSize()
+const Dimension2di& GLRenderSystem::getCurrentRenderTargetSize() const
 {
-	_currentRenderTargetSize = Root::getSingleton().getDevice()->getScreenSize();
+	if (_currentRenderTargetSize._width == 0)
+		return Root::getSingleton().getDevice()->getScreenSize();
 	return _currentRenderTargetSize;
 }
 

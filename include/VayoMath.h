@@ -29,7 +29,7 @@
 
 NS_VAYO_BEGIN
 
-template <typename T>
+template<typename T>
 inline T typeUpperLimit()
 {
 	const char* typeName = typeid(T).name();
@@ -52,7 +52,7 @@ inline T typeUpperLimit()
 	return 0;
 }
 
-template <typename T>
+template<typename T>
 inline T typeLowerLimit()
 {
 	const char* typeName = typeid(T).name();
@@ -80,6 +80,17 @@ inline unsigned int m3dIsPOW2(unsigned int iValue)
 }
 
 template<typename T>
+inline T abs_(const T& a)
+{
+	return a < (T)0 ? -a : a;
+}
+
+inline float round_(float x)
+{
+	return floorf(x + 0.5f);
+}
+
+template<typename T>
 inline const T& min_(const T& a, const T& b)
 {
 	return a < b ? a : b;
@@ -92,12 +103,24 @@ inline const T& max_(const T& a, const T& b)
 }
 
 template<typename T>
+inline const T& min_(const T& a, const T& b, const T& c)
+{
+	return a < b ? min_(a, c) : min_(b, c);
+}
+
+template<typename T>
+inline const T& max_(const T& a, const T& b, const T& c)
+{
+	return a < b ? max_(b, c) : max_(a, c);
+}
+
+template<typename T>
 inline T lerp_(const T& a, const T& b, const float t)
 {
 	return (T)(a*(1.0f - t) + (b*t));
 }
 
-template <typename T>
+template<typename T>
 inline const T clamp_(const T& value, const T& low, const T& high)
 {
 	return min_(max_(value, low), high);

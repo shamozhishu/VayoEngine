@@ -322,8 +322,9 @@ void TestModel::onSetConstants1(MaterialRendererServices* services)
 	services->setShaderConstant("material.specular", 1);
 
 	Camera* pCamera = Root::getSingleton().getCurSceneMgr()->getActiveCamera();
-	Vector3df cameraPos = pCamera->getWorldPos();
-	Vector3df cameraFront = pCamera->getLook();
+	Vector3df cameraPos, cameraFront;
+	pCamera->getWorldPos(cameraPos);
+	pCamera->getWorldLook(cameraFront);
 	services->setShaderConstant("viewPos", cameraPos);
 	services->setShaderConstant("material.shininess", 32.0f);
 	// directional light
@@ -367,11 +368,11 @@ void TestModel::onSetConstants1(MaterialRendererServices* services)
 	services->setShaderConstant("spotLight.position", cameraPos);
 	services->setShaderConstant("spotLight.direction", cameraFront);
 	services->setShaderConstant("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-	services->setShaderConstant("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-	services->setShaderConstant("spotLight.specular", 1.0f, 1.0f, 1.0f);
+	services->setShaderConstant("spotLight.diffuse", 1.0f, 0.0f, 0.0f);
+	services->setShaderConstant("spotLight.specular", 1.0f, 0.0f, 0.0f);
 	services->setShaderConstant("spotLight.constant", 1.0f);
-	services->setShaderConstant("spotLight.linear", 0.09f);
-	services->setShaderConstant("spotLight.quadratic", 0.032f);
+	services->setShaderConstant("spotLight.linear", 0.0f);
+	services->setShaderConstant("spotLight.quadratic", 0.0f);
 	services->setShaderConstant("spotLight.cutOff", cosf(m3dDegToRad(12.5f)));
 	services->setShaderConstant("spotLight.outerCutOff", cosf(m3dDegToRad(15.0f)));
 

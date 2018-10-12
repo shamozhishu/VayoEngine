@@ -66,6 +66,7 @@ public:
 	virtual bool endScene();
 	virtual const Matrix4x4& getTransform(ETransformationState state) const = 0;
 	virtual void setTransform(ETransformationState state, const Matrix4x4& mat) = 0;
+	virtual const Dimension2di& getCurrentRenderTargetSize() const = 0;
 	virtual void setViewpot(const Recti& area) = 0;
 	virtual void setAmbientLight(const Colour& color) = 0;
 	virtual void setMaterial(const Material& material) = 0;

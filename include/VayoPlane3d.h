@@ -178,7 +178,7 @@ public:
 	// param lookDirection: Look direction.
 	// return: Returns true if the plane is front facing, which mean it would
 	// be visible, and false if it is backfacing.
-	bool isFrontFacting(const Vector3d<T>& lookDirection) const
+	bool isFrontFacing(const Vector3d<T>& lookDirection) const
 	{
 		return _normal.dotProduct(lookDirection) <= 0.0f;
 	}

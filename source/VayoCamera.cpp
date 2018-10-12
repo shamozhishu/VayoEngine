@@ -76,11 +76,23 @@ void Camera::setNeedUpdate(bool isUpdate)
 	_needUpdate = isUpdate;
 }
 
-Vector3df Camera::getWorldPos() const
+bool Camera::getWorldPos(Vector3df& outWorldPos) const
 {
-	Vector3df worldPos = _viewArea.getTransform(Frustum::EFT_VIEW).getTranslation();
-	worldPos.invert();
-	return worldPos;
+	Matrix4x4 worldTransform = _viewArea.getTransform(Frustum::EFT_VIEW);
+	if (!worldTransform.makeInverse())
+		return false;
+	outWorldPos = worldTransform.getTranslation();
+	return true;
+}
+
+bool Camera::getWorldLook(Vector3df& outWorldLook) const
+{
+	Matrix4x4 worldTransform = _viewArea.getTransform(Frustum::EFT_VIEW);
+	if (!worldTransform.makeInverse())
+		return false;
+	outWorldLook.set(-worldTransform[8], -worldTransform[9], -worldTransform[10]);
+	outWorldLook.normalize();
+	return true;
 }
 
 const Vector3df& Camera::getRight() const
@@ -309,7 +321,7 @@ void Camera::rebuildViewArea()
 
 void Camera::recalculateViewArea()
 {
-	_viewArea._cameraPosition = getWorldPos();
+	getWorldPos(_viewArea._cameraPosition);
 	Matrix4x4 m = _viewArea.getTransform(Frustum::EFT_PROJECTION) * _viewArea.getTransform(Frustum::EFT_VIEW);
 	_viewArea.setFrom(m);
 }

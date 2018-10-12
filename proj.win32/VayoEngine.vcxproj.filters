@@ -224,6 +224,9 @@
     <ClCompile Include="..\source\VayoNodeAnimator.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\VayoCollision.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\tinyxml2\tinyxml2.h">
@@ -503,6 +506,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoNodeAnimator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoCollision.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

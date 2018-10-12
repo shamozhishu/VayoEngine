@@ -164,7 +164,7 @@ public:
 		const Vector3d<double> lineVectf64(lineVect._x, lineVect._y, lineVect._z);
 		Vector3d<double> outIntersectionf64;
 
-		Triangle3d<float> trianglef64(Vector3d<double>((double)_pointA._x, (double)_pointA._y, (double)_pointA._z)
+		Triangle3d<double> trianglef64(Vector3d<double>((double)_pointA._x, (double)_pointA._y, (double)_pointA._z)
 									,Vector3d<double>((double)_pointB._x, (double)_pointB._y, (double)_pointB._z)
 									, Vector3d<double>((double)_pointC._x, (double)_pointC._y, (double)_pointC._z));
 		const Vector3d<double> normalf64 = trianglef64.getNormal().normalize();

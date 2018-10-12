@@ -56,6 +56,9 @@ namespace Vayo
 	class NodeAnimator;
 	class SceneNode;
 	class SceneManager;
+	class TriContainer;
+	class SimpleTriContainer;
+	class CollisionDetector;
 	class KeypadDispatcher;
 	class TouchDispatcher;
 	class Device;

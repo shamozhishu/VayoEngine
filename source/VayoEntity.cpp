@@ -120,7 +120,6 @@ void Entity::buildSubEntities()
 			delete (*it);
 
 		_subEntities.clear();
-		_localAABB.setEmpty();
 
 		if (!_mesh || 0 == _mesh->getChangedID())
 			return;
@@ -135,13 +134,6 @@ void Entity::buildSubEntities()
 			{
 				pSubEntity->setMaterial(pSubMesh->getMaterialName());
 				_subEntities.push_back(pSubEntity);
-			}
-
-			const Vertex* vertList = pSubMesh->getVertices();
-			unsigned int vertNum = pSubMesh->getVertexCount();
-			for (unsigned int i = 0; i < vertNum; ++i)
-			{
-				_localAABB.addInternalPoint(vertList[i]._position);
 			}
 		}
 

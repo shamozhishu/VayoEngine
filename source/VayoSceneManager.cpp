@@ -9,6 +9,7 @@
 #include "VayoEntity.h"
 #include "VayoRoot.h"
 #include "VayoNodeAnimator.h"
+#include "VayoCollision.h"
 
 #define ELSE_IF_CREATE_OBJECT(OBJ_TYPE)                                            \
 else if (strTmp == #OBJ_TYPE)                                                      \
@@ -84,10 +85,12 @@ SceneManager::SceneManager(const wstring& sceneName)
 	}
 
 	_rootSceneNode = createSceneNode(NULL, L"RootSceneNode");
+	_collDetector = new CollisionDetector(this);
 }
 
 SceneManager::~SceneManager()
 {
+	SAFE_DELETE(_collDetector);
 	destroyAllAnimators();
 	destroyAllObjects();
 	destroyAllSceneNodes();
