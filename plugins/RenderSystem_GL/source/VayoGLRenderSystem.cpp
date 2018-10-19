@@ -1,5 +1,5 @@
 #include "VayoGLRenderSystem.h"
-#include "wglext.h"
+#include <wglext.h>
 #include "VayoLog.h"
 #include "VayoMesh.h"
 #include "VayoRoot.h"
@@ -32,6 +32,14 @@ GLRenderSystem::GLRenderSystem(const wstring& name)
 	, _maxTextureUnits(MATERIAL_MAX_TEXTURES)
 	, _maxTextureLODBias(0.0f)
 {
+	_dimAliasedLine[0] = 1.0f;
+	_dimAliasedLine[1] = 1.0f;
+	_dimAliasedPoint[0] = 1.0f;
+	_dimAliasedPoint[1] = 1.0f;
+	_dimSmoothedLine[0] = 1.0f;
+	_dimSmoothedLine[1] = 1.0f;
+	_dimSmoothedPoint[0] = 1.0f;
+	_dimSmoothedPoint[1] = 1.0f;
 	memset(_texturesUnitSet, 0, sizeof(_texturesUnitSet));
 }
 
@@ -371,6 +379,10 @@ bool GLRenderSystem::init()
 	glGetIntegerv(GL_MAX_TEXTURE_UNITS, &num);
 	_maxTextureUnits = min_(MATERIAL_MAX_TEXTURES, (int)num);
 	glGetFloatv(GL_MAX_TEXTURE_LOD_BIAS, &_maxTextureLODBias);
+	glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, _dimAliasedLine);
+	glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, _dimAliasedPoint);
+	glGetFloatv(GL_SMOOTH_LINE_WIDTH_RANGE, _dimSmoothedLine);
+	glGetFloatv(GL_SMOOTH_POINT_SIZE_RANGE, _dimSmoothedPoint);
 	glClearDepth(1.0f);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -850,7 +862,6 @@ void GLRenderSystem::renderArray(const void* indexList, unsigned int primitiveCo
 	switch (primType)
 	{
 	case EPT_POINTS:
-		glPointSize(_curMaterial._thickness);
 		glDrawArrays(GL_POINTS, 0, primitiveCount);
 		break;
 	case EPT_LINE_STRIP:
@@ -1884,6 +1895,21 @@ void GLRenderSystem::setBasicRenderStates(const Material& material, const Materi
 		else
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 			(material._textureLayer[i]._bilinearFilter || material._textureLayer[i]._trilinearFilter) ? GL_LINEAR : GL_NEAREST);
+	}
+
+	if (resetAllRenderStates || lastMaterial._thickness != material._thickness)
+	{
+		if (_antiAliasFactor)
+		{
+			// we don't use point smoothing.
+			glPointSize(clamp_(static_cast<GLfloat>(material._thickness), _dimAliasedPoint[0], _dimAliasedPoint[1]));
+			glLineWidth(clamp_(static_cast<GLfloat>(material._thickness), _dimSmoothedLine[0], _dimSmoothedLine[1]));
+		}
+		else
+		{
+			glPointSize(clamp_(static_cast<GLfloat>(material._thickness), _dimAliasedPoint[0], _dimAliasedPoint[1]));
+			glLineWidth(clamp_(static_cast<GLfloat>(material._thickness), _dimAliasedLine[0], _dimAliasedLine[1]));
+		}
 	}
 
 	if (resetAllRenderStates || lastMaterial._antiAliasing != material._antiAliasing)

@@ -9,6 +9,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="gl">
+      <UniqueIdentifier>{4f1751bd-0791-4029-97c1-a1d4e151658f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\VayoGLRenderSystem.h">
@@ -32,11 +35,14 @@
     <ClInclude Include="include\VayoGLPlugin.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\thirdparty\glad\glad.h">
-      <Filter>source</Filter>
+    <ClInclude Include="gl\glad.h">
+      <Filter>gl</Filter>
     </ClInclude>
-    <ClInclude Include="source\wglext.h">
-      <Filter>source</Filter>
+    <ClInclude Include="gl\khrplatform.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="gl\wglext.h">
+      <Filter>gl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -58,8 +64,8 @@
     <ClCompile Include="source\VayoGLDll.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\thirdparty\glad\glad.c">
-      <Filter>source</Filter>
+    <ClCompile Include="gl\glad.c">
+      <Filter>gl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

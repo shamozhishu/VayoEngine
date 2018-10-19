@@ -236,6 +236,7 @@ public:
 			_specularColor != b._specularColor ||
 			_emissiveColor != b._emissiveColor ||
 			_shininess != b._shininess ||
+			_thickness != b._thickness ||
 			_alphaRef != b._alphaRef ||
 			_antiAliasing != b._antiAliasing ||
 			_stencilMask != b._stencilMask ||

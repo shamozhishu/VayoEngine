@@ -136,6 +136,10 @@ private:
 	bool                  _resetRenderStates;
 	bool                  _transformation3DChanged;
 	bool                  _isFillDisplayList;
+	GLfloat               _dimAliasedLine[2];
+	GLfloat               _dimAliasedPoint[2];
+	GLfloat               _dimSmoothedLine[2];
+	GLfloat               _dimSmoothedPoint[2];
 	Texture*              _texturesUnitSet[MATERIAL_MAX_TEXTURES];
 
 protected:

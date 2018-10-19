@@ -8,7 +8,7 @@
 
 #include "VayoSupport.h"
 #include <Windows.h>
-#include <glad/glad.h>
+#include <glad.h>
 #include <gl/GLU.h>
 
 #ifdef VAYO_GLPLUGIN_EXPORTS

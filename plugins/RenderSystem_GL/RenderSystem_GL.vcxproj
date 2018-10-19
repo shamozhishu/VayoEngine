@@ -69,25 +69,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\include;..\..\ThirdParty;include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\include;include;gl;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)_d</TargetName>
     <LibraryPath>..\..\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\..\include;..\..\ThirdParty;include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\include;include;gl;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>..\..\include;..\..\ThirdParty;include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\include;include;gl;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IncludePath>..\..\include;..\..\ThirdParty;include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\include;include;gl;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -148,7 +148,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\thirdparty\glad\glad.h" />
+    <ClInclude Include="gl\glad.h" />
+    <ClInclude Include="gl\khrplatform.h" />
+    <ClInclude Include="gl\wglext.h" />
     <ClInclude Include="include\VayoGLDisplayList.h" />
     <ClInclude Include="include\VayoGLMaterialRenderer.h" />
     <ClInclude Include="include\VayoGLPlugin.h" />
@@ -156,10 +158,9 @@
     <ClInclude Include="include\VayoGLSupport.h" />
     <ClInclude Include="include\VayoGLTesselator.h" />
     <ClInclude Include="include\VayoGLTexture.h" />
-    <ClInclude Include="source\wglext.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\thirdparty\glad\glad.c" />
+    <ClCompile Include="gl\glad.c" />
     <ClCompile Include="source\VayoGLDisplayList.cpp" />
     <ClCompile Include="source\VayoGLDll.cpp" />
     <ClCompile Include="source\VayoGLPlugin.cpp" />
