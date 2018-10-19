@@ -14,7 +14,7 @@ NS_VAYO_BEGIN
 class _VayoExport App : public TouchDelegate, public KeypadDelegate
 {
 public:
-	App(const Root::InitConfig& initConfig);
+	App(const Root::Config& config);
 	virtual ~App();
 	virtual void run();
 	virtual bool startup() { return false; }

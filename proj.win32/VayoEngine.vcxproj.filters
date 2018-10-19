@@ -274,10 +274,31 @@
     <ClInclude Include="..\ThirdParty\zlib\zutil.h">
       <Filter>thirdparty\zlib</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\VayoFontManager.h">
+      <Filter>source\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\VayoUIFactory.h">
+      <Filter>source\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\VayoWireBoundingBox.h">
+      <Filter>source\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\VayoWin32Device.h">
+      <Filter>source\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\stb_image\stb_image.h">
+      <Filter>thirdparty\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\stb_image\stb_image_write.h">
+      <Filter>thirdparty\stb_image</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\Vayo.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoAabbox3d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoAny.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoApp.h">
@@ -286,10 +307,16 @@
     <ClInclude Include="..\include\VayoArcball.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoBaseGUI.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoBitState.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoCamera.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoCollision.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoColour.h">
@@ -301,10 +328,19 @@
     <ClInclude Include="..\include\VayoConfigManager.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoCoreGUI.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoDatabaseCSV.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoDevice.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoDimension2d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoDisplayList.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoDynLib.h">
@@ -337,6 +373,9 @@
     <ClInclude Include="..\include\VayoLightData.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoLine2d.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoLine3d.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -350,6 +389,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoMaterialManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoMaterialRenderer.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoMath.h">
@@ -370,6 +412,9 @@
     <ClInclude Include="..\include\VayoNode.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoNodeAnimator.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoPlane3d.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -385,6 +430,9 @@
     <ClInclude Include="..\include\VayoRenderable.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoRenderQueue.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoRenderSystem.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -397,7 +445,13 @@
     <ClInclude Include="..\include\VayoSceneNode.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoScriptSystem.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoSharedPtr.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoSigslot.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoSingleton.h">
@@ -415,10 +469,19 @@
     <ClInclude Include="..\include\VayoTable.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoTesselator.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoTessGridBuilder.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoTessGridHandler.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoTexture.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VayoTextureLayer.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoTextureManager.h">
@@ -433,6 +496,9 @@
     <ClInclude Include="..\include\VayoTriangle3d.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\VayoUserDataBind.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\VayoUtils.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -443,72 +509,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\VayoVertex.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoTesselator.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoDisplayList.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoMaterialRenderer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\VayoFontManager.h">
-      <Filter>source\headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\VayoUIFactory.h">
-      <Filter>source\headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\VayoWireBoundingBox.h">
-      <Filter>source\headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\VayoWin32Device.h">
-      <Filter>source\headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\thirdparty\stb_image\stb_image.h">
-      <Filter>thirdparty\stb_image</Filter>
-    </ClInclude>
-    <ClInclude Include="..\thirdparty\stb_image\stb_image_write.h">
-      <Filter>thirdparty\stb_image</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoMaterialLayer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoAny.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoUserDataBind.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoBaseGUI.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoCoreGUI.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoDatabaseCSV.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoSigslot.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoLine2d.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoRenderQueue.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoTessGridHandler.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoScriptSystem.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoNodeAnimator.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VayoCollision.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

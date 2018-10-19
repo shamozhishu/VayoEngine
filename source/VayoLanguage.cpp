@@ -1,6 +1,7 @@
 #include "VayoLanguage.h"
 #include "VayoConfigManager.h"
 #include "VayoRoot.h"
+#include "VayoLog.h"
 
 #define MAX_BUFF_SIZE (1024 * 512)
 
@@ -118,6 +119,8 @@ bool Language::init()
 			loadLanPack(strBuff, fin);
 			fin.close();
 		}
+		else
+			Log::wprint(ELL_ERROR, L"语言包文件[%s]打开失败", strFileName.c_str());
 	}
 
 	std::sort(_lanPack.begin(), _lanPack.end(), tagLanWrapper::comp);

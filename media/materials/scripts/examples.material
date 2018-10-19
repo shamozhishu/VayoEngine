@@ -263,8 +263,8 @@ material examples/箱子
 	backface_culling off
 	fog_enable off
 	stencil_buffer on
-	stencil_depth_pass 2
-	stencil_func 7
+	stencil_depth_pass replace
+	stencil_func always
 	stencil_ref 1
 	stencil_mask 255
 	
@@ -290,8 +290,8 @@ material examples/描边
 	backface_culling off
 	fog_enable off
 	stencil_buffer on
-	stencil_depth_pass 2
-	stencil_func 6
+	stencil_depth_pass replace
+	stencil_func notequal
 	stencil_ref 1
 	stencil_mask 0
 }

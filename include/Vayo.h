@@ -79,13 +79,13 @@
 #include "VayoSpriteBox.h"
 #include "VayoImage.h"
 #include "VayoTexture.h"
+#include "VayoTextureLayer.h"
 #include "VayoTextureManager.h"
 #include "VayoTesselator.h"
 #include "VayoDisplayList.h"
 #include "VayoMaterial.h"
-#include "VayoMaterialLayer.h"
-#include "VayoMaterialManager.h"
 #include "VayoMaterialRenderer.h"
+#include "VayoMaterialManager.h"
 // 应用程序基类
 #include "VayoApp.h"
 

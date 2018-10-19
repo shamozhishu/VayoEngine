@@ -44,6 +44,18 @@ void Device::onResize()
 	}
 }
 
+void Device::setMainWndCaption(const wstring& wndCaption)
+{
+	_mainWndCaption = wndCaption;
+	const_cast<wstring&>(Root::getSingleton().getConfig().WindowName) = _mainWndCaption;
+}
+
+void Device::setScreenSize(const Dimension2di& screenSize)
+{
+	_screenSize = screenSize;
+	const_cast<Dimension2di&>(Root::getSingleton().getConfig().WindowSize) = _screenSize;
+}
+
 void Device::injectMouseDown(unsigned int btnState, int x, int y)
 {
 }
@@ -68,9 +80,7 @@ void Device::injectKeyboard(unsigned int keyCode, unsigned int scanCode, bool ke
 void Device::injectSizeMinimized(int w, int h)
 {
 	// Save the new client area dimensions.
-	_screenSize._width = w;
-	_screenSize._height = h;
-
+	setScreenSize(Dimension2di(w, h));
 	_appPaused = true;
 	_minimized = true;
 	_maximized = false;
@@ -79,9 +89,7 @@ void Device::injectSizeMinimized(int w, int h)
 void Device::injectSizeMaximized(int w, int h)
 {
 	// Save the new client area dimensions.
-	_screenSize._width = w;
-	_screenSize._height = h;
-
+	setScreenSize(Dimension2di(w, h));
 	_appPaused = false;
 	_minimized = false;
 	_maximized = true;
@@ -91,9 +99,7 @@ void Device::injectSizeMaximized(int w, int h)
 void Device::injectSizeRestored(int w, int h)
 {
 	// Save the new client area dimensions.
-	_screenSize._width = w;
-	_screenSize._height = h;
-
+	setScreenSize(Dimension2di(w, h));
 	// Restoring from minimized state?
 	if (_minimized)
 	{

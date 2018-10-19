@@ -33,7 +33,10 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\thirdparty\glad\glad.h">
-      <Filter>include</Filter>
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\wglext.h">
+      <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -38,10 +38,10 @@ void App::run()
 	cleanup();
 }
 
-App::App(const Root::InitConfig& initConfig)
+App::App(const Root::Config& config)
 {
 	Log::wprint(ELL_INFORMATION, L"Vayo Engine version 1.0");
-	new Root(initConfig);
+	new Root(config);
 }
 
 App::~App()

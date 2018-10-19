@@ -71,18 +71,36 @@ private: TypeName& operator=(const TypeName&);
 
 #define PROPERTY_R(varType, varName, funName)                              \
 protected: varType varName;                                                \
+public: varType get##funName(void) const { return varName; }
+
+#define PROPERTY_VR(varType, varName, funName)                             \
+protected: varType varName;                                                \
 public: virtual varType get##funName(void) const { return varName; }
 
 #define PROPERTY_R_REF(varType, varName, funName)                          \
+protected: varType varName;                                                \
+public: const varType& get##funName(void) const { return varName; }
+
+#define PROPERTY_VR_REF(varType, varName, funName)                         \
 protected: varType varName;                                                \
 public: virtual const varType& get##funName(void) const { return varName; }
 
 #define PROPERTY_RW(varType, varName, funName)                             \
 protected: varType varName;                                                \
+public: varType get##funName(void) const { return varName; }               \
+public: void set##funName(varType var) { varName = var; }
+
+#define PROPERTY_VRW(varType, varName, funName)                            \
+protected: varType varName;                                                \
 public: virtual varType get##funName(void) const { return varName; }       \
 public: virtual void set##funName(varType var) { varName = var; }
 
 #define PROPERTY_RW_REF(varType, varName, funName)                         \
+protected: varType varName;                                                \
+public: const varType& get##funName(void) const { return varName; }        \
+public: void set##funName(const varType& var) { varName = var; }
+
+#define PROPERTY_VRW_REF(varType, varName, funName)                        \
 protected: varType varName;                                                \
 public: virtual const varType& get##funName(void) const { return varName; }\
 public: virtual void set##funName(const varType& var) { varName = var; }

@@ -242,11 +242,17 @@ bool UIImageSet::init(const wstring& filepath)
 {
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(w2a_(filepath).c_str()) != XML_SUCCESS)
+	{
+		Log::wprint(ELL_ERROR, L"图集[%s]加载失败", filepath.c_str());
 		return false;
+	}
 
 	XMLElement* pRoot = doc.RootElement();
 	if (NULL == pRoot)
+	{
+		Log::wprint(ELL_ERROR, L"图集[%s]解析失败", filepath.c_str());
 		return false;
+	}
 
 	_icons.clear();
 	const tagUIConfig& filePaths = Root::getSingleton().getConfigManager()->getUIConfig();
@@ -268,8 +274,12 @@ bool UIImageSet::init(const wstring& filepath)
 
 	_bindTexture = Root::getSingleton().getTextureManager()->getTexture(_imagePath);
 	if (!_bindTexture)
+	{
+		Log::wprint(ELL_ERROR, L"图集[%s]获取纹理[%s]失败", filepath.c_str(), _imagePath.c_str());
 		return false;
+	}
 
+	Log::wprint(ELL_INFORMATION, L"图集[%s]创建成功", filepath.c_str());
 	return true;
 }
 
@@ -2482,8 +2492,6 @@ UIManager::UIManager()
 	memset(_imageSetArr, 0, sizeof(_imageSetArr));
 	Root::getSingleton().getTouchDispatcher()->addTouchDelegate(this);
 	Root::getSingleton().getKeypadDispatcher()->addKeypadDelegate(this);
-	if (NULL == s_fontManager)
-		s_fontManager = new FontManager();
 }
 
 UIManager::~UIManager()
@@ -2508,42 +2516,53 @@ UIManager::~UIManager()
 bool UIManager::init()
 {
 	const tagUIConfig& uiConfig = Root::getSingleton().getConfigManager()->getUIConfig();
-	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(w2a_(uiConfig.SeqAnimPath).c_str()) != XML_SUCCESS)
-		return false;
-
-	XMLElement* pRoot = doc.RootElement();
-	if (NULL == pRoot)
-		return false;
-
-	_arrAnimSet.clear();
-
-	XMLElement* pAnim = pRoot->FirstChildElement("anim");
-	while (pAnim)
+	do
 	{
-		tagAnim curAnimFrame;
-		curAnimFrame.AnimID = pAnim->IntAttribute("ID");
-		_arrAnimSet.push_back(curAnimFrame);
-		XMLElement* pKeyFrame = pAnim->FirstChildElement("keyframe");
-		while (pKeyFrame)
+		// loading sequence frame animation.
+		tinyxml2::XMLDocument doc;
+		if (doc.LoadFile(w2a_(uiConfig.SeqAnimPath).c_str()) != XML_SUCCESS)
 		{
-			tagAnim::tagKeyFrame keyFrame;
-			keyFrame.SrcImageSetID = pKeyFrame->IntAttribute("srcImageSetID");
-			keyFrame.IconName = utf8ToUnicode(pKeyFrame->Attribute("iconName"));
-			keyFrame.Time = pKeyFrame->IntAttribute("time");
-			keyFrame.Scale = pKeyFrame->FloatAttribute("scale");
-			keyFrame.XOffset = pKeyFrame->FloatAttribute("xoffset");
-			keyFrame.YOffset = pKeyFrame->FloatAttribute("yoffset");
-			keyFrame.ScaleByCenter = (0 == pKeyFrame->IntAttribute("scaleByCenter") ? false : true);
-
-			tagAnim& curAnimFrame = _arrAnimSet.back();
-			curAnimFrame.ArrKeyFrame.push_back(keyFrame);
-
-			pKeyFrame = pKeyFrame->NextSiblingElement();
+			Log::wprint(ELL_ERROR, L"序列帧动画[%s]加载失败", uiConfig.SeqAnimPath.c_str());
+			break;
 		}
-		pAnim = pAnim->NextSiblingElement();
-	}
 
+		XMLElement* pRoot = doc.RootElement();
+		if (NULL == pRoot)
+		{
+			Log::wprint(ELL_ERROR, L"序列帧动画[%s]解析失败", uiConfig.SeqAnimPath.c_str());
+			break;
+		}
+
+		_arrAnimSet.clear();
+
+		XMLElement* pAnim = pRoot->FirstChildElement("anim");
+		while (pAnim)
+		{
+			tagAnim curAnimFrame;
+			curAnimFrame.AnimID = pAnim->IntAttribute("ID");
+			_arrAnimSet.push_back(curAnimFrame);
+			XMLElement* pKeyFrame = pAnim->FirstChildElement("keyframe");
+			while (pKeyFrame)
+			{
+				tagAnim::tagKeyFrame keyFrame;
+				keyFrame.SrcImageSetID = pKeyFrame->IntAttribute("srcImageSetID");
+				keyFrame.IconName = utf8ToUnicode(pKeyFrame->Attribute("iconName"));
+				keyFrame.Time = pKeyFrame->IntAttribute("time");
+				keyFrame.Scale = pKeyFrame->FloatAttribute("scale");
+				keyFrame.XOffset = pKeyFrame->FloatAttribute("xoffset");
+				keyFrame.YOffset = pKeyFrame->FloatAttribute("yoffset");
+				keyFrame.ScaleByCenter = (0 == pKeyFrame->IntAttribute("scaleByCenter") ? false : true);
+
+				tagAnim& curAnimFrame = _arrAnimSet.back();
+				curAnimFrame.ArrKeyFrame.push_back(keyFrame);
+
+				pKeyFrame = pKeyFrame->NextSiblingElement();
+			}
+			pAnim = pAnim->NextSiblingElement();
+		}
+	} while (0);
+
+	// loading imageset.
 	unordered_map<int, wstring>::const_iterator itor = uiConfig.ImgsetAll.cbegin();
 	for (; itor != uiConfig.ImgsetAll.cend(); ++itor)
 	{
@@ -2560,6 +2579,8 @@ bool UIManager::init()
 
 	// loading font.
 	unsigned int fontIdx = 0;
+	if (NULL == s_fontManager)
+		s_fontManager = new FontManager();
 	s_fontManager->initialize();
 	const vector<tagFontConfig>& fontsSet = Root::getSingleton().getConfigManager()->getFontConfig();
 	vector<tagFontConfig>::const_iterator cit = fontsSet.cbegin();
@@ -2581,6 +2602,7 @@ bool UIManager::init()
 		++fontIdx;
 	}
 
+	// loading skin.
 	setSkin(new UISkin(uiConfig.SkinFilePath));
 
 	return true;

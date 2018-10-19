@@ -1,4 +1,5 @@
 #include "VayoGLRenderSystem.h"
+#include "wglext.h"
 #include "VayoLog.h"
 #include "VayoMesh.h"
 #include "VayoRoot.h"
@@ -20,10 +21,11 @@ GLRenderSystem::GLRenderSystem(const wstring& name)
 	: RenderSystem(name)
 	, _hCurrentDC(NULL)
 	, _hCurrentRC(NULL)
-	, _pixelFormat(-1)
 	, _currentRenderMode(ERM_NONE)
+	, _colorBufferFormat(ECF_BGRA8888)
 	, _resetRenderStates(true)
 	, _transformation3DChanged(true)
+	, _antiAliasFactor(0)
 	, _lastSetLight(-1)
 	, _maxTextureSize(1)
 	, _isFillDisplayList(false)
@@ -39,47 +41,321 @@ GLRenderSystem::~GLRenderSystem()
 	removeAllHardwareBuffers();
 	destroyAllDisplayList();
 	destroyAllTesselators();
-	wglMakeCurrent(getCurrentDC(), NULL);
-	wglDeleteContext(getCurrentRC());
-	::ReleaseDC((HWND)Root::getSingleton().getDevice()->getMainWnd(), getCurrentDC());
-}
 
-bool GLRenderSystem::init(bool mark /*= false*/)
-{
-	if (mark)
+	if (_hCurrentRC)
 	{
-		if (wglGetCurrentContext() != _hCurrentRC)
-			wglMakeCurrent(_hCurrentDC, _hCurrentRC);
-		return true;
+		if (!wglMakeCurrent(_hCurrentDC, NULL))
+			Log::print(ELL_WARNING, "Release of dc and rc failed.");
+		if (!wglDeleteContext(_hCurrentRC))
+			Log::print(ELL_WARNING, "Release of rendering context failed.");
 	}
 
-	static PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),
-		1,
-		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-		PFD_TYPE_RGBA,
-		32,
-		0, 0, 0, 0, 0, 0,
-		0, 0,
-		0, 0, 0, 0, 0,
-		24,
-		8,
-		0,
-		0,
-		0,
-		0, 0, 0 };
+	if (_hCurrentDC)
+		ReleaseDC((HWND)Root::getSingleton().getDevice()->getMainWnd(), _hCurrentDC);
+}
 
-	_hCurrentDC = ::GetDC((HWND)Root::getSingleton().getDevice()->getMainWnd());
-	_pixelFormat = ChoosePixelFormat(_hCurrentDC, &pfd);
-	SetPixelFormat(_hCurrentDC, _pixelFormat, &pfd);
-	_hCurrentRC = wglCreateContext(_hCurrentDC);
-	if (_hCurrentRC == NULL)
+bool GLRenderSystem::init()
+{
+	int pixelFormat = 0;
+	static PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR), // Size Of This Pixel Format Descriptor
+		1,                             // Version Number
+		PFD_DRAW_TO_WINDOW |           // Format Must Support Window
+		PFD_SUPPORT_OPENGL |           // Format Must Support OpenGL
+		PFD_DOUBLEBUFFER,              // Must Support Double Buffering
+		PFD_TYPE_RGBA,                 // Request An RGBA Format
+		32,                            // Select Our Color Depth
+		0, 0, 0, 0, 0, 0,              // Color Bits Ignored
+		0,                             // No Alpha Buffer
+		0,                             // Shift Bit Ignored
+		0,                             // No Accumulation Buffer
+		0, 0, 0, 0,                    // Accumulation Bits Ignored
+		24,                            // Z-Buffer (Depth Buffer)
+		8,                             // Stencil Buffer Depth
+		0,                             // No Auxiliary Buffer
+		PFD_MAIN_PLANE,                // Main Drawing Layer
+		0,                             // Reserved
+		0, 0, 0 };                     // Layer Masks Ignored
+
+	const Root::Config& conf = Root::getSingleton().getConfig();
+	_antiAliasFactor = conf.AntiAliasFactor;
+	if (conf.AntiAliasFactor > 1)
 	{
-		Log::print(ELL_ERROR, "Failed to initialize Context");
+		// Create a window to test antialiasing support.
+		const wchar_t* szClassName = L"GLRenderSystem";
+		HINSTANCE lhInstance = GetModuleHandle(0);
+
+		WNDCLASSEX wcex;
+		wcex.cbSize = sizeof(WNDCLASSEX);
+		wcex.style = CS_HREDRAW | CS_VREDRAW;
+		wcex.lpfnWndProc = (WNDPROC)DefWindowProc;
+		wcex.cbClsExtra = 0;
+		wcex.cbWndExtra = 0;
+		wcex.hInstance = lhInstance;
+		wcex.hIcon = NULL;
+		wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+		wcex.lpszMenuName = 0;
+		wcex.lpszClassName = szClassName;
+		wcex.hIconSm = 0;
+		wcex.hIcon = 0;
+
+		RegisterClassEx(&wcex);
+
+		RECT clientSize;
+		clientSize.top = 0;
+		clientSize.left = 0;
+		clientSize.right = conf.WindowSize._width;
+		clientSize.bottom = conf.WindowSize._height;
+
+		DWORD style = WS_POPUP;
+		if (!conf.FullScreen)
+			style = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+
+		AdjustWindowRect(&clientSize, style, FALSE);
+
+		const int realWidth = clientSize.right - clientSize.left;
+		const int realHeight = clientSize.bottom - clientSize.top;
+
+		const int windowLeft = (GetSystemMetrics(SM_CXSCREEN) - realWidth) / 2;
+		const int windowTop = (GetSystemMetrics(SM_CYSCREEN) - realHeight) / 2;
+
+		HWND temporary_wnd = CreateWindow(szClassName, __TEXT(""), style, windowLeft,
+			windowTop, realWidth, realHeight, NULL, NULL, lhInstance, NULL);
+
+		if (!temporary_wnd)
+		{
+			Log::print(ELL_ERROR, "Cannot create a temporary window.");
+			UnregisterClass(szClassName, lhInstance);
+			return false;
+		}
+
+		_hCurrentDC = GetDC(temporary_wnd);
+		pixelFormat = ChoosePixelFormat(_hCurrentDC, &pfd);
+		if (!pixelFormat)
+		{
+			Log::print(ELL_ERROR, "Cannot create a GL device context, No suitable pixel format for temporary window.");
+			ReleaseDC(temporary_wnd, _hCurrentDC);
+			DestroyWindow(temporary_wnd);
+			UnregisterClass(szClassName, lhInstance);
+			return false;
+		}
+
+		SetPixelFormat(_hCurrentDC, pixelFormat, &pfd);
+		_hCurrentRC = wglCreateContext(_hCurrentDC);
+		if (!_hCurrentRC)
+		{
+			Log::print(ELL_ERROR, "Cannot create a temporary GL rendering context.");
+			ReleaseDC(temporary_wnd, _hCurrentDC);
+			DestroyWindow(temporary_wnd);
+			UnregisterClass(szClassName, lhInstance);
+			return false;
+		}
+
+		if (!wglMakeCurrent(_hCurrentDC, _hCurrentRC))
+		{
+			Log::print(ELL_ERROR, "Cannot activate a temporary GL rendering context.");
+			wglDeleteContext(_hCurrentRC);
+			ReleaseDC(temporary_wnd, _hCurrentDC);
+			DestroyWindow(temporary_wnd);
+			UnregisterClass(szClassName, lhInstance);
+			return false;
+		}
+
+		string wglExtensions;
+
+#ifdef WGL_ARB_extensions_string
+		PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
+		if (wglGetExtensionsStringARB)
+			wglExtensions = wglGetExtensionsStringARB(_hCurrentDC);
+#elif defined(WGL_EXT_extensions_string)
+		PFNWGLGETEXTENSIONSSTRINGEXTPROC wglGetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC)wglGetProcAddress("wglGetExtensionsStringEXT");
+		if (wglGetExtensionsStringEXT)
+			wglExtensions = wglGetExtensionsStringEXT(_hCurrentDC);
+#endif
+
+		const bool pixel_format_supported = (wglExtensions.find("WGL_ARB_pixel_format") != std::string::npos);
+		const bool multi_sample_supported = (
+			(wglExtensions.find("WGL_ARB_multisample") != std::string::npos) ||
+			(wglExtensions.find("WGL_EXT_multisample") != std::string::npos) ||
+			(wglExtensions.find("WGL_3DFX_multisample") != std::string::npos));
+
+#ifdef _DEBUG
+		Log::print(ELL_DEBUG, "WGL_extensions:\n%s", wglExtensions.c_str());
+#endif
+
+#ifdef WGL_ARB_pixel_format
+		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+		if (pixel_format_supported && wglChoosePixelFormatARB)
+		{
+			// This value determines the number of samples used for antialiasing,
+			// My experience is that 8 does not show a big improvement over 4,
+			// But 4 shows a big improvement over 2.
+
+			if (_antiAliasFactor > 32)
+			{
+				_antiAliasFactor = 32;
+				const_cast<unsigned char&>(conf.AntiAliasFactor) = _antiAliasFactor;
+			}
+
+			float fAttributes[] = { 0.0f, 0.0f };
+			int iAttributes[] =
+			{
+				WGL_DRAW_TO_WINDOW_ARB, 1,
+				WGL_SUPPORT_OPENGL_ARB, 1,
+				WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
+				WGL_COLOR_BITS_ARB, 24,
+				WGL_ALPHA_BITS_ARB, 8,
+				WGL_DEPTH_BITS_ARB, 24, // 10,11
+				WGL_STENCIL_BITS_ARB, 8,
+				WGL_DOUBLE_BUFFER_ARB, 1,
+				WGL_STEREO_ARB, 0,
+				WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+#ifdef WGL_ARB_multisample
+				WGL_SAMPLES_ARB, _antiAliasFactor, // 20,21
+				WGL_SAMPLE_BUFFERS_ARB, 1,
+#elif defined(WGL_EXT_multisample)
+				WGL_SAMPLES_EXT, _antiAliasFactor, // 20,21
+				WGL_SAMPLE_BUFFERS_EXT, 1,
+#elif defined(WGL_3DFX_multisample)
+				WGL_SAMPLES_3DFX,_antiAliasFactor, // 20,21
+				WGL_SAMPLE_BUFFERS_3DFX, 1,
+#endif
+#ifdef WGL_ARB_framebuffer_sRGB
+				WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB, conf.HandleSRGB ? 1 : 0,
+#elif defined(WGL_EXT_framebuffer_sRGB)
+				WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT, conf.HandleSRGB ? 1 : 0,
+#endif
+				0,0,0,0
+			};
+
+			int iAttrSize = sizeof(iAttributes) / sizeof(int);
+			const bool framebuffer_srgb_supported = (
+				(wglExtensions.find("WGL_ARB_framebuffer_sRGB") != std::string::npos) ||
+				(wglExtensions.find("WGL_EXT_framebuffer_sRGB") != std::string::npos));
+
+			if (!framebuffer_srgb_supported)
+			{
+				memmove(&iAttributes[24], &iAttributes[26], sizeof(int)*(iAttrSize - 26));
+				iAttrSize -= 2;
+			}
+
+			if (!multi_sample_supported)
+			{
+				memmove(&iAttributes[20], &iAttributes[24], sizeof(int)*(iAttrSize - 24));
+				iAttrSize -= 4;
+			}
+
+			int rv = 0;
+
+			do
+			{
+				int pixelFmt = 0;
+				UINT numFmt = 0;
+				const BOOL valid = wglChoosePixelFormatARB(_hCurrentDC, iAttributes, fAttributes, 1, &pixelFmt, &numFmt);
+				if (valid && numFmt)
+					rv = pixelFmt;
+				else
+					iAttributes[21] -= 1;
+
+			} while (rv == 0 && iAttributes[21] > 1);
+
+			if (rv)
+			{
+				pixelFormat = rv;
+				_antiAliasFactor = iAttributes[21];
+				const_cast<unsigned char&>(conf.AntiAliasFactor) = _antiAliasFactor;
+			}
+		}
+		else
+#endif
+		{
+			_antiAliasFactor = 0;
+			const_cast<unsigned char&>(conf.AntiAliasFactor) = _antiAliasFactor;
+		}
+
+		wglMakeCurrent(_hCurrentDC, NULL);
+		wglDeleteContext(_hCurrentRC);
+		ReleaseDC(temporary_wnd, _hCurrentDC);
+		DestroyWindow(temporary_wnd);
+		UnregisterClass(szClassName, lhInstance);
+	}
+
+	_hCurrentDC = GetDC((HWND)Root::getSingleton().getDevice()->getMainWnd());
+	if (!_hCurrentDC)
+	{
+		Log::print(ELL_ERROR, "Cannot create a GL device context.");
 		return false;
 	}
 
-	wglMakeCurrent(_hCurrentDC, _hCurrentRC);
+	if (pixelFormat == 0 || !SetPixelFormat(_hCurrentDC, pixelFormat, &pfd))
+	{
+		pixelFormat = ChoosePixelFormat(_hCurrentDC, &pfd);
+		if (!pixelFormat)
+		{
+			Log::print(ELL_ERROR, "Cannot create a GL device context, %s.", "No suitable format");
+			return false;
+		}
+
+		if (!SetPixelFormat(_hCurrentDC, pixelFormat, &pfd))
+		{
+			Log::print(ELL_ERROR, "Cannot set the pixel format.");
+			return false;
+		}
+	}
+
+	Log::print(ELL_DEBUG, "Pixel Format %d.", pixelFormat);
+
+#ifdef WGL_ARB_create_context
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+	if (wglCreateContextAttribsARB)
+	{
+		int iAttribs[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+			0
+		};
+
+		_hCurrentRC = wglCreateContextAttribsARB(_hCurrentDC, 0, iAttribs);
+	}
+	else
+#endif
+	{
+		_hCurrentRC = wglCreateContext(_hCurrentDC);
+	}
+
+	if (!_hCurrentRC)
+	{
+		Log::print(ELL_ERROR, "Cannot create a GL rendering context.");
+		return false;
+	}
+
+	if (!wglMakeCurrent(_hCurrentDC, _hCurrentRC))
+	{
+		Log::print(ELL_ERROR, "Cannot activate GL rendering context.");
+		wglDeleteContext(_hCurrentRC);
+		return false;
+	}
+
+	int pf = GetPixelFormat(_hCurrentDC);
+	DescribePixelFormat(_hCurrentDC, pf, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+	if (pfd.cAlphaBits != 0)
+	{
+		if (pfd.cRedBits == 8)
+			_colorBufferFormat = ECF_BGRA8888;
+		else
+			_colorBufferFormat = ECF_BGRA5551;
+	}
+	else
+	{
+		if (pfd.cRedBits == 8)
+			_colorBufferFormat = ECF_BGR888;
+		else
+			_colorBufferFormat = ECF_BGR565;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	if (!gladLoadGL())
 	{
 		Log::print(ELL_ERROR, "Failed to initialize GLAD");
@@ -97,8 +373,13 @@ bool GLRenderSystem::init(bool mark /*= false*/)
 	glGetFloatv(GL_MAX_TEXTURE_LOD_BIAS, &_maxTextureLODBias);
 	glClearDepth(1.0f);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_NORMALIZE);
+	glFrontFace(GL_CCW);
+	if (conf.HandleSRGB)
+		glEnable(GL_FRAMEBUFFER_SRGB);
 
 	setRenderMode3D();
 
@@ -107,7 +388,13 @@ bool GLRenderSystem::init(bool mark /*= false*/)
 
 bool GLRenderSystem::isActive() const
 {
-	return getCurrentDC() != NULL && getCurrentRC() != NULL;
+	return getCurrentDC() != NULL && getCurrentRC() == wglGetCurrentContext();
+}
+
+void GLRenderSystem::restoreContext() const
+{
+	if (wglGetCurrentContext() != _hCurrentRC)
+		wglMakeCurrent(_hCurrentDC, _hCurrentRC);
 }
 
 bool GLRenderSystem::beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Colour color)
@@ -1398,91 +1685,91 @@ int GLRenderSystem::addShaderMaterial(const char* vertexShaderProgram /*= ""*/,
 
 void GLRenderSystem::setBasicRenderStates(const Material& material, const Material& lastMaterial, bool resetAllRenderStates)
 {
-	if (resetAllRenderStates || _lastMaterial._clockwise != _curMaterial._clockwise)
-		glFrontFace(_curMaterial._clockwise ? GL_CW : GL_CCW);
+	if (resetAllRenderStates || lastMaterial._clockwise != material._clockwise)
+		glFrontFace(material._clockwise ? GL_CW : GL_CCW);
 
-	if (resetAllRenderStates || _lastMaterial._gouraudShading != _curMaterial._gouraudShading)
-		glShadeModel(_curMaterial._gouraudShading ? GL_SMOOTH : GL_FLAT);
+	if (resetAllRenderStates || lastMaterial._gouraudShading != material._gouraudShading)
+		glShadeModel(material._gouraudShading ? GL_SMOOTH : GL_FLAT);
 
 	if (resetAllRenderStates ||
-		_lastMaterial._ambientColor != _curMaterial._ambientColor ||
-		_lastMaterial._diffuseColor != _curMaterial._diffuseColor ||
-		_lastMaterial._specularColor != _curMaterial._specularColor ||
-		_lastMaterial._emissiveColor != _curMaterial._emissiveColor ||
-		_lastMaterial._shininess != _curMaterial._shininess)
+		lastMaterial._ambientColor != material._ambientColor ||
+		lastMaterial._diffuseColor != material._diffuseColor ||
+		lastMaterial._specularColor != material._specularColor ||
+		lastMaterial._emissiveColor != material._emissiveColor ||
+		lastMaterial._shininess != material._shininess)
 	{
 		GLfloat color[4];
 
 		float inv = 1.0f / 255.0f;
 
-		color[0] = _curMaterial._ambientColor.getRed() * inv;
-		color[1] = _curMaterial._ambientColor.getGreen() * inv;
-		color[2] = _curMaterial._ambientColor.getBlue() * inv;
-		color[3] = _curMaterial._ambientColor.getAlpha() * inv;
+		color[0] = material._ambientColor.getRed() * inv;
+		color[1] = material._ambientColor.getGreen() * inv;
+		color[2] = material._ambientColor.getBlue() * inv;
+		color[3] = material._ambientColor.getAlpha() * inv;
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
 
-		color[0] = _curMaterial._diffuseColor.getRed() * inv;
-		color[1] = _curMaterial._diffuseColor.getGreen() * inv;
-		color[2] = _curMaterial._diffuseColor.getBlue() * inv;
-		color[3] = _curMaterial._diffuseColor.getAlpha() * inv;
+		color[0] = material._diffuseColor.getRed() * inv;
+		color[1] = material._diffuseColor.getGreen() * inv;
+		color[2] = material._diffuseColor.getBlue() * inv;
+		color[3] = material._diffuseColor.getAlpha() * inv;
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
 
-		color[0] = _curMaterial._specularColor.getRed() * inv;
-		color[1] = _curMaterial._specularColor.getGreen() * inv;
-		color[2] = _curMaterial._specularColor.getBlue() * inv;
-		color[3] = _curMaterial._specularColor.getAlpha() * inv;
+		color[0] = material._specularColor.getRed() * inv;
+		color[1] = material._specularColor.getGreen() * inv;
+		color[2] = material._specularColor.getBlue() * inv;
+		color[3] = material._specularColor.getAlpha() * inv;
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, color);
 
-		color[0] = _curMaterial._emissiveColor.getRed() * inv;
-		color[1] = _curMaterial._emissiveColor.getGreen() * inv;
-		color[2] = _curMaterial._emissiveColor.getBlue() * inv;
-		color[3] = _curMaterial._emissiveColor.getAlpha() * inv;
+		color[0] = material._emissiveColor.getRed() * inv;
+		color[1] = material._emissiveColor.getGreen() * inv;
+		color[2] = material._emissiveColor.getBlue() * inv;
+		color[3] = material._emissiveColor.getAlpha() * inv;
 		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, color);
 
-		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, _curMaterial._shininess);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, material._shininess);
 	}
 
-	if (resetAllRenderStates || _lastMaterial._wireframe != _curMaterial._wireframe)
-		glPolygonMode(GL_FRONT_AND_BACK, _curMaterial._wireframe ? GL_LINE : GL_FILL);
+	if (resetAllRenderStates || lastMaterial._wireframe != material._wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, material._wireframe ? GL_LINE : GL_FILL);
 
-	if (resetAllRenderStates || _lastMaterial._lighting != _curMaterial._lighting)
+	if (resetAllRenderStates || lastMaterial._lighting != material._lighting)
 	{
-		if (_curMaterial._lighting)
+		if (material._lighting)
 			glEnable(GL_LIGHTING);
 		else
 			glDisable(GL_LIGHTING);
 	}
 
-	if (resetAllRenderStates || _lastMaterial._zBuffer != _curMaterial._zBuffer)
+	if (resetAllRenderStates || lastMaterial._zBuffer != material._zBuffer)
 	{
-		if (_curMaterial._zBuffer)
+		if (material._zBuffer)
 			glEnable(GL_DEPTH_TEST);
 		else
 			glDisable(GL_DEPTH_TEST);
 	}
 
-	if (resetAllRenderStates || _lastMaterial._zWriteEnable != _curMaterial._zWriteEnable)
-		glDepthMask(_curMaterial._zWriteEnable ? GL_TRUE : GL_FALSE);
+	if (resetAllRenderStates || lastMaterial._zWriteEnable != material._zWriteEnable)
+		glDepthMask(material._zWriteEnable ? GL_TRUE : GL_FALSE);
 
-	if (resetAllRenderStates || _lastMaterial._stencilBuffer != _curMaterial._stencilBuffer)
+	if (resetAllRenderStates || lastMaterial._stencilBuffer != material._stencilBuffer)
 	{
-		if (_curMaterial._stencilBuffer)
+		if (material._stencilBuffer)
 			glEnable(GL_STENCIL_TEST);
 		else
 			glDisable(GL_STENCIL_TEST);
 	}
 
-	if (_curMaterial._stencilBuffer)
+	if (material._stencilBuffer)
 	{
-		if (_lastMaterial._stencilFunc != _curMaterial._stencilFunc ||
-			_lastMaterial._stencilRef != _curMaterial._stencilRef ||
-			_lastMaterial._stencilFuncMask != _curMaterial._stencilFuncMask)
+		if (lastMaterial._stencilFunc != material._stencilFunc ||
+			lastMaterial._stencilRef != material._stencilRef ||
+			lastMaterial._stencilFuncMask != material._stencilFuncMask)
 		{
 			GLenum func = GL_NEVER;
-			GLint ref = _curMaterial._stencilRef;
-			GLuint mask = _curMaterial._stencilFuncMask;
+			GLint ref = material._stencilRef;
+			GLuint mask = material._stencilFuncMask;
 
-			switch (_curMaterial._stencilFunc)
+			switch (material._stencilFunc)
 			{
 			case ESF_NEVER: func = GL_NEVER; break;
 			case ESF_LESS: func = GL_LESS; break;
@@ -1498,21 +1785,21 @@ void GLRenderSystem::setBasicRenderStates(const Material& material, const Materi
 			glStencilFunc(func, ref, mask);
 		}
 
-		if (_lastMaterial._stencilMask != _curMaterial._stencilMask)
+		if (lastMaterial._stencilMask != material._stencilMask)
 		{
-			GLuint mask = _curMaterial._stencilMask;
+			GLuint mask = material._stencilMask;
 			glStencilMask(mask);
 		}
 
-		if (_lastMaterial._stencilFail != _curMaterial._stencilFail ||
-			_lastMaterial._depthFail != _curMaterial._depthFail ||
-			_lastMaterial._stencilDepthPass != _curMaterial._stencilDepthPass)
+		if (lastMaterial._stencilFail != material._stencilFail ||
+			lastMaterial._depthFail != material._depthFail ||
+			lastMaterial._stencilDepthPass != material._stencilDepthPass)
 		{
 			GLenum fail = GL_KEEP;
 			GLenum zfail = GL_KEEP;
 			GLenum zpass = GL_KEEP;
 
-			switch (_curMaterial._stencilFail)
+			switch (material._stencilFail)
 			{
 			case ESO_KEEP: fail = GL_KEEP; break;
 			case ESO_ZERO: fail = GL_ZERO; break;
@@ -1525,7 +1812,7 @@ void GLRenderSystem::setBasicRenderStates(const Material& material, const Materi
 			default: break;
 			}
 
-			switch (_curMaterial._depthFail)
+			switch (material._depthFail)
 			{
 			case ESO_KEEP: zfail = GL_KEEP; break;
 			case ESO_ZERO: zfail = GL_ZERO; break;
@@ -1538,7 +1825,7 @@ void GLRenderSystem::setBasicRenderStates(const Material& material, const Materi
 			default: break;
 			}
 
-			switch (_curMaterial._stencilDepthPass)
+			switch (material._stencilDepthPass)
 			{
 			case ESO_KEEP: zpass = GL_KEEP; break;
 			case ESO_ZERO: zpass = GL_ZERO; break;
@@ -1555,23 +1842,23 @@ void GLRenderSystem::setBasicRenderStates(const Material& material, const Materi
 		}
 	}
 
-	if (resetAllRenderStates || _lastMaterial._backfaceCulling != _curMaterial._backfaceCulling)
+	if (resetAllRenderStates || lastMaterial._backfaceCulling != material._backfaceCulling)
 	{
-		if (_curMaterial._backfaceCulling)
+		if (material._backfaceCulling)
 			glEnable(GL_CULL_FACE);
 		else
 			glDisable(GL_CULL_FACE);
 	}
 
-	if (resetAllRenderStates || _lastMaterial._fogEnable != _curMaterial._fogEnable)
+	if (resetAllRenderStates || lastMaterial._fogEnable != material._fogEnable)
 	{
-		if (_curMaterial._fogEnable)
+		if (material._fogEnable)
 			glEnable(GL_FOG);
 		else
 			glDisable(GL_FOG);
 	}
 
-	for (unsigned int i = 0; i < _maxTextureUnits; ++i)
+	for (int i = 0; i < _maxTextureUnits; ++i)
 	{
 		if (!_texturesUnitSet[i])
 			continue;
@@ -1597,6 +1884,35 @@ void GLRenderSystem::setBasicRenderStates(const Material& material, const Materi
 		else
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 			(material._textureLayer[i]._bilinearFilter || material._textureLayer[i]._trilinearFilter) ? GL_LINEAR : GL_NEAREST);
+	}
+
+	if (resetAllRenderStates || lastMaterial._antiAliasing != material._antiAliasing)
+	{
+		if (material._antiAliasing & EAAM_ALPHA_TO_COVERAGE)
+			glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+		else if (lastMaterial._antiAliasing & EAAM_ALPHA_TO_COVERAGE)
+			glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+		if ((_antiAliasFactor >= 2) && (material._antiAliasing & EAAM_ON))
+			glEnable(GL_MULTISAMPLE);
+		else
+			glDisable(GL_MULTISAMPLE);
+
+		if ((material._antiAliasing & EAAM_LINE_SMOOTH) != (lastMaterial._antiAliasing & EAAM_LINE_SMOOTH))
+		{
+			if (material._antiAliasing & EAAM_LINE_SMOOTH)
+				glEnable(GL_LINE_SMOOTH);
+			else if (lastMaterial._antiAliasing & EAAM_LINE_SMOOTH)
+				glDisable(GL_LINE_SMOOTH);
+		}
+
+		if ((material._antiAliasing & EAAM_POINT_SMOOTH) != (lastMaterial._antiAliasing & EAAM_POINT_SMOOTH))
+		{
+			if (material._antiAliasing & EAAM_POINT_SMOOTH)
+				glEnable(GL_POINT_SMOOTH);
+			else if (lastMaterial._antiAliasing & EAAM_POINT_SMOOTH)
+				glDisable(GL_POINT_SMOOTH);
+		}
 	}
 
 	setWrapMode(material);

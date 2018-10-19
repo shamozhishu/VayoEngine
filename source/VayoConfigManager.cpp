@@ -1,36 +1,44 @@
 #include "VayoConfigManager.h"
 #include "tinyxml2/tinyxml2.h"
 #include "VayoUtils.h"
+#include "VayoRoot.h"
+#include "VayoLog.h"
 
 using namespace tinyxml2;
 
 NS_VAYO_BEGIN
 
-bool ConfigManager::init(const wstring& rootDirectory /*= L""*/)
+bool ConfigManager::init()
 {
 	tinyxml2::XMLDocument doc;
-	string configDirectory = w2a_(rootDirectory);
+	string rootDirectory = w2a_(Root::getSingleton().getConfig().RootDirectory);
 
-	if (configDirectory == "")
+	if (rootDirectory == "")
 	{
-		configDirectory = w2a_(getWorkingDirectory());
+		rootDirectory = w2a_(getWorkingDirectory());
 	}
 
-	if (configDirectory.substr(configDirectory.length() - 1) == "\\"
-		|| configDirectory.substr(configDirectory.length() - 1) == "/")
+	if (rootDirectory.substr(rootDirectory.length() - 1) == "\\"
+		|| rootDirectory.substr(rootDirectory.length() - 1) == "/")
 	{
-		configDirectory.erase(configDirectory.find_last_not_of("/\\") + 1);
+		rootDirectory.erase(rootDirectory.find_last_not_of("/\\") + 1);
 	}
 
-	if (doc.LoadFile((configDirectory + "\\engine_config.xml").c_str()) != XML_SUCCESS)
+	if (doc.LoadFile((rootDirectory + "\\engine_config.xml").c_str()) != XML_SUCCESS)
+	{
+		Log::wprint(ELL_ERROR, L"引擎配置文件[%s\\engine_config.xml]加载失败", a2w_(rootDirectory).c_str());
 		return false;
+	}
 
 	XMLElement* pRoot = doc.RootElement();
 	if (NULL == pRoot)
+	{
+		Log::wprint(ELL_ERROR, L"引擎配置文件[%s\\engine_config.xml]解析失败", a2w_(rootDirectory).c_str());
 		return false;
+	}
 
 	string curTag;
-	_rootResourcePath = a2w_(configDirectory) + L"\\" + utf8ToUnicode(pRoot->Attribute("rootpath"));
+	_rootResourcePath = a2w_(rootDirectory) + L"\\" + utf8ToUnicode(pRoot->Attribute("rootpath"));
 	XMLElement* pElem = pRoot->FirstChildElement();
 	while (pElem)
 	{
@@ -82,17 +90,26 @@ bool ConfigManager::init(const wstring& rootDirectory /*= L""*/)
 			_uiConfig.TableCSVPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("tablecsv"));
 			XMLElement* skin = pElem->FirstChildElement("skin");
 			if (!skin)
+			{
+				Log::wprint(ELL_ERROR, L"<skin>标签缺失");
 				return false;
+			}
 
 			_uiConfig.SkinFilePath = _rootResourcePath + utf8ToUnicode(skin->Attribute("file"));
 			XMLElement* seqanim = pElem->FirstChildElement("seqanim");
 			if (!seqanim)
+			{
+				Log::wprint(ELL_ERROR, L"<seqanim>标签缺失");
 				return false;
+			}
 
 			_uiConfig.SeqAnimPath = _rootResourcePath + utf8ToUnicode(seqanim->Attribute("file"));
 			XMLElement* imagesetall = pElem->FirstChildElement("imagesetall");
 			if (!imagesetall)
+			{
+				Log::wprint(ELL_ERROR, L"<imagesetall>标签缺失");
 				return false;
+			}
 
 			XMLElement* imageset = imagesetall->FirstChildElement();
 			while (imageset)
@@ -104,7 +121,10 @@ bool ConfigManager::init(const wstring& rootDirectory /*= L""*/)
 
 			XMLElement* fontall = pElem->FirstChildElement("fonts");
 			if (!fontall)
+			{
+				Log::wprint(ELL_ERROR, L"<fonts>标签缺失");
 				return false;
+			}
 
 			tagFontConfig fontAttrib;
 			XMLElement* font = fontall->FirstChildElement();
@@ -122,6 +142,8 @@ bool ConfigManager::init(const wstring& rootDirectory /*= L""*/)
 		pElem = pElem->NextSiblingElement();
 	}
 
+	const_cast<wstring&>(Root::getSingleton().getConfig().RootDirectory) = a2w_(rootDirectory);
+	Log::wprint(ELL_INFORMATION, L"引擎配置文件[%s\\engine_config.xml]加载成功", a2w_(rootDirectory).c_str());
 	return true;
 }
 

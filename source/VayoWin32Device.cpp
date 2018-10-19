@@ -281,7 +281,7 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		PAINTSTRUCT ps;
 		BeginPaint(_mainWnd, &ps);
 		Root* pRoot = Root::getSingletonPtr();
-		if (pRoot->isOwnerDraw() && pRoot->getIsInit())
+		if (pRoot->getConfig().OwnerDraw && pRoot->IsLaunched())
 			pRoot->renderOneFrame();
 		EndPaint(_mainWnd, &ps);
 		return 0;
@@ -299,7 +299,7 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 //////////////////////////////////////////////////////////////////////////
 
 Win32Device::Win32Device()
-	: _mainWnd(0)
+	: _mainWnd(NULL)
 	, _externalWindow(false)
 {
 	gWin32Device = this;
@@ -316,15 +316,15 @@ void* Win32Device::getMainWnd() const
 	return _mainWnd;
 }
 
-bool Win32Device::init(void* wndID)
+bool Win32Device::init()
 {
-	if (wndID)
+	if (Root::getSingleton().getConfig().WndHandle)
 	{
-		_mainWnd = static_cast<HWND>(wndID);
+		_mainWnd = static_cast<HWND>(Root::getSingleton().getConfig().WndHandle);
 		RECT rc;
-		GetWindowRect(_mainWnd, &rc);
-		_screenPos = Position2di(rc.left, rc.top);
-		_screenSize = Dimension2di(rc.right - rc.left, rc.bottom - rc.top);
+		GetClientRect(_mainWnd, &rc);
+		setScreenSize(Dimension2di(rc.right - rc.left, rc.bottom - rc.top));
+		const_cast<bool&>(Root::getSingleton().getConfig().FullScreen) = false;
 		_externalWindow = true;
 	}
 	else
@@ -345,7 +345,7 @@ bool Win32Device::init(void* wndID)
 		RegisterClass(&wc);
 
 		DWORD style = WS_POPUP;
-		if (!Root::getSingleton().isFullscreen())
+		if (!Root::getSingleton().getConfig().FullScreen)
 			style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 		// Compute window rectangle dimensions based on requested client area dimensions.
 		RECT R = { 0, 0, _screenSize._width, _screenSize._height };
@@ -361,12 +361,12 @@ bool Win32Device::init(void* wndID)
 		if (windowTop < 0)
 			windowTop = 0;
 
-		if (Root::getSingleton().isFullscreen())
+		if (Root::getSingleton().getConfig().FullScreen)
 		{
 			windowLeft = 0;
 			windowTop = 0;
-			_screenSize._width = realWidth = GetSystemMetrics(SM_CXSCREEN);
-			_screenSize._height = realHeight = GetSystemMetrics(SM_CYSCREEN);
+			realWidth = GetSystemMetrics(SM_CXSCREEN);
+			realHeight = GetSystemMetrics(SM_CYSCREEN);
 		}
 
 		_mainWnd = CreateWindow(L"VayoEngine", _mainWndCaption.c_str(), style,
@@ -380,7 +380,17 @@ bool Win32Device::init(void* wndID)
 		MoveWindow(_mainWnd, windowLeft, windowTop, realWidth, realHeight, TRUE);
 		ShowWindow(_mainWnd, SW_SHOW);
 		UpdateWindow(_mainWnd);
+		const_cast<void*&>(Root::getSingleton().getConfig().WndHandle) = _mainWnd;
 	}
+
+	if (!_externalWindow)
+	{
+		SetActiveWindow(_mainWnd);
+		SetForegroundWindow(_mainWnd);
+	}
+
+	KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
+	KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
 
 	return true;
 }
@@ -416,50 +426,15 @@ void Win32Device::onSleep(unsigned int milliSeconds /*= 0*/)
 
 void Win32Device::onDestroy()
 {
-	if (Root::getSingleton().isQuitWhenCloseWnd())
+	if (Root::getSingleton().getConfig().PostQuit)
 		PostQuitMessage(0);
 }
 
-void Win32Device::setScreenArea(Recti screenArea)
-{
-	Recti lastScreenArea(_screenPos, _screenSize);
-	if (screenArea != lastScreenArea)
-	{
-		_screenPos = screenArea.getPos();
-		_screenSize = screenArea.getSize();
-		if (_mainWnd)
-			MoveWindow(_mainWnd, _screenPos._x, _screenPos._y,
-				_screenSize._width, _screenSize._height, TRUE);
-	}
-}
-
-void Win32Device::setScreenPos(Position2di screenPos)
-{
-	if (screenPos != _screenPos)
-	{
-		_screenPos = screenPos;
-		if (_mainWnd)
-			MoveWindow(_mainWnd, _screenPos._x, _screenPos._y,
-				_screenSize._width, _screenSize._height, TRUE);
-	}
-}
-
-void Win32Device::setScreenSize(Dimension2di screenSize)
-{
-	if (screenSize != _screenSize)
-	{
-		_screenSize = screenSize;
-		if (_mainWnd)
-			MoveWindow(_mainWnd, _screenPos._x, _screenPos._y,
-				_screenSize._width, _screenSize._height, TRUE);
-	}
-}
-
-void Win32Device::setMainWndCaption(wstring wndCaption)
+void Win32Device::setMainWndCaption(const wstring& wndCaption)
 {
 	if (wndCaption != _mainWndCaption)
 	{
-		_mainWndCaption = wndCaption;
+		Device::setMainWndCaption(wndCaption);
 		if (_mainWnd)
 			SetWindowText(_mainWnd, _mainWndCaption.c_str());
 	}
@@ -573,16 +548,16 @@ void Win32Device::injectActivate()
 	Device::injectActivate();
 	RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
 	if (pRenderer)
-		pRenderer->init(true);
+		pRenderer->restoreContext();
 }
 
-Device* Device::create(const wstring& windowName, const Dimension2di& windowSize)
+Device* Device::create()
 {
 	Device* pDevice = NULL;
 	// create win32 device.
 	pDevice = new Win32Device();
-	pDevice->setMainWndCaption(windowName);
-	pDevice->setScreenSize(windowSize);
+	pDevice->setMainWndCaption(Root::getSingleton().getConfig().WindowName);
+	pDevice->setScreenSize(Root::getSingleton().getConfig().WindowSize);
 	return pDevice;
 }
 

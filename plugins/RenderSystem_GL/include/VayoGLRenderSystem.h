@@ -21,8 +21,9 @@ public:
 	DisplayList* createDisplayList(const wstring& name = L"");
 	Tesselator*  createTesselator(const wstring& name = L"");
 
-	bool init(bool mark = false);
+	bool init();
 	bool isActive() const;
+	void restoreContext() const;
 	bool beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Colour color);
 	bool endScene();
 	const Matrix4x4& getTransform(ETransformationState state) const;
@@ -64,7 +65,8 @@ public:
 
 	void              testGLErrorBegan();
 	bool              testGLErrorEnded(const wstring& errLog = L"");
-	ERenderSystemType getRenderSystemType() { return ERST_OPENGL; }
+	EColorFormat      getColorBufferFormat() const { return _colorBufferFormat; }
+	ERenderSystemType getRenderSystemType() const { return ERST_OPENGL; }
 	unsigned int      getMaximalPrimitiveCount() const { return 0x7fffffff; }
 	bool              setActiveTexture(int stage, Texture* texture);
 	bool              disableTextures(int fromStage = 0);
@@ -121,12 +123,14 @@ private:
 		ERM_3D
 	};
 	ERenderMode           _currentRenderMode;
+	EColorFormat          _colorBufferFormat;
 	Matrix4x4             _matrizes[ETS_COUNT];
 	vector<unsigned char> _colorBuffer;
 	Material              _curMaterial;
 	Material              _lastMaterial;
 	int                   _lastSetLight;
 	int                   _maxTextureUnits;
+	unsigned char         _antiAliasFactor;
 	float                 _maxTextureLODBias;
 	Dimension2di          _currentRenderTargetSize;
 	bool                  _resetRenderStates;
@@ -137,7 +141,6 @@ private:
 protected:
 	PROPERTY_R(HDC,   _hCurrentDC,     CurrentDC)
 	PROPERTY_R(HGLRC, _hCurrentRC,     CurrentRC)
-	PROPERTY_R(int,   _pixelFormat,    PixelFormat)
 	PROPERTY_R(GLint, _maxTextureSize, MaxTextureSize)
 };
 

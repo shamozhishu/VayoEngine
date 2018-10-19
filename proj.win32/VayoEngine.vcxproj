@@ -221,12 +221,14 @@
     <ClInclude Include="..\include\VayoAny.h" />
     <ClInclude Include="..\include\VayoApp.h" />
     <ClInclude Include="..\include\VayoArcball.h" />
+    <ClInclude Include="..\include\VayoBaseGUI.h" />
     <ClInclude Include="..\include\VayoBitState.h" />
     <ClInclude Include="..\include\VayoCamera.h" />
     <ClInclude Include="..\include\VayoCollision.h" />
     <ClInclude Include="..\include\VayoColour.h" />
     <ClInclude Include="..\include\VayoCommon.h" />
     <ClInclude Include="..\include\VayoConfigManager.h" />
+    <ClInclude Include="..\include\VayoCoreGUI.h" />
     <ClInclude Include="..\include\VayoDatabaseCSV.h" />
     <ClInclude Include="..\include\VayoDevice.h" />
     <ClInclude Include="..\include\VayoDimension2d.h" />
@@ -236,7 +238,6 @@
     <ClInclude Include="..\include\VayoEntity.h" />
     <ClInclude Include="..\include\VayoFileIO.h" />
     <ClInclude Include="..\include\VayoFrustum.h" />
-    <ClInclude Include="..\include\VayoCoreGUI.h" />
     <ClInclude Include="..\include\VayoImage.h" />
     <ClInclude Include="..\include\VayoInput.h" />
     <ClInclude Include="..\include\VayoLanguage.h" />
@@ -247,7 +248,6 @@
     <ClInclude Include="..\include\VayoLog.h" />
     <ClInclude Include="..\include\VayoManualObject.h" />
     <ClInclude Include="..\include\VayoMaterial.h" />
-    <ClInclude Include="..\include\VayoMaterialLayer.h" />
     <ClInclude Include="..\include\VayoMaterialManager.h" />
     <ClInclude Include="..\include\VayoMaterialRenderer.h" />
     <ClInclude Include="..\include\VayoMath.h" />
@@ -279,11 +279,11 @@
     <ClInclude Include="..\include\VayoTessGridBuilder.h" />
     <ClInclude Include="..\include\VayoTessGridHandler.h" />
     <ClInclude Include="..\include\VayoTexture.h" />
+    <ClInclude Include="..\include\VayoTextureLayer.h" />
     <ClInclude Include="..\include\VayoTextureManager.h" />
     <ClInclude Include="..\include\VayoTiledMap.h" />
     <ClInclude Include="..\include\VayoTimer.h" />
     <ClInclude Include="..\include\VayoTriangle3d.h" />
-    <ClInclude Include="..\include\VayoBaseGUI.h" />
     <ClInclude Include="..\include\VayoUserDataBind.h" />
     <ClInclude Include="..\include\VayoUtils.h" />
     <ClInclude Include="..\include\VayoVector2d.h" />

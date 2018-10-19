@@ -16,39 +16,42 @@ NS_VAYO_BEGIN
 class _VayoExport Root : public Singleton<Root>
 {
 public:
-	typedef struct tagInitConfig
+	typedef struct tagConfig
 	{
-		bool         PostQuit;
-		bool         OwnerDraw;
-		bool         FullScreen;
-		Colour       BgClearColor;
-		Dimension2di WindowSize;
-		wstring      WindowName;
-		wstring      RendererName;
-		wstring      RootDirectory;
-		void*        WindowId;
-		tagInitConfig()
-			: PostQuit(true)
+		void*         WndHandle;
+		bool          PostQuit;
+		bool          OwnerDraw;
+		bool          FullScreen;
+		bool          HandleSRGB;
+		Colour        BgClearColor;
+		Dimension2di  WindowSize;
+		wstring       WindowName;
+		wstring       RendererName;
+		wstring       RootDirectory;
+		unsigned char AntiAliasFactor;
+		tagConfig()
+			: WndHandle(NULL)
+			, PostQuit(true)
 			, OwnerDraw(false)
 			, FullScreen(false)
+			, HandleSRGB(false)
 			, BgClearColor(0)
 			, WindowSize(1280, 720)
 			, WindowName(L"VayoEngine1.0")
 			, RendererName(L"RenderSystem_GL")
-			, WindowId(NULL) {}
-	} InitConfig;
+		    , AntiAliasFactor(0) {}
+	} Config;
 
 public:
-	Root(const InitConfig& initConfig);
+	Root(const Config& config);
 	~Root();
 	bool          launch();
 	bool          renderOneFrame();
-	bool          isOwnerDraw() const;
-	bool          isFullscreen() const;
-	bool          isQuitWhenCloseWnd() const;
 	Timer&        getTimer() { return _timer; }
-	int           getFrameCnt() { return _frameCnt; }
-	float         getMsOneFrame() { return _msOneFrame; }
+	const Timer&  getTimer() const { return _timer; }
+	int           getFrameCnt() const { return _frameCnt; }
+	float         getMsOneFrame() const { return _msOneFrame; }
+	bool          IsLaunched() const { return _isLaunched; }
 	void          addRenderSystem(RenderSystem* newRenderer);
 
 	bool          loadScene(const wstring& xmlFileName);
@@ -67,13 +70,13 @@ public:
 	void unloadPlugin(const wstring& pluginName);
 	void installPlugin(Plugin* plugin);
 	void uninstallPlugin(Plugin* plugin);
-	const vector<Plugin*>& getInstalledPlugins() const { return _plugins; }
+	const vector<Plugin*>& getInstalledPlugins() const;
 
 private:
 	Timer                       _timer;
 	int                         _frameCnt;
 	float                       _msOneFrame;
-	InitConfig                  _initConfig;
+	bool                        _isLaunched;
 	map<wstring, SceneManager*> _sceneMgrPool;
 	map<wstring, RenderSystem*> _renderers;
 	vector<Plugin*>             _plugins;
@@ -83,7 +86,7 @@ private:
 	void updateFrameStats();
 
 protected:
-	PROPERTY_R(bool,              _isInit,           IsInit)
+	PROPERTY_R_REF(Config,        _configuration,    Config)
 	PROPERTY_RW(SceneManager*,    _curSceneMgr,      CurSceneMgr)
 	PROPERTY_RW(ScriptSystem*,    _scriptSystem,     ScriptSystem)
 	PROPERTY_R(RenderSystem*,     _activeRenderer,   ActiveRenderer)

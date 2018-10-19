@@ -42,3 +42,33 @@ material 200厂/焊杯
 	emissive_color 0 0 0 0
 	shininess 16
 }
+
+material 200厂/二维图端子
+{
+	ambient_color 0 0 0 255
+	diffuse_color 0 0 0 255
+	specular_color 0 0 0 255
+	emissive_color 0 0 0 0
+	shininess 16
+	anti_aliasing on
+}
+
+material 200厂/二维图节点
+{
+	ambient_color 0 0 0 255
+	diffuse_color 0 0 0 255
+	specular_color 0 0 0 255
+	emissive_color 0 0 0 0
+	shininess 16
+	anti_aliasing on
+}
+
+material 200厂/二维图导线
+{
+	ambient_color 0 0 255 255
+	diffuse_color 0 0 255 255
+	specular_color 0 0 0 255
+	emissive_color 0 0 0 0
+	shininess 16
+	anti_aliasing on line_smooth
+}

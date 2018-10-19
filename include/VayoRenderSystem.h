@@ -60,8 +60,9 @@ public:
 	virtual void         destroyTesselator(const wstring& name);
 	virtual void         destroyAllTesselators();
 
-	virtual bool init(bool mark = false) = 0;
+	virtual bool init() = 0;
 	virtual bool isActive() const = 0;
+	virtual void restoreContext() const = 0;
 	virtual bool beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Colour color);
 	virtual bool endScene();
 	virtual const Matrix4x4& getTransform(ETransformationState state) const = 0;
@@ -111,7 +112,8 @@ public:
 	virtual void removeAllHardwareBuffers();
 	virtual bool isHardwareBufferRecommend(SubMesh* mb);
 
-	virtual ERenderSystemType getRenderSystemType() { return ERST_NULL; }
+	virtual EColorFormat getColorBufferFormat() const = 0;
+	virtual ERenderSystemType getRenderSystemType() const { return ERST_NULL; }
 	virtual unsigned int getMaximalPrimitiveCount() const { return 0xFFFFFFFF; }
 	inline unsigned int getPrimTotalNum() const { return _primitivesDrawn; }
 

@@ -20,14 +20,11 @@ public:
 	Win32Device();
 	~Win32Device();
 	void*   getMainWnd() const;
-	bool    init(void* wndID);
+	bool    init();
 	bool    handleEvents(bool& idle);
 	void    onSleep(unsigned int milliSeconds = 0);
 	void    onDestroy();
-	void    setScreenArea(Recti screenArea);
-	void    setScreenPos(Position2di screenPos);
-	void    setScreenSize(Dimension2di screenSize);
-	void    setMainWndCaption(wstring wndCaption);
+	void    setMainWndCaption(const wstring& wndCaption);
 
 	// ÊÂ¼þ×¢Èë
 	void    injectMouseDown(unsigned int btnState, int x, int y);

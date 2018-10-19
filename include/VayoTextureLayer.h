@@ -1,10 +1,10 @@
 /*************************************************************************\
 * 望友引擎1.0
 * Copyright (c) 2018-2018 author by 朱加浩
-* 材质层
+* 纹理层
 \*************************************************************************/
-#ifndef __VAYO_MATERIAL_LAYER_H__
-#define __VAYO_MATERIAL_LAYER_H__
+#ifndef __VAYO_TEXTURE_LAYER_H__
+#define __VAYO_TEXTURE_LAYER_H__
 
 #define VAYO_MATERIAL_MAX_TEXTURES 4
 
@@ -35,10 +35,10 @@ static const char* const aTextureClampNames[] = {
 	"texture_clamp_mirror_clamp_to_edge",
 	"texture_clamp_mirror_clamp_to_border", NULL };
 
-class MaterialLayer
+class TextureLayer
 {
 public:
-	MaterialLayer()
+	TextureLayer()
 		: _texture(NULL)
 		, _textureWrapU(ETC_REPEAT)
 		, _textureWrapV(ETC_REPEAT)
@@ -46,12 +46,12 @@ public:
 		, _trilinearFilter(false)
 		, _lodBias(0) {}
 
-	MaterialLayer(const MaterialLayer& other)
+	TextureLayer(const TextureLayer& other)
 	{
 		*this = other;
 	}
 
-	MaterialLayer& operator=(const MaterialLayer& other)
+	TextureLayer& operator=(const TextureLayer& other)
 	{
 		if (this == &other)
 			return *this;
@@ -67,7 +67,7 @@ public:
 		return *this;
 	}
 
-	inline bool operator!=(const MaterialLayer& b) const
+	inline bool operator!=(const TextureLayer& b) const
 	{
 		bool different =
 			_texture != b._texture ||
@@ -85,7 +85,7 @@ public:
 		return different;
 	}
 
-	inline bool operator==(const MaterialLayer& b) const
+	inline bool operator==(const TextureLayer& b) const
 	{
 		return !(b != *this);
 	}
@@ -101,4 +101,4 @@ public:
 
 NS_VAYO_END
 
-#endif // __VAYO_MATERIAL_LAYER_H__
+#endif // __VAYO_TEXTURE_LAYER_H__

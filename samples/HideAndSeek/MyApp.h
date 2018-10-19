@@ -11,7 +11,7 @@ using namespace Vayo;
 class ModelViewer : public App, public Singleton<ModelViewer>
 {
 public:
-	ModelViewer(const Root::InitConfig& initConfig);
+	ModelViewer(const Root::Config& config);
 	bool startup();
 	void cleanup();
 	bool keyClicked(const tagKeyInput& keyInput);

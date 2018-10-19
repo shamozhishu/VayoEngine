@@ -110,21 +110,21 @@ UISkin::UISkin(const wstring& skinFilePath)
 {
 	if (skinFilePath.empty())
 	{
-		Log::wprint(ELL_ERROR, L"GUI皮肤加载失败: 皮肤路径名为空");
+		Log::wprint(ELL_ERROR, L"GUI皮肤文件路径为空");
 		return;
 	}
 
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(w2a_(skinFilePath).c_str()) != XML_SUCCESS)
 	{
-		Log::wprint(ELL_ERROR, L"GUI皮肤加载失败: skinFilePath=%s", skinFilePath.c_str());
+		Log::wprint(ELL_ERROR, L"GUI皮肤[%s]加载失败", skinFilePath.c_str());
 		return;
 	}
 
 	XMLElement* pRoot = doc.RootElement();
 	if (NULL == pRoot)
 	{
-		Log::wprint(ELL_ERROR, L"GUI皮肤加载失败: 空文件");
+		Log::wprint(ELL_ERROR, L"GUI皮肤[%s]解析失败", skinFilePath.c_str());
 		return;
 	}
 

@@ -121,7 +121,7 @@ bool DatabaseCSV::init()
 	for (unsigned i = 0; i < len; i++)
 	{
 		if (!loadTable(allFilePath[i], tableDataBuff))
-			Log::wprint(ELL_ERROR, L"加载[%s]文件失败", allFilePath[i].c_str());
+			Log::wprint(ELL_ERROR, L"表数据文件[%s]加载失败", allFilePath[i].c_str());
 	}
 
 	return true;

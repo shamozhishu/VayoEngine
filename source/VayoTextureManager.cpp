@@ -18,6 +18,7 @@ TextureManager::~TextureManager()
 
 bool TextureManager::init()
 {
+	_texturePool.clear();
 	return true;
 }
 

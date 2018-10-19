@@ -11,6 +11,12 @@ NS_VAYO_BEGIN
 MaterialManager::MaterialManager()
 {
 	memset(_materialCallback, 0, sizeof(_materialCallback));
+	int i = 0;
+	while (materialScriptAttribs[i].TheKey)
+	{
+		_attribsWordMap[materialScriptAttribs[i].TheKey] = materialScriptAttribs[i].TheValue;
+		++i;
+	}
 }
 
 MaterialManager::~MaterialManager()
@@ -135,6 +141,21 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			}
 		}
 
+		if (0 == strTag.substr(0, 13).compare("material_type"))
+		{
+			container.clear();
+			stringtok(container, strTag, " ");
+			if (container.size() == 2)
+			{
+				unordered_map<string, int>::iterator it = _attribsWordMap.find(container[1]);
+				if (it != _attribsWordMap.end())
+				{
+					materialPtr->_materialType = (EMaterialType)it->second;
+					continue;
+				}
+			}
+		}
+
 		if (0 == strTag.substr(0, 13).compare("ambient_color"))
 		{
 			container.clear();
@@ -228,13 +249,50 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			}
 		}
 
-		if (0 == strTag.substr(0, 12).compare("stencil_func"))
+		if (0 == strTag.substr(0, 13).compare("anti_aliasing"))
+		{
+			container.clear();
+			stringtok(container, strTag, " ");
+			unsigned int antiAliasCnt = container.size();
+			if (antiAliasCnt >= 2)
+			{
+				bool isok = true;
+				materialPtr->_antiAliasing = EAAM_OFF;
+				for (int i = antiAliasCnt - 1; i >= 1; --i)
+				{
+					unordered_map<string, int>::iterator it = _attribsWordMap.find(container[i]);
+					if (it != _attribsWordMap.end())
+						materialPtr->_antiAliasing |= (unsigned char)it->second;
+					else
+					{
+						isok = false;
+						break;
+					}
+				}
+
+				if (isok)
+					continue;
+			}
+		}
+
+		if (0 == strTag.substr(0, 12).compare("stencil_mask"))
 		{
 			container.clear();
 			stringtok(container, strTag, " ");
 			if (container.size() == 2)
 			{
-				materialPtr->_stencilFunc = (EStencilFunc)atoi(container[1].c_str());
+				materialPtr->_stencilMask = (unsigned char)atoi(container[1].c_str());
+				continue;
+			}
+		}
+
+		if (0 == strTag.substr(0, 17).compare("stencil_func_mask"))
+		{
+			container.clear();
+			stringtok(container, strTag, " ");
+			if (container.size() == 2)
+			{
+				materialPtr->_stencilFuncMask = (unsigned char)atoi(container[1].c_str());
 				continue;
 			}
 		}
@@ -250,25 +308,18 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			}
 		}
 
-		if (0 == strTag.substr(0, 12).compare("stencil_mask"))
+		if (0 == strTag.substr(0, 12).compare("stencil_func"))
 		{
 			container.clear();
 			stringtok(container, strTag, " ");
 			if (container.size() == 2)
 			{
-				materialPtr->_stencilMask = (unsigned int)atoi(container[1].c_str());
-				continue;
-			}
-		}
-
-		if (0 == strTag.substr(0, 17).compare("stencil_func_mask"))
-		{
-			container.clear();
-			stringtok(container, strTag, " ");
-			if (container.size() == 2)
-			{
-				materialPtr->_stencilFuncMask = (unsigned int)atoi(container[1].c_str());
-				continue;
+				unordered_map<string, int>::iterator it = _attribsWordMap.find(container[1]);
+				if (it != _attribsWordMap.end())
+				{
+					materialPtr->_stencilFunc = (EStencilFunc)it->second;
+					continue;
+				}
 			}
 		}
 
@@ -278,8 +329,12 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			stringtok(container, strTag, " ");
 			if (container.size() == 2)
 			{
-				materialPtr->_stencilFail = (EStencilOp)atoi(container[1].c_str());
-				continue;
+				unordered_map<string, int>::iterator it = _attribsWordMap.find(container[1]);
+				if (it != _attribsWordMap.end())
+				{
+					materialPtr->_stencilFail = (EStencilOp)it->second;
+					continue;
+				}
 			}
 		}
 
@@ -289,8 +344,12 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			stringtok(container, strTag, " ");
 			if (container.size() == 2)
 			{
-				materialPtr->_depthFail = (EStencilOp)atoi(container[1].c_str());
-				continue;
+				unordered_map<string, int>::iterator it = _attribsWordMap.find(container[1]);
+				if (it != _attribsWordMap.end())
+				{
+					materialPtr->_depthFail = (EStencilOp)it->second;
+					continue;
+				}
 			}
 		}
 
@@ -300,8 +359,12 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			stringtok(container, strTag, " ");
 			if (container.size() == 2)
 			{
-				materialPtr->_stencilDepthPass = (EStencilOp)atoi(container[1].c_str());
-				continue;
+				unordered_map<string, int>::iterator it = _attribsWordMap.find(container[1]);
+				if (it != _attribsWordMap.end())
+				{
+					materialPtr->_stencilDepthPass = (EStencilOp)it->second;
+					continue;
+				}
 			}
 		}
 
@@ -484,18 +547,34 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			stringtok(container, strTag, " ");
 			if (container.size() == 2)
 			{
-				strTag = container[1];
-				if (0 == strTag.compare("trilinear_filter"))
+				unordered_map<string, int>::iterator it = _attribsWordMap.find(container[1]);
+				if (it != _attribsWordMap.end())
 				{
-					materialPtr->_textureLayer[curSelTexLayer]._trilinearFilter = true;
-					materialPtr->_textureLayer[curSelTexLayer]._bilinearFilter = false;
-					continue;
-				}
-				else if (0 == strTag.compare("bilinear_filter"))
-				{
-					materialPtr->_textureLayer[curSelTexLayer]._trilinearFilter = false;
-					materialPtr->_textureLayer[curSelTexLayer]._bilinearFilter = true;
-					continue;
+					bool isok = false;
+					int mark = it->second;
+					switch (mark)
+					{
+					case 1:
+						materialPtr->_textureLayer[curSelTexLayer]._trilinearFilter = false;
+						materialPtr->_textureLayer[curSelTexLayer]._bilinearFilter = false;
+						isok = true;
+						break;
+					case 2:
+						materialPtr->_textureLayer[curSelTexLayer]._trilinearFilter = false;
+						materialPtr->_textureLayer[curSelTexLayer]._bilinearFilter = true;
+						isok = true;
+						break;
+					case 3:
+						materialPtr->_textureLayer[curSelTexLayer]._trilinearFilter = true;
+						materialPtr->_textureLayer[curSelTexLayer]._bilinearFilter = false;
+						isok = true;
+						break;
+					default:
+						break;
+					}
+
+					if (isok)
+						continue;
 				}
 			}
 		}
@@ -564,7 +643,7 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			}
 		}
 		
-		Log::wprint(ELL_ERROR, L"解析材质脚本失败：%s", filePath.c_str());
+		Log::wprint(ELL_ERROR, L"解析材质脚本失败：%s[%s:%s]", filePath.c_str(), utf8ToUnicode(materialName).c_str(), utf8ToUnicode(strTag).c_str());
 		return false;
 
 	} while (!fin.eof());

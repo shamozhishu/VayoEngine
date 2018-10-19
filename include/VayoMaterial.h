@@ -7,7 +7,7 @@
 #define __VAYO_MATERIAL_H__
 
 #include "VayoColour.h"
-#include "VayoMaterialLayer.h"
+#include "VayoTextureLayer.h"
 NS_VAYO_BEGIN
 
 enum EMaterialType
@@ -109,6 +109,15 @@ enum EMaterialFlag
 	EMF_MATERIAL_FLAG_COUNT
 };
 
+enum EAntiAliasingMode
+{
+	EAAM_OFF = 0,
+	EAAM_ON = 1,
+	EAAM_LINE_SMOOTH = 4,
+	EAAM_POINT_SMOOTH = 8,
+	EAAM_ALPHA_TO_COVERAGE = 16
+};
+
 enum EStencilFunc
 {
 	ESF_NEVER,
@@ -148,10 +157,11 @@ public:
 		, _shininess(0.0f)
 		, _thickness(1.0f)
 		, _alphaRef(0.0f)
-		, _stencilFunc(ESF_NEVER)
-		, _stencilRef(0)
+		, _antiAliasing(EAAM_ON)
 		, _stencilMask(0xFF)
 		, _stencilFuncMask(0xFF)
+		, _stencilRef(0)
+		, _stencilFunc(ESF_NEVER)
 		, _stencilFail(ESO_KEEP)
 		, _depthFail(ESO_KEEP)
 		, _stencilDepthPass(ESO_KEEP)
@@ -187,10 +197,11 @@ public:
 		_shininess = other._shininess;
 		_thickness = other._thickness;
 		_alphaRef = other._alphaRef;
-		_stencilFunc = other._stencilFunc;
-		_stencilRef = other._stencilRef;
+		_antiAliasing = other._antiAliasing;
 		_stencilMask = other._stencilMask;
 		_stencilFuncMask = other._stencilFuncMask;
+		_stencilRef = other._stencilRef;
+		_stencilFunc = other._stencilFunc;
 		_stencilFail = other._stencilFail;
 		_depthFail = other._depthFail;
 		_stencilDepthPass = other._stencilDepthPass;
@@ -217,46 +228,6 @@ public:
 		return *this;
 	}
 
-public:
-	wstring        _materialName;
-	EMaterialType  _materialType;
-	Colour         _ambientColor;
-	Colour         _diffuseColor;
-	Colour         _specularColor;
-	Colour         _emissiveColor;
-	float          _shininess;
-	float          _thickness;
-	float          _alphaRef;
-	EStencilFunc   _stencilFunc;
-	int            _stencilRef;
-	unsigned int   _stencilMask;
-	unsigned int   _stencilFuncMask;
-	EStencilOp     _stencilFail;
-	EStencilOp     _depthFail;
-	EStencilOp     _stencilDepthPass;
-	wstring        _vertexSource;
-	wstring        _fragmentSource;
-	unsigned int   _shaderCallback;
-	MaterialLayer  _textureLayer[MATERIAL_MAX_TEXTURES];
-
-	union
-	{
-		struct
-		{
-			bool _wireframe;
-			bool _clockwise;
-			bool _gouraudShading;
-			bool _lighting;
-			bool _zBuffer;
-			bool _zWriteEnable;
-			bool _stencilBuffer;
-			bool _backfaceCulling;
-			bool _useMipMaps;
-			bool _fogEnable;
-		};
-		bool _flags[EMF_MATERIAL_FLAG_COUNT];
-	};
-
 	inline bool operator!=(const Material& b) const
 	{
 		return _materialType != b._materialType ||
@@ -266,10 +237,11 @@ public:
 			_emissiveColor != b._emissiveColor ||
 			_shininess != b._shininess ||
 			_alphaRef != b._alphaRef ||
-			_stencilFunc != b._stencilFunc ||
-			_stencilRef != b._stencilRef ||
+			_antiAliasing != b._antiAliasing ||
 			_stencilMask != b._stencilMask ||
 			_stencilFuncMask != b._stencilFuncMask ||
+			_stencilRef != b._stencilRef ||
+			_stencilFunc != b._stencilFunc ||
 			_stencilFail != b._stencilFail ||
 			_depthFail != b._depthFail ||
 			_stencilDepthPass != b._stencilDepthPass ||
@@ -289,6 +261,47 @@ public:
 	{
 		return !(b != *this);
 	}
+
+public:
+	wstring        _materialName;
+	EMaterialType  _materialType;
+	Colour         _ambientColor;
+	Colour         _diffuseColor;
+	Colour         _specularColor;
+	Colour         _emissiveColor;
+	float          _shininess;
+	float          _thickness;
+	float          _alphaRef;
+	unsigned char  _antiAliasing;
+	unsigned char  _stencilMask;
+	unsigned char  _stencilFuncMask;
+	int            _stencilRef;
+	EStencilFunc   _stencilFunc;
+	EStencilOp     _stencilFail;
+	EStencilOp     _depthFail;
+	EStencilOp     _stencilDepthPass;
+	wstring        _vertexSource;
+	wstring        _fragmentSource;
+	unsigned int   _shaderCallback;
+	TextureLayer   _textureLayer[MATERIAL_MAX_TEXTURES];
+
+	union
+	{
+		struct
+		{
+			bool _wireframe;
+			bool _clockwise;
+			bool _gouraudShading;
+			bool _lighting;
+			bool _zBuffer;
+			bool _zWriteEnable;
+			bool _stencilBuffer;
+			bool _backfaceCulling;
+			bool _useMipMaps;
+			bool _fogEnable;
+		};
+		bool _flags[EMF_MATERIAL_FLAG_COUNT];
+	};
 };
 
 NS_VAYO_END

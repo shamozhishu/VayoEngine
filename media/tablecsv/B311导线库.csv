@@ -1,0 +1,4 @@
+编号,线束代号,生产厂家,单个线芯直径,纤芯截面,线芯根数,线束整外径,屏蔽直径,导体材料
+id,name,factory,diameter,area,number,external_diameter,shield_diameter,material
+1,AF-250,天津609厂,0.2,0.2,7,1.4,0,镀银铜导体
+2,609C55A0812-22-6,天津609厂,0.16,0.3/0.4,19,1.27,0,镀银铜导体

@@ -156,6 +156,7 @@
     <ClInclude Include="include\VayoGLSupport.h" />
     <ClInclude Include="include\VayoGLTesselator.h" />
     <ClInclude Include="include\VayoGLTexture.h" />
+    <ClInclude Include="source\wglext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\thirdparty\glad\glad.c" />

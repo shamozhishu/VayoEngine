@@ -27,9 +27,9 @@ typedef void(*DLL_STOP_PLUGIN)(void);
 //-------------------------------------------------------------------------
 // Root class.
 //-------------------------------------------------------------------------
-Root::Root(const InitConfig& initConfig)
-	: _initConfig(initConfig)
-	, _isInit(false)
+Root::Root(const Config& config)
+	: _configuration(config)
+	, _isLaunched(false)
 	, _curSceneMgr(NULL)
 	, _scriptSystem(NULL)
 	, _activeRenderer(NULL)
@@ -70,13 +70,13 @@ bool Root::launch()
 {
 	do
 	{
-		IF_FALSE_BREAK(_configManager && _configManager->init(_initConfig.RootDirectory));
+		IF_FALSE_BREAK(_configManager && _configManager->init());
 		IF_FALSE_BREAK(_csvDatabase && _csvDatabase->init());
 		IF_FALSE_BREAK(_language && _language->init());
 		loadPlugins();
-		_device = Device::create(_initConfig.WindowName, _initConfig.WindowSize);
-		IF_FALSE_BREAK(_device && _device->init(_initConfig.WindowId));
-		map<wstring, RenderSystem*>::iterator it = _renderers.find(_initConfig.RendererName);
+		_device = Device::create();
+		IF_FALSE_BREAK(_device && _device->init());
+		map<wstring, RenderSystem*>::iterator it = _renderers.find(_configuration.RendererName);
 		if (it != _renderers.end())
 			_activeRenderer = it->second;
 		IF_FALSE_BREAK(_activeRenderer && _activeRenderer->init());
@@ -84,10 +84,7 @@ bool Root::launch()
 		IF_FALSE_BREAK(_textureManager && _textureManager->init());
 		IF_FALSE_BREAK(_materialManager && _materialManager->init());
 		IF_FALSE_BREAK(_meshManager && _meshManager->init());
-
-		if (_initConfig.WindowId)
-			_initConfig.FullScreen = false;
-		_isInit = true;
+		_isLaunched = true;
 		return true;
 
 	} while (0);
@@ -99,7 +96,7 @@ bool Root::renderOneFrame()
 {
 	updateFrameStats();
 
-	if (!_activeRenderer->beginScene(true, true, true, _initConfig.BgClearColor))
+	if (!_activeRenderer->beginScene(true, true, true, _configuration.BgClearColor))
 		return false;
 
 	if (_curSceneMgr && _curSceneMgr->getActiveCamera())
@@ -112,21 +109,6 @@ bool Root::renderOneFrame()
 
 	_uiManager->render();
 	return _activeRenderer->endScene();
-}
-
-bool Root::isOwnerDraw() const
-{
-	return _initConfig.OwnerDraw;
-}
-
-bool Root::isFullscreen() const
-{
-	return _initConfig.FullScreen;
-}
-
-bool Root::isQuitWhenCloseWnd() const
-{
-	return _initConfig.PostQuit;
 }
 
 void Root::addRenderSystem(RenderSystem* newRenderer)
@@ -311,6 +293,11 @@ void Root::uninstallPlugin(Plugin* plugin)
 		_plugins.erase(it);
 	}
 	Log::wprint(ELL_DEBUG, L"Plugin successfully uninstalled");
+}
+
+const vector<Plugin*>& Root::getInstalledPlugins() const
+{
+	return _plugins;
 }
 
 void Root::updateFrameStats()
