@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Tolua">
+      <UniqueIdentifier>{b01fc4ef-e55a-420e-952b-af540cac3684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\VayoLuaPlugin.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VayoLuaScriptStack.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VayoLuaScriptSystem.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VayoLuaSupport.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Tolua\tolua.h">
+      <Filter>Tolua</Filter>
+    </ClInclude>
+    <ClInclude Include="Tolua\tolua_event.h">
+      <Filter>Tolua</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\VayoLuaDll.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VayoLuaPlugin.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VayoLuaScriptStack.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VayoLuaScriptSystem.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Tolua\tolua_event.c">
+      <Filter>Tolua</Filter>
+    </ClCompile>
+    <ClCompile Include="Tolua\tolua_is.c">
+      <Filter>Tolua</Filter>
+    </ClCompile>
+    <ClCompile Include="Tolua\tolua_map.c">
+      <Filter>Tolua</Filter>
+    </ClCompile>
+    <ClCompile Include="Tolua\tolua_push.c">
+      <Filter>Tolua</Filter>
+    </ClCompile>
+    <ClCompile Include="Tolua\tolua_to.c">
+      <Filter>Tolua</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
