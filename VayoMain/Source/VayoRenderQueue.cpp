@@ -49,8 +49,8 @@ void RenderQueue::update(Matrix4x4& curTransform, bool execTransform /*= true*/)
 
 	if (_basicSolids.size() > 0)
 	{
-		vector<Renderable*>::const_iterator cit = _basicSolids.cbegin();
-		for (; cit != _basicSolids.cend(); ++cit)
+		vector<Renderable*>::const_reverse_iterator cit = _basicSolids.crbegin();
+		for (; cit != _basicSolids.crend(); ++cit)
 		{
 			pCurrentRenderable = (*cit);
 

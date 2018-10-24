@@ -11,12 +11,6 @@
 #include "VayoVector2d.h"
 #include "VayoSharedPtr.h"
 
-namespace tinyxml2
-{
-	class XMLElement;
-}
-using namespace tinyxml2;
-
 NS_VAYO_BEGIN
 
 /**

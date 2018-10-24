@@ -15,6 +15,8 @@
 #define _TAG_OBJECTGROUP_ "objectgroup"
 #define _TAG_OBJECT_      "object"
 
+using tinyxml2::XMLElement;
+
 NS_VAYO_BEGIN
 
 /************************************************************************/
@@ -53,7 +55,7 @@ void TMXXMLParser::destroyMapInfo()
 bool TMXXMLParser::parseMapInfo(const wstring& strMapPath)
 {
 	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(w2a_(strMapPath).c_str()) != XML_SUCCESS)
+	if (doc.LoadFile(w2a_(strMapPath).c_str()) != tinyxml2::XML_SUCCESS)
 		return false;
 
 	destroyMapInfo();

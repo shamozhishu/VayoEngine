@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\tinyxml2\tinyxml2.h" />
     <ClInclude Include="Include\Vayo.h" />
     <ClInclude Include="Include\VayoAabbox3d.h" />
     <ClInclude Include="Include\VayoAny.h" />
     <ClInclude Include="Include\VayoApp.h" />
     <ClInclude Include="Include\VayoArcball.h" />
+    <ClInclude Include="Include\VayoAttribSerializer.h" />
     <ClInclude Include="Include\VayoBaseGUI.h" />
     <ClInclude Include="Include\VayoBitState.h" />
     <ClInclude Include="Include\VayoCamera.h" />
@@ -68,6 +70,7 @@
     <ClInclude Include="Include\VayoRenderQueue.h" />
     <ClInclude Include="Include\VayoRenderSystem.h" />
     <ClInclude Include="Include\VayoRoot.h" />
+    <ClInclude Include="Include\VayoSceneLoader.h" />
     <ClInclude Include="Include\VayoSceneManager.h" />
     <ClInclude Include="Include\VayoSceneNode.h" />
     <ClInclude Include="Include\VayoScriptSystem.h" />
@@ -81,6 +84,7 @@
     <ClInclude Include="Include\VayoTesselator.h" />
     <ClInclude Include="Include\VayoTessGridBuilder.h" />
     <ClInclude Include="Include\VayoTessGridHandler.h" />
+    <ClInclude Include="Include\VayoTextObject.h" />
     <ClInclude Include="Include\VayoTexture.h" />
     <ClInclude Include="Include\VayoTextureLayer.h" />
     <ClInclude Include="Include\VayoTextureManager.h" />
@@ -101,7 +105,6 @@
     <ClInclude Include="ThirdParty\rc5\rc5_locl.h" />
     <ClInclude Include="ThirdParty\stb_image\stb_image.h" />
     <ClInclude Include="ThirdParty\stb_image\stb_image_write.h" />
-    <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h" />
     <ClInclude Include="ThirdParty\zlib\crc32.h" />
     <ClInclude Include="ThirdParty\zlib\deflate.h" />
     <ClInclude Include="ThirdParty\zlib\gzguts.h" />
@@ -146,6 +149,7 @@
     <ClCompile Include="Source\VayoRenderQueue.cpp" />
     <ClCompile Include="Source\VayoRenderSystem.cpp" />
     <ClCompile Include="Source\VayoRoot.cpp" />
+    <ClCompile Include="Source\VayoSceneLoader.cpp" />
     <ClCompile Include="Source\VayoSceneManager.cpp" />
     <ClCompile Include="Source\VayoSceneNode.cpp" />
     <ClCompile Include="Source\VayoScriptSystem.cpp" />
@@ -154,6 +158,7 @@
     <ClCompile Include="Source\VayoSpriteBox.cpp" />
     <ClCompile Include="Source\VayoTessGridBuilder.cpp" />
     <ClCompile Include="Source\VayoTessGridHandler.cpp" />
+    <ClCompile Include="Source\VayoTextObject.cpp" />
     <ClCompile Include="Source\VayoTextureManager.cpp" />
     <ClCompile Include="Source\VayoTiledMap.cpp" />
     <ClCompile Include="Source\VayoTimer.cpp" />
@@ -165,7 +170,7 @@
     <ClCompile Include="ThirdParty\rc5\rc5_skey.cpp" />
     <ClCompile Include="ThirdParty\stb_image\stb_image.cpp" />
     <ClCompile Include="ThirdParty\stb_image\stb_image_write.cpp" />
-    <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="ThirdParty\tinyxml2.cpp" />
     <ClCompile Include="ThirdParty\zlib\adler32.c" />
     <ClCompile Include="ThirdParty\zlib\compress.c" />
     <ClCompile Include="ThirdParty\zlib\crc32.c" />

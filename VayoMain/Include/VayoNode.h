@@ -9,12 +9,7 @@
 #include "VayoSupport.h"
 #include "VayoMatrix4x4.h"
 #include "VayoUserDataBind.h"
-
-namespace tinyxml2
-{
-	class XMLElement;
-}
-using namespace tinyxml2;
+#include "VayoAttribSerializer.h"
 
 NS_VAYO_BEGIN
 
@@ -25,9 +20,8 @@ typedef struct tagSpatialInfo
 	Vector3df _scale;
 } SpatialInfo;
 
-class _VayoExport Node
+class _VayoExport Node : public AttribSerializer
 {
-	friend class SceneManager;
 public:
 	Node(const wstring& name, Node* parent, SceneManager* mgr);
 	virtual ~Node();
@@ -63,7 +57,6 @@ public:
 
 protected:
 	virtual void updateAbsPosition();
-	virtual bool parseXML(XMLElement* xml);
 	DISALLOW_COPY_AND_ASSIGN(Node)
 protected:
 	wstring               _name;

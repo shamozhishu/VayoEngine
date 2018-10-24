@@ -244,7 +244,7 @@ void TessGridBuilder::rebuild()
 void TessGridBuilder::setProp(const wstring& modelName, const wstring& materialName/*=L""*/)
 {
 	_prop.modelName = modelName;
-	_prop.materialName = materialName;
+	_prop.materialName = materialName.empty() ? L"default_material" : materialName;
 }
 
 void TessGridBuilder::setPlace(EPlace place, const Vector3df& pos/*=Vector3df::Origin*/, const Vector3df& rot/*=Vector3df::Origin*/, const Vector3df& scale/*=Vector3df(1,1,1)*/)
@@ -260,7 +260,7 @@ void TessGridBuilder::setTopCap(int idx, Vector3df norm, wstring materialName /*
 	Cap cap;
 	cap.idxType = L"index";
 	cap.normal = norm;
-	cap.materialName = materialName;
+	cap.materialName = materialName.empty() ? L"default_material" : materialName;
 	cap.reverse = reverse;
 	cap.indexes.push_back(idx);
 	_topCaps.push_back(cap);
@@ -271,7 +271,7 @@ void TessGridBuilder::setTopCap(int lowerIdx, int upperIdx, Vector3df norm, wstr
 	Cap cap;
 	cap.idxType = L"range";
 	cap.normal = norm;
-	cap.materialName = materialName;
+	cap.materialName = materialName.empty() ? L"default_material" : materialName;
 	cap.reverse = reverse;
 	cap.indexes.push_back(lowerIdx);
 	cap.indexes.push_back(upperIdx);
@@ -283,7 +283,7 @@ void TessGridBuilder::setTopCap(const vector<int>& indexes, Vector3df norm, wstr
 	Cap cap;
 	cap.idxType = L"array";
 	cap.normal = norm;
-	cap.materialName = materialName;
+	cap.materialName = materialName.empty() ? L"default_material" : materialName;
 	cap.reverse = reverse;
 	cap.indexes = indexes;
 	_topCaps.push_back(cap);
@@ -294,7 +294,7 @@ void TessGridBuilder::setBottomCap(int idx, Vector3df norm, wstring materialName
 	Cap cap;
 	cap.idxType = L"index";
 	cap.normal = norm;
-	cap.materialName = materialName;
+	cap.materialName = materialName.empty() ? L"default_material" : materialName;
 	cap.reverse = reverse;
 	cap.indexes.push_back(idx);
 	_bottomCaps.push_back(cap);
@@ -305,7 +305,7 @@ void TessGridBuilder::setBottomCap(int lowerIdx, int upperIdx, Vector3df norm, w
 	Cap cap;
 	cap.idxType = L"range";
 	cap.normal = norm;
-	cap.materialName = materialName;
+	cap.materialName = materialName.empty() ? L"default_material" : materialName;
 	cap.reverse = reverse;
 	cap.indexes.push_back(lowerIdx);
 	cap.indexes.push_back(upperIdx);
@@ -317,7 +317,7 @@ void TessGridBuilder::setBottomCap(const vector<int>& indexes, Vector3df norm, w
 	Cap cap;
 	cap.idxType = L"array";
 	cap.normal = norm;
-	cap.materialName = materialName;
+	cap.materialName = materialName.empty() ? L"default_material" : materialName;
 	cap.reverse = reverse;
 	cap.indexes = indexes;
 	_bottomCaps.push_back(cap);
@@ -371,7 +371,7 @@ void TessGridBuilder::beginAddStretBody(int idx, wstring materialName /*= L""*/,
 	StretchingBody& stretBody = _stretchingBodies.back();
 	stretBody.idxType = L"index";
 	stretBody.indexes.push_back(idx);
-	stretBody.materialName = materialName;
+	stretBody.materialName = materialName.empty() ? L"default_material" : materialName;
 	stretBody.reverse = reverse;
 }
 
@@ -382,7 +382,7 @@ void TessGridBuilder::beginAddStretBody(int lowerIdx, int upperIdx, wstring mate
 	stretBody.idxType = L"range";
 	stretBody.indexes.push_back(lowerIdx);
 	stretBody.indexes.push_back(upperIdx);
-	stretBody.materialName = materialName;
+	stretBody.materialName = materialName.empty() ? L"default_material" : materialName;
 	stretBody.reverse = reverse;
 }
 
@@ -392,7 +392,7 @@ void TessGridBuilder::beginAddStretBody(const vector<int>& indexes, wstring mate
 	StretchingBody& stretBody = _stretchingBodies.back();
 	stretBody.idxType = L"array";
 	stretBody.indexes = indexes;
-	stretBody.materialName = materialName;
+	stretBody.materialName = materialName.empty() ? L"default_material" : materialName;
 	stretBody.reverse = reverse;
 }
 

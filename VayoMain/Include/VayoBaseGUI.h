@@ -9,15 +9,9 @@
 #include "VayoSupport.h"
 #include "VayoColour.h"
 #include "VayoRectangle.h"
+#include "VayoAttribSerializer.h"
 
 #define VAYO_MAX_IMAGESET_NUM (500)
-
-namespace tinyxml2
-{
-	class XMLElement;
-}
-
-using namespace tinyxml2;
 
 NS_VAYO_BEGIN
 

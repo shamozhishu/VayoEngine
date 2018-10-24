@@ -7,9 +7,10 @@
 #define __VAYO_NODE_ANIMATOR_H__
 
 #include "VayoInput.h"
+#include "VayoAttribSerializer.h"
 NS_VAYO_BEGIN
 
-class _VayoExport NodeAnimator : public TouchDelegate, public KeypadDelegate
+class _VayoExport NodeAnimator : public AttribSerializer, public TouchDelegate, public KeypadDelegate
 {
 public:
 	NodeAnimator(const wstring& name);

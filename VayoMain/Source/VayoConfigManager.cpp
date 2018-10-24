@@ -4,7 +4,7 @@
 #include "VayoRoot.h"
 #include "VayoLog.h"
 
-using namespace tinyxml2;
+using tinyxml2::XMLElement;
 
 NS_VAYO_BEGIN
 
@@ -24,7 +24,7 @@ bool ConfigManager::init()
 		rootDirectory.erase(rootDirectory.find_last_not_of("/\\") + 1);
 	}
 
-	if (doc.LoadFile((rootDirectory + "\\engine_config.xml").c_str()) != XML_SUCCESS)
+	if (doc.LoadFile((rootDirectory + "\\engine_config.xml").c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		Log::wprint(ELL_ERROR, L"引擎配置文件[%s\\engine_config.xml]加载失败", a2w_(rootDirectory).c_str());
 		return false;

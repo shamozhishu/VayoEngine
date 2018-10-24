@@ -5,7 +5,6 @@
 #include "VayoLanguage.h"
 #include "VayoRoot.h"
 #include "VayoLog.h"
-#include "tinyxml2/tinyxml2.h"
 #include "VayoTextureManager.h"
 #include "VayoFontManager.h"
 #include "VayoUIFactory.h"
@@ -241,7 +240,7 @@ UIImageSet* UIImageSet::createImgset(const wstring& filepath)
 bool UIImageSet::init(const wstring& filepath)
 {
 	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(w2a_(filepath).c_str()) != XML_SUCCESS)
+	if (doc.LoadFile(w2a_(filepath).c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		Log::wprint(ELL_ERROR, L"Í¼¼¯[%s]¼ÓÔØÊ§°Ü", filepath.c_str());
 		return false;
@@ -649,14 +648,49 @@ void UIControl::setImage(EUIControlStatus status, const wstring& iconName)
 	_imageArr[status] = iconName;
 }
 
-bool UIControl::loadTemplate(XMLElement* xml)
+void UIControl::serialize(XMLElement* outXml)
 {
-	if (NULL == xml)
+	char buffer[256] = {};
+	// 1, id
+	sprintf_s(buffer, sizeof(buffer), "%d", _ID);
+	outXml->SetAttribute("id", buffer);
+	// 2, rect
+	Recti animRc = getAnimatedRelativeRect();
+	sprintf_s(buffer, sizeof(buffer), "%d,%d,%d,%d", animRc._upperLeftCorner._x, animRc._upperLeftCorner._y, animRc.getWidth(), animRc.getHeight());
+	outXml->SetAttribute("rect", buffer);
+	// 3, imageset
+	sprintf_s(buffer, sizeof(buffer), "%d", _imgsetID);
+	outXml->SetAttribute("imageset", buffer);
+	// 4, image
+	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_imageArr[EUICS_NORMAL]).c_str());
+	outXml->SetAttribute("image", buffer);
+	// 5, text
+	outXml->SetAttribute("textid", _textID.c_str());
+	// 6, textscale
+	sprintf_s(buffer, sizeof(buffer), "%.1f", _textScale);
+	outXml->SetAttribute("textscale", buffer);
+	// 7, textcolor
+	sprintf_s(buffer, sizeof(buffer), "0x%08x", _textColor._clr);
+	outXml->SetAttribute("textcolor", buffer);
+	// 8, textalignhori
+	sprintf_s(buffer, sizeof(buffer), "%d", _textAlignHori);
+	outXml->SetAttribute("textalignhori", buffer);
+	// 9, textalignvert
+	sprintf_s(buffer, sizeof(buffer), "%d", _textAlignVert);
+	outXml->SetAttribute("textalignvert", buffer);
+	// 10, fontID
+	sprintf_s(buffer, sizeof(buffer), "%d", _fontID);
+	outXml->SetAttribute("fontid", buffer);
+}
+
+bool UIControl::deserialize(XMLElement* inXml)
+{
+	if (NULL == inXml)
 		return false;
 
-	setID(xml->IntAttribute("id"));
+	setID(inXml->IntAttribute("id"));
 	vector<string> container;
-	string strTemp = xml->Attribute("rect");
+	string strTemp = inXml->Attribute("rect");
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 4)
 	{
@@ -667,12 +701,12 @@ bool UIControl::loadTemplate(XMLElement* xml)
 		setRectArea(x, y, width, height);
 	}
 
-	setImgsetID(xml->IntAttribute("imageset"));
+	setImgsetID(inXml->IntAttribute("imageset"));
 
-	strTemp = xml->Attribute("image");
+	strTemp = inXml->Attribute("image");
 	setImage(EUICS_NORMAL, utf8ToUnicode(strTemp));
 
-	_textID = xml->Attribute("textid");
+	_textID = inXml->Attribute("textid");
 	container.clear();
 	stringtok(container, _textID, ",");
 	unsigned int ids = container.size();
@@ -683,49 +717,14 @@ bool UIControl::loadTemplate(XMLElement* xml)
 		textContent += L"\r\n";
 	}
 	setText(trim(textContent));
-	setTextScale(xml->FloatAttribute("textscale"));
-	strTemp = xml->Attribute("textcolor");
+	setTextScale(inXml->FloatAttribute("textscale"));
+	strTemp = inXml->Attribute("textcolor");
 	setTextColor(strtoul(strTemp.c_str(), NULL, 16));
-	setTextAlignHori((EUIAlignment)xml->IntAttribute("textalignhori"));
-	setTextAlignVert((EUIAlignment)xml->IntAttribute("textalignvert"));
-	setFontID(xml->IntAttribute("fontid"));
+	setTextAlignHori((EUIAlignment)inXml->IntAttribute("textalignhori"));
+	setTextAlignVert((EUIAlignment)inXml->IntAttribute("textalignvert"));
+	setFontID(inXml->IntAttribute("fontid"));
 
 	return true;
-}
-
-void UIControl::saveTemplate(XMLElement* xml)
-{
-	char buffer[256] = {};
-	// 1, id
-	sprintf_s(buffer, sizeof(buffer), "%d", _ID);
-	xml->SetAttribute("id", buffer);
-	// 2, rect
-	Recti animRc = getAnimatedRelativeRect();
-	sprintf_s(buffer, sizeof(buffer), "%d,%d,%d,%d", animRc._upperLeftCorner._x, animRc._upperLeftCorner._y, animRc.getWidth(), animRc.getHeight());
-	xml->SetAttribute("rect", buffer);
-	// 3, imageset
-	sprintf_s(buffer, sizeof(buffer), "%d", _imgsetID);
-	xml->SetAttribute("imageset", buffer);
-	// 4, image
-	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_imageArr[EUICS_NORMAL]).c_str());
-	xml->SetAttribute("image", buffer);
-	// 5, text
-	xml->SetAttribute("textid", _textID.c_str());
-	// 6, textscale
-	sprintf_s(buffer, sizeof(buffer), "%.1f", _textScale);
-	xml->SetAttribute("textscale", buffer);
-	// 7, textcolor
-	sprintf_s(buffer, sizeof(buffer), "0x%08x", _textColor._clr);
-	xml->SetAttribute("textcolor", buffer);
-	// 8, textalignhori
-	sprintf_s(buffer, sizeof(buffer), "%d", _textAlignHori);
-	xml->SetAttribute("textalignhori", buffer);
-	// 9, textalignvert
-	sprintf_s(buffer, sizeof(buffer), "%d", _textAlignVert);
-	xml->SetAttribute("textalignvert", buffer);
-	// 10, fontID
-	sprintf_s(buffer, sizeof(buffer), "%d", _fontID);
-	xml->SetAttribute("fontid", buffer);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -834,24 +833,24 @@ void UIButton::touchEnded(const Touch& touch)
 	}
 }
 
-bool UIButton::loadTemplate(XMLElement* xml)
+void UIButton::serialize(XMLElement* outXml)
 {
-	if (!UIControl::loadTemplate(xml))
-		return false;
-
-	setImage(EUICS_PUSH, utf8ToUnicode(xml->Attribute("pushimage")));
-	setImage(EUICS_DISABLE, utf8ToUnicode(xml->Attribute("disableimage")));
-	return true;
-}
-
-void UIButton::saveTemplate(XMLElement* xml)
-{
-	UIControl::saveTemplate(xml);
+	UIControl::serialize(outXml);
 	char buffer[256] = {};
 	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_imageArr[EUICS_PUSH]).c_str());
-	xml->SetAttribute("pushimage", buffer);
+	outXml->SetAttribute("pushimage", buffer);
 	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_imageArr[EUICS_DISABLE]).c_str());
-	xml->SetAttribute("disableimage", buffer);
+	outXml->SetAttribute("disableimage", buffer);
+}
+
+bool UIButton::deserialize(XMLElement* inXml)
+{
+	if (!UIControl::deserialize(inXml))
+		return false;
+
+	setImage(EUICS_PUSH, utf8ToUnicode(inXml->Attribute("pushimage")));
+	setImage(EUICS_DISABLE, utf8ToUnicode(inXml->Attribute("disableimage")));
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -958,22 +957,22 @@ void UICheckBox::touchEnded(const Touch& touch)
 	}
 }
 
-bool UICheckBox::loadTemplate(XMLElement* xml)
+void UICheckBox::serialize(XMLElement* outXml)
 {
-	if (!UIControl::loadTemplate(xml))
-		return false;
-
-	setChecked(xml->BoolAttribute("checked"));
-	return true;
-}
-
-void UICheckBox::saveTemplate(XMLElement* xml)
-{
-	UIControl::saveTemplate(xml);
+	UIControl::serialize(outXml);
 	char buffer[256] = {};
 	int check = _checked ? 1 : 0;
 	sprintf_s(buffer, sizeof(buffer), "%d", check);
-	xml->SetAttribute("checked", buffer);
+	outXml->SetAttribute("checked", buffer);
+}
+
+bool UICheckBox::deserialize(XMLElement* inXml)
+{
+	if (!UIControl::deserialize(inXml))
+		return false;
+
+	setChecked(inXml->BoolAttribute("checked"));
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1120,42 +1119,42 @@ void UIStatic::setBgColor(Colour color)
 	_drawBg = true;
 }
 
-bool UIStatic::loadTemplate(XMLElement* xml)
+void UIStatic::serialize(XMLElement* outXml)
 {
-	if (!UIControl::loadTemplate(xml))
-		return false;
-
-	setWordWrap(xml->BoolAttribute("wordwrap"));
-	setBorder(xml->BoolAttribute("border"));
-	setDrawBg(xml->BoolAttribute("drawbg"));
-	setClipText(xml->BoolAttribute("cliptext"));
-	string strTemp = xml->Attribute("bgcolor");
-	setBgColor(strtoul(strTemp.c_str(), NULL, 16));
-	setBgColorEnabled(xml->BoolAttribute("bgcolorenabled"));
-	return true;
-}
-
-void UIStatic::saveTemplate(XMLElement* xml)
-{
-	UIControl::saveTemplate(xml);
+	UIControl::serialize(outXml);
 	char buffer[256] = {};
 	int val = _wordWrap ? 1 : 0;
 	sprintf_s(buffer, sizeof(buffer), "%d", val);
-	xml->SetAttribute("wordwrap", buffer);
+	outXml->SetAttribute("wordwrap", buffer);
 	val = _border ? 1 : 0;
 	sprintf_s(buffer, sizeof(buffer), "%d", val);
-	xml->SetAttribute("border", buffer);
+	outXml->SetAttribute("border", buffer);
 	val = _drawBg ? 1 : 0;
 	sprintf_s(buffer, sizeof(buffer), "%d", val);
-	xml->SetAttribute("drawbg", buffer);
+	outXml->SetAttribute("drawbg", buffer);
 	val = _clipText ? 1 : 0;
 	sprintf_s(buffer, sizeof(buffer), "%d", val);
-	xml->SetAttribute("cliptext", buffer);
+	outXml->SetAttribute("cliptext", buffer);
 	sprintf_s(buffer, sizeof(buffer), "0x%08x", _bgColor._clr);
-	xml->SetAttribute("bgcolor", buffer);
+	outXml->SetAttribute("bgcolor", buffer);
 	val = _bgColorEnabled ? 1 : 0;
 	sprintf_s(buffer, sizeof(buffer), "%d", val);
-	xml->SetAttribute("bgcolorenabled", buffer);
+	outXml->SetAttribute("bgcolorenabled", buffer);
+}
+
+bool UIStatic::deserialize(XMLElement* inXml)
+{
+	if (!UIControl::deserialize(inXml))
+		return false;
+
+	setWordWrap(inXml->BoolAttribute("wordwrap"));
+	setBorder(inXml->BoolAttribute("border"));
+	setDrawBg(inXml->BoolAttribute("drawbg"));
+	setClipText(inXml->BoolAttribute("cliptext"));
+	string strTemp = inXml->Attribute("bgcolor");
+	setBgColor(strtoul(strTemp.c_str(), NULL, 16));
+	setBgColorEnabled(inXml->BoolAttribute("bgcolorenabled"));
+	return true;
 }
 
 void UIStatic::breakText()
@@ -1593,49 +1592,49 @@ bool UIScrollBar::touchWheel(const Touch& touch, float wheel)
 	return true;
 }
 
-bool UIScrollBar::loadTemplate(XMLElement* xml)
+void UIScrollBar::serialize(XMLElement* outXml)
 {
-	if (!UIControl::loadTemplate(xml))
+	UIControl::serialize(outXml);
+	char buffer[256] = {};
+	sprintf_s(buffer, sizeof(buffer), "%d", _min);
+	outXml->SetAttribute("min", buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", _max);
+	outXml->SetAttribute("max", buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", _smallStep);
+	outXml->SetAttribute("smallstep", buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", _largeStep);
+	outXml->SetAttribute("largestep", buffer);
+	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_upButton->getImage(EUICS_NORMAL)).c_str());
+	outXml->SetAttribute("btnnormalimage", buffer);
+	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_upButton->getImage(EUICS_PUSH)).c_str());
+	outXml->SetAttribute("btnpushimage", buffer);
+	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_upButton->getImage(EUICS_DISABLE)).c_str());
+	outXml->SetAttribute("btndisableimage", buffer);
+	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_sliderIconName).c_str());
+	outXml->SetAttribute("sliderimage", buffer);
+}
+
+bool UIScrollBar::deserialize(XMLElement* inXml)
+{
+	if (!UIControl::deserialize(inXml))
 		return false;
 
-	setMin(xml->IntAttribute("min"));
-	setMax(xml->IntAttribute("max"));
-	setSmallStep(xml->IntAttribute("smallstep"));
-	setLargeStep(xml->IntAttribute("largestep"));
-	string strTemp = xml->Attribute("sliderimage");
+	setMin(inXml->IntAttribute("min"));
+	setMax(inXml->IntAttribute("max"));
+	setSmallStep(inXml->IntAttribute("smallstep"));
+	setLargeStep(inXml->IntAttribute("largestep"));
+	string strTemp = inXml->Attribute("sliderimage");
 	setSliderIconName(utf8ToUnicode(strTemp));
-	strTemp = xml->Attribute("btnnormalimage");
+	strTemp = inXml->Attribute("btnnormalimage");
 	_upButton->setImage(EUICS_NORMAL, utf8ToUnicode(strTemp));
 	_downButton->setImage(EUICS_NORMAL, utf8ToUnicode(strTemp));
-	strTemp = xml->Attribute("btnpushimage");
+	strTemp = inXml->Attribute("btnpushimage");
 	_upButton->setImage(EUICS_PUSH, utf8ToUnicode(strTemp));
 	_downButton->setImage(EUICS_PUSH, utf8ToUnicode(strTemp));
-	strTemp = xml->Attribute("btndisableimage");
+	strTemp = inXml->Attribute("btndisableimage");
 	_upButton->setImage(EUICS_DISABLE, utf8ToUnicode(strTemp));
 	_downButton->setImage(EUICS_DISABLE, utf8ToUnicode(strTemp));
 	return true;
-}
-
-void UIScrollBar::saveTemplate(XMLElement* xml)
-{
-	UIControl::saveTemplate(xml);
-	char buffer[256] = {};
-	sprintf_s(buffer, sizeof(buffer), "%d", _min);
-	xml->SetAttribute("min", buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", _max);
-	xml->SetAttribute("max", buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", _smallStep);
-	xml->SetAttribute("smallstep", buffer);
-	sprintf_s(buffer, sizeof(buffer), "%d", _largeStep);
-	xml->SetAttribute("largestep", buffer);
-	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_upButton->getImage(EUICS_NORMAL)).c_str());
-	xml->SetAttribute("btnnormalimage", buffer);
-	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_upButton->getImage(EUICS_PUSH)).c_str());
-	xml->SetAttribute("btnpushimage", buffer);
-	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_upButton->getImage(EUICS_DISABLE)).c_str());
-	xml->SetAttribute("btndisableimage", buffer);
-	sprintf_s(buffer, sizeof(buffer), "%s", w2a_(_sliderIconName).c_str());
-	xml->SetAttribute("sliderimage", buffer);
 }
 
 void UIScrollBar::refreshControls()
@@ -1897,17 +1896,17 @@ bool UIListBox::touchWheel(const Touch& touch, float wheel)
 	return true;
 }
 
-bool UIListBox::loadTemplate(XMLElement* xml)
+void UIListBox::serialize(XMLElement* outXml)
 {
-	if (!UIControl::loadTemplate(xml))
+	UIControl::serialize(outXml);
+}
+
+bool UIListBox::deserialize(XMLElement* inXml)
+{
+	if (!UIControl::deserialize(inXml))
 		return false;
 
 	return true;
-}
-
-void UIListBox::saveTemplate(XMLElement* xml)
-{
-	UIControl::saveTemplate(xml);
 }
 
 void UIListBox::setItemHeight(int height)
@@ -2205,8 +2204,21 @@ UIDialog::UIDialog(const wstring& fileName)
 {
 	const tagUIConfig& filePaths = Root::getSingleton().getConfigManager()->getUIConfig();
 	wstring fullPath = filePaths.DlgXmlPath + fileName;
-	if (parseXMLFile(fullPath))
+	tinyxml2::XMLDocument doc;
+	if (doc.LoadFile(w2a_(fullPath).c_str()) != tinyxml2::XML_SUCCESS)
+		return;
+
+	XMLElement* pRoot = doc.RootElement();
+	if (NULL == pRoot)
+		return;
+
+	if (deserialize(pRoot))
+	{
+		_xmlFilePath = fullPath;
+		showWidget(false);
+		setOutlineColor(Colour(255, 0, 100, 255));
 		Root::getSingleton().getUIManager()->addDialog(this);
+	}
 }
 
 UIDialog::~UIDialog()
@@ -2429,18 +2441,24 @@ bool UIDialog::keyClicked(const tagKeyInput& keyInput)
 	return UIWidget::keyClicked(keyInput);
 }
 
-bool UIDialog::parseXMLFile(const wstring& fullPath)
+void UIDialog::serialize(XMLElement* outXml)
 {
-	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(w2a_(fullPath).c_str()) != XML_SUCCESS)
-		return false;
+	char buffer[256] = {};
+	Recti animRc = getAnimatedRelativeRect();
+	sprintf_s(buffer, sizeof(buffer), "%d,%d,%d,%d", animRc._upperLeftCorner._x,
+		animRc._upperLeftCorner._y,
+		animRc.getWidth(),
+		animRc.getHeight());
+	outXml->SetAttribute("rect", buffer);
+	sprintf_s(buffer, sizeof(buffer), "%d", _imgsetID);
+	outXml->SetAttribute("imageset", buffer);
+	outXml->SetAttribute("image", w2a_(_image).c_str());
+}
 
-	XMLElement* pRoot = doc.RootElement();
-	if (NULL == pRoot)
-		return false;
-
+bool UIDialog::deserialize(XMLElement* inXml)
+{
 	vector<string> container;
-	string strArea = pRoot->Attribute("rect");
+	string strArea = inXml->Attribute("rect");
 	stringtok(container, strArea, ",");
 	if (container.size() >= 4)
 	{
@@ -2451,18 +2469,18 @@ bool UIDialog::parseXMLFile(const wstring& fullPath)
 		setRectArea(x, y, width, height);
 	}
 
-	setImgsetID(atoi(pRoot->Attribute("imageset")));
-	setImage(utf8ToUnicode(pRoot->Attribute("image")));
+	setImgsetID(atoi(inXml->Attribute("imageset")));
+	setImage(utf8ToUnicode(inXml->Attribute("image")));
 
 	UIFactory uiFactory;
-	XMLElement* pElem = pRoot->FirstChildElement();
+	XMLElement* pElem = inXml->FirstChildElement();
 	while (pElem)
 	{
 		UIControl* pCtrl = uiFactory.createCtrl(utf8ToUnicode(pElem->Name()));
 		if (NULL != pCtrl)
 		{
 			pCtrl->setParent(this);
-			if (pCtrl->loadTemplate(pElem))
+			if (pCtrl->deserialize(pElem))
 			{
 				_controls.push_back(pCtrl);
 			}
@@ -2474,10 +2492,6 @@ bool UIDialog::parseXMLFile(const wstring& fullPath)
 
 		pElem = pElem->NextSiblingElement();
 	}
-
-	_xmlFilePath = fullPath;
-	showWidget(false);
-	setOutlineColor(Colour(255, 0, 100, 255));
 
 	return true;
 }
@@ -2520,7 +2534,7 @@ bool UIManager::init()
 	{
 		// loading sequence frame animation.
 		tinyxml2::XMLDocument doc;
-		if (doc.LoadFile(w2a_(uiConfig.SeqAnimPath).c_str()) != XML_SUCCESS)
+		if (doc.LoadFile(w2a_(uiConfig.SeqAnimPath).c_str()) != tinyxml2::XML_SUCCESS)
 		{
 			Log::wprint(ELL_ERROR, L"ÐòÁÐÖ¡¶¯»­[%s]¼ÓÔØÊ§°Ü", uiConfig.SeqAnimPath.c_str());
 			break;
@@ -2852,16 +2866,7 @@ bool UIManager::keyClicked(const tagKeyInput& keyInput)
 			tinyxml2::XMLDocument doc;
 			doc.NewDeclaration();
 			XMLElement* root = doc.NewElement("Dialog");
-			char buffer[256] = {};
-			Recti animRc = pCurSelectedDlg->getAnimatedRelativeRect();
-			sprintf_s(buffer, sizeof(buffer), "%d,%d,%d,%d", animRc._upperLeftCorner._x,
-				animRc._upperLeftCorner._y,
-				animRc.getWidth(),
-				animRc.getHeight());
-			root->SetAttribute("rect", buffer);
-			sprintf_s(buffer, sizeof(buffer), "%d", pCurSelectedDlg->getImgsetID());
-			root->SetAttribute("imageset", buffer);
-			root->SetAttribute("image", w2a_(pCurSelectedDlg->getImage()).c_str());
+			pCurSelectedDlg->serialize(root);
 			doc.InsertEndChild(root);
 
 			UIControl* pCtrl = NULL;
@@ -2871,11 +2876,11 @@ bool UIManager::keyClicked(const tagKeyInput& keyInput)
 			{
 				pCtrl = (*constItor);
 				XMLElement* pCtrlElem = doc.NewElement(w2a_(pCtrl->getName()).c_str());
+				pCtrl->serialize(pCtrlElem);
 				root->InsertEndChild(pCtrlElem);
-				pCtrl->saveTemplate(pCtrlElem);
 			}
 
-			if (XML_SUCCESS != doc.SaveFile(w2a_(pCurSelectedDlg->getXMLFilePath()).c_str()))
+			if (tinyxml2::XML_SUCCESS != doc.SaveFile(w2a_(pCurSelectedDlg->getXMLFilePath()).c_str()))
 			{
 				Log::wprint(ELL_ERROR, L"±£´æ%sÊ§°Ü", pCurSelectedDlg->getXMLFilePath().c_str());
 				return false;

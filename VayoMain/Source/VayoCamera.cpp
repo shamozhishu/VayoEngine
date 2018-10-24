@@ -4,7 +4,6 @@
 #include "VayoRenderSystem.h"
 #include "VayoSceneNode.h"
 #include "VayoSceneManager.h"
-#include "tinyxml2/tinyxml2.h"
 #include "VayoUtils.h"
 
 NS_VAYO_BEGIN
@@ -472,16 +471,21 @@ void FPSCamera::rebuildViewArea()
 		Camera::rebuildViewArea();
 }
 
-bool FPSCamera::parseXML(XMLElement* xml)
+void FPSCamera::serialize(XMLElement* outXml)
 {
-	if (!xml)
+
+}
+
+bool FPSCamera::deserialize(XMLElement* inXml)
+{
+	if (!inXml)
 		return false;
 
-	_moveSpeed[0] = _moveSpeed[1] = xml->FloatAttribute("moveSpeed");
+	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
 
 	Vector3df position(0, 0, 0), target(0, 0, -1), worldUp(0, 1, 0);
 	vector<string> container;
-	string strTemp = xml->Attribute("position");
+	string strTemp = inXml->Attribute("position");
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
 	{
@@ -491,7 +495,7 @@ bool FPSCamera::parseXML(XMLElement* xml)
 		position.set(x, y, z);
 	}
 
-	strTemp = xml->Attribute("target");
+	strTemp = inXml->Attribute("target");
 	container.clear();
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
@@ -502,7 +506,7 @@ bool FPSCamera::parseXML(XMLElement* xml)
 		target.set(x, y, z);
 	}
 
-	strTemp = xml->Attribute("worldUp");
+	strTemp = inXml->Attribute("worldUp");
 	container.clear();
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
@@ -515,9 +519,9 @@ bool FPSCamera::parseXML(XMLElement* xml)
 
 	lookAt(position, target, worldUp);
 
-	float fovY = xml->FloatAttribute("fovY");
-	float zn = xml->FloatAttribute("zn");
-	float zf = xml->FloatAttribute("zf");
+	float fovY = inXml->FloatAttribute("fovY");
+	float zn = inXml->FloatAttribute("zn");
+	float zf = inXml->FloatAttribute("zf");
 
 	setLens(fovY, getAspect(), zn, zf);
 
@@ -716,17 +720,22 @@ void OrbitCamera::rebuildViewArea()
 		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _arcball._transform * _affector;
 }
 
-bool OrbitCamera::parseXML(XMLElement* xml)
+void OrbitCamera::serialize(XMLElement* outXml)
 {
-	if (!xml)
+
+}
+
+bool OrbitCamera::deserialize(XMLElement* inXml)
+{
+	if (!inXml)
 		return false;
 
-	_moveSpeed[0] = _moveSpeed[1] = xml->FloatAttribute("moveSpeed");
-	_zoomSpeed[0] = _zoomSpeed[1] = xml->FloatAttribute("zoomSpeed");
+	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
+	_zoomSpeed[0] = _zoomSpeed[1] = inXml->FloatAttribute("zoomSpeed");
 	
 	Vector3df position(0, 0, 0), target(0, 0, -1), worldUp(0, 1, 0);
 	vector<string> container;
-	string strTemp = xml->Attribute("position");
+	string strTemp = inXml->Attribute("position");
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
 	{
@@ -736,7 +745,7 @@ bool OrbitCamera::parseXML(XMLElement* xml)
 		position.set(x, y, z);
 	}
 
-	strTemp = xml->Attribute("target");
+	strTemp = inXml->Attribute("target");
 	container.clear();
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
@@ -747,7 +756,7 @@ bool OrbitCamera::parseXML(XMLElement* xml)
 		target.set(x, y, z);
 	}
 
-	strTemp = xml->Attribute("worldUp");
+	strTemp = inXml->Attribute("worldUp");
 	container.clear();
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
@@ -760,9 +769,9 @@ bool OrbitCamera::parseXML(XMLElement* xml)
 
 	lookAt(position, target, worldUp);
 
-	float fovY = xml->FloatAttribute("fovY");
-	float zn = xml->FloatAttribute("zn");
-	float zf = xml->FloatAttribute("zf");
+	float fovY = inXml->FloatAttribute("fovY");
+	float zn = inXml->FloatAttribute("zn");
+	float zf = inXml->FloatAttribute("zf");
 
 	setLens(fovY, getAspect(), zn, zf);
 
@@ -968,6 +977,16 @@ void EagleEyeCamera::restoreViewMemento(const wstring& name)
 		SAFE_DELETE(it->second);
 		_viewMementoPool.erase(it);
 	}
+}
+
+void EagleEyeCamera::serialize(XMLElement* outXml)
+{
+
+}
+
+bool EagleEyeCamera::deserialize(XMLElement* inXml)
+{
+	return true;
 }
 
 NS_VAYO_END

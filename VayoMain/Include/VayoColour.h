@@ -33,7 +33,7 @@ class _VayoExport Colour
 {
 public:
 	inline Colour()
-		: _clr(0u) {}
+		: _clr(0xff000000) {}
 	inline Colour (int a, int r, int g, int b)
 		: _clr(((a & 0xff)<<24) | ((r & 0xff)<<16) | ((g & 0xff)<<8) | (b & 0xff))	{}
 	inline Colour(unsigned int clr)

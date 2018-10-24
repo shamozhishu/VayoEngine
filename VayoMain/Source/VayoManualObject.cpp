@@ -1,5 +1,4 @@
 #include "VayoManualObject.h"
-#include "tinyxml2/tinyxml2.h"
 #include "VayoRoot.h"
 #include "VayoSceneNode.h"
 #include "VayoRenderSystem.h"
@@ -49,6 +48,20 @@ void ManualObject::render()
 		submitDisplay();
 		_needSubmit = false;
 	}
+}
+
+void ManualObject::setMaterial(const wstring& name)
+{
+	if (getMaterial()->_materialName != name)
+		_needSubmit = true;
+	Renderable::setMaterial(name);
+}
+
+void ManualObject::setMaterial(const MaterialPtr& material)
+{
+	if (getMaterial().get() != material.get())
+		_needSubmit = true;
+	Renderable::setMaterial(material);
 }
 
 void ManualObject::getWorldTransform(Matrix4x4& mat) const
@@ -199,6 +212,11 @@ MeshPtr ManualObject::getMesh() const
 SubMesh* ManualObject::getOpSubMesh() const
 {
 	return _opSubMesh;
+}
+
+void ManualObject::resetSubmit()
+{
+	_needSubmit = true;
 }
 
 void ManualObject::generatePlane(float extent, float step, const wstring& materialName)
@@ -359,13 +377,18 @@ void ManualObject::submitDisplay()
 	}
 }
 
-bool ManualObject::parseXML(XMLElement* xml)
+void ManualObject::serialize(XMLElement* outXml)
 {
-	if (!xml)
+
+}
+
+bool ManualObject::deserialize(XMLElement* inXml)
+{
+	if (!inXml)
 		return false;
 
 	vector<string> container;
-	const char* pszTmp = xml->Attribute("model");
+	const char* pszTmp = inXml->Attribute("model");
 	if (NULL == pszTmp)
 		return true;
 

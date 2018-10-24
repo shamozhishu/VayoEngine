@@ -1,5 +1,6 @@
 #include "VayoSceneNode.h"
 #include "VayoRoot.h"
+#include "VayoUtils.h"
 #include "VayoRenderSystem.h"
 #include "VayoMovableObject.h"
 #include "VayoSceneManager.h"
@@ -153,6 +154,66 @@ SceneNode* SceneNode::createChildSceneNode(const wstring& name /*= L""*/)
 	if (_sceneMgr)
 		pRet = _sceneMgr->createSceneNode(this, name);
 	return pRet;
+}
+
+void SceneNode::serialize(XMLElement* outXml)
+{
+
+}
+
+bool SceneNode::deserialize(XMLElement* inXml)
+{
+	if (!inXml)
+		return false;
+
+	string strTemp;
+	vector<string> container;
+	const char* szTmp = inXml->Attribute("relTranslation");
+	if (szTmp)
+		strTemp = szTmp;
+	stringtok(container, strTemp, ",");
+	if (container.size() >= 3)
+	{
+		float x = (float)atof(container[0].c_str());
+		float y = (float)atof(container[1].c_str());
+		float z = (float)atof(container[2].c_str());
+		_relSpace._translation.set(x, y, z);
+	}
+
+	strTemp.clear();
+	container.clear();
+	szTmp = inXml->Attribute("relRotation");
+	if (szTmp)
+		strTemp = szTmp;
+	stringtok(container, strTemp, ",");
+	if (container.size() >= 3)
+	{
+		float x = (float)atof(container[0].c_str());
+		float y = (float)atof(container[1].c_str());
+		float z = (float)atof(container[2].c_str());
+		_relSpace._rotation.set(x, y, z);
+	}
+
+	strTemp.clear();
+	container.clear();
+	szTmp = inXml->Attribute("relScale");
+	if (szTmp)
+		strTemp = szTmp;
+	stringtok(container, strTemp, ",");
+	if (container.size() >= 3)
+	{
+		float x = (float)atof(container[0].c_str());
+		float y = (float)atof(container[1].c_str());
+		float z = (float)atof(container[2].c_str());
+		_relSpace._scale.set(x, y, z);
+	}
+
+	szTmp = inXml->Attribute("canVisit");
+	if (szTmp)
+		strTemp = szTmp;
+	_canVisit = (strTemp == "false" ? false : true);
+
+	return true;
 }
 
 NS_VAYO_END

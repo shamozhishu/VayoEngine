@@ -16,10 +16,9 @@ bool ModelViewer::startup()
 	Log::print(ELL_INFORMATION, "Model Viewer 程序启动");
 
 	// 加载场景
-	if (!Root::getSingleton().loadScene(L"测试场景.xml"))
+	SceneManager* pCurSceneMgr = Root::getSingleton().createSceneMgr(L"测试场景");
+	if (!pCurSceneMgr->loadScene(L"测试场景.scene"))
 		return false;
-
-	SceneManager* pCurSceneMgr = Root::getSingleton().getCurSceneMgr();
 
 	// 获取摄像机
 	m_cameraFPS = pCurSceneMgr->findObject<FPSCamera>(L"第一人称摄像机");

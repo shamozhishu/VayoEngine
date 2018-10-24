@@ -54,9 +54,8 @@ public:
 	bool          IsLaunched() const { return _isLaunched; }
 	void          addRenderSystem(RenderSystem* newRenderer);
 
-	bool          loadScene(const wstring& xmlFileName);
-	SceneManager* findSceneMgr(const wstring& sceneName);
 	SceneManager* createSceneMgr(const wstring& sceneName = L"");
+	SceneManager* findSceneMgr(const wstring& sceneName);
 	void          destroySceneMgr(const wstring& sceneName);
 	void          destroySceneMgr(SceneManager* pSceneMgr);
 	void          destroyAllSceneMgrs();

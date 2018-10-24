@@ -20,17 +20,24 @@ protected:
 	LightData _lightData;
 };
 
+/**
+ * Serialized template:
+ * <DirectionalLight name="主方向光" ambientColor="0xff808080" diffuseColor="0xffffffff" specularColor="ffcccccc" direction="-0.57735,0.57735,0.57735"/>
+**/
 class _VayoExport DirectionalLight : public MovableObject, public Light
 {
 public:
 	DirectionalLight(const wstring& name);
 	void update(float dt);
 	void setDirection(float x, float y, float z);
-
-protected:
-	bool parseXML(XMLElement* xml);
+	void serialize(XMLElement* outXml);
+	bool deserialize(XMLElement* inXml);
 };
 
+/**
+ * Serialized template:
+ * TODO
+**/
 class _VayoExport PointLight : public MovableObject, public Light
 {
 public:
@@ -39,11 +46,14 @@ public:
 	void setPosition(float x, float y, float z);
 	void setRange(float range);
 	void setAtt(float a0, float a1, float a2);
-
-protected:
-	bool parseXML(XMLElement* xml);
+	void serialize(XMLElement* outXml);
+	bool deserialize(XMLElement* inXml);
 };
 
+/**
+ * Serialized template:
+ * TODO
+**/
 class _VayoExport SpotLight : public PointLight
 {
 public:
@@ -52,9 +62,8 @@ public:
 	void setDirection(float x, float y, float z);
 	void setExponent(float exponent);
 	void setCutoff(float cutoff);
-
-protected:
-	bool parseXML(XMLElement* xml);
+	void serialize(XMLElement* outXml);
+	bool deserialize(XMLElement* inXml);
 };
 
 NS_VAYO_END

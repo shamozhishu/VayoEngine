@@ -114,16 +114,17 @@ class TessGridParser
 	static inline bool onTesselating(TessGridHandler& tess, ManualObject* pObj,
 		const Vector3df& norm, const wstring& materialname, bool reverse, int idx)
 	{
+		wstring materialName = materialname == L"default_material" ? L"" : materialname;
 		bool tessSucc = false;
 		if (idx < 0)
 		{
 			tess.changeNormalList(norm);
-			tessSucc = tess.tesselating(pObj, reverse, materialname);
+			tessSucc = tess.tesselating(pObj, reverse, materialName);
 		}
 		else
 		{
 			tess.changeNormalList(norm, (unsigned int)idx);
-			tessSucc = tess.tesselatingOnce(pObj, (unsigned int)idx, reverse, materialname);
+			tessSucc = tess.tesselatingOnce(pObj, (unsigned int)idx, reverse, materialName);
 		}
 
 		return tessSucc;
@@ -207,7 +208,8 @@ class TessGridParser
 		}
 
 		strin >> tag;
-		pObj->setMaterial(tag);
+		if (tag != L"default_material")
+			pObj->setMaterial(tag);
 
 		unsigned int vertexCount, contourCount;
 		strin >> vertexCount >> contourCount;
@@ -632,7 +634,7 @@ bool TessGridHandler::parseTessgridFile(const wstring& filename)
 		std::wifstream fin(filePath);
 		if (!fin)
 		{
-			Log::wprint(ELL_ERROR, L"打开[%s]文件失败", filename.c_str());
+			Log::wprint(ELL_ERROR, L"文件[%s]打开失败", filename.c_str());
 			return false;
 		}
 
@@ -642,11 +644,11 @@ bool TessGridHandler::parseTessgridFile(const wstring& filename)
 		
 		if (parseTessgridFile(filestream))
 		{
-			Log::wprint(ELL_INFORMATION, L"解析[%s]文件成功", filename.c_str());
+			Log::wprint(ELL_INFORMATION, L"文件[%s]解析成功", filename.c_str());
 			return true;
 		}
 		
-		Log::wprint(ELL_ERROR, L"解析[%s]文件失败", filename.c_str());
+		Log::wprint(ELL_ERROR, L"文件[%s]解析失败", filename.c_str());
 	}
 
 	return false;
@@ -679,6 +681,11 @@ bool TessGridHandler::parseTessgridFile(wstringstream& filestream)
 			break;
 		}
 	}
+
+	if (succParse)
+		Log::wprint(ELL_DEBUG, L"文件流解析成功");
+	else
+		Log::wprint(ELL_WARNING, L"文件流解析失败");
 
 	return succParse;
 }

@@ -31,21 +31,26 @@ private:
 	SubMesh*    _subMesh;
 };
 
+/**
+ * Serialized template:
+ * <Entity name="Ô²Öù" model="Cylinder,examples/cube,5,10,50,0xffffffff,true,0"/>
+**/
 class _VayoExport Entity : public MovableObject
 {
 public:
 	Entity(const wstring& name);
 	~Entity();
-	void                update(float dt);
-	void                setMesh(MeshPtr pMesh);
-	MeshPtr             getMesh() const;
-	SubEntity*          getSubEntity(unsigned int index);
-	SubEntity*          getSubEntity(const wstring& name);
-	unsigned int        getSubEntCount(void);
+	void         update(float dt);
+	void         setMesh(MeshPtr pMesh);
+	MeshPtr      getMesh() const;
+	SubEntity*   getSubEntity(unsigned int index);
+	SubEntity*   getSubEntity(const wstring& name);
+	unsigned int getSubEntCount(void);
+	void         serialize(XMLElement* outXml);
+	bool         deserialize(XMLElement* inXml);
 
 protected:
 	void buildSubEntities();
-	bool parseXML(XMLElement* xml);
 private:
 	MeshPtr            _mesh;
 	unsigned int       _changedMeshID;

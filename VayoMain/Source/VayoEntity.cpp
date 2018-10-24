@@ -6,7 +6,6 @@
 #include "VayoRenderSystem.h"
 #include "VayoMeshManager.h"
 #include "VayoSceneManager.h"
-#include "tinyxml2/tinyxml2.h"
 #include "VayoMaterialManager.h"
 #include "VayoManualObject.h"
 
@@ -141,12 +140,17 @@ void Entity::buildSubEntities()
 	}
 }
 
-bool Entity::parseXML(XMLElement* xml)
+void Entity::serialize(XMLElement* outXml)
 {
-	if (!xml)
+
+}
+
+bool Entity::deserialize(XMLElement* inXml)
+{
+	if (!inXml)
 		return false;
 
-	const char* pszTmp = xml->Attribute("model");
+	const char* pszTmp = inXml->Attribute("model");
 	if (NULL == pszTmp)
 		return true;
 

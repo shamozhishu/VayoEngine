@@ -1,78 +1,26 @@
 #include "VayoSceneManager.h"
-#include "tinyxml2/tinyxml2.h"
 #include "VayoSceneNode.h"
-#include "VayoRenderSystem.h"
-#include "VayoUtils.h"
-#include "VayoCamera.h"
-#include "VayoLight.h"
-#include "VayoManualObject.h"
-#include "VayoEntity.h"
 #include "VayoRoot.h"
+#include "VayoCamera.h"
 #include "VayoNodeAnimator.h"
 #include "VayoCollision.h"
-
-#define ELSE_IF_CREATE_OBJECT(OBJ_TYPE)                                            \
-else if (strTmp == #OBJ_TYPE)                                                      \
-{                                                                                  \
-	wstring objName = utf8ToUnicode(xml->Attribute("name"));                       \
-	pObj = findObject<OBJ_TYPE>(objName);                                          \
-	if (NULL == pObj)                                                              \
-	{                                                                              \
-		pObj = createObject<OBJ_TYPE>(objName);                                    \
-		if (NULL == pObj || !pObj->parseXML(xml))                                  \
-		{                                                                          \
-			return false;                                                          \
-		}                                                                          \
-	}                                                                              \
-}
+#include "VayoSceneLoader.h"
 
 NS_VAYO_BEGIN
 
-bool SceneManager::xmlParseSceneRecursion(XMLElement* xml, SceneNode* pParent)
+void SceneManager::setSceneLoader(SceneLoader* sceneLoader)
 {
-	MovableObject* pObj = NULL;
-	string strTmp = xml->Value();
-	/*<SceneNode name="灯光场景节点" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" isVisible="true">*/
-	if (strTmp == "SceneNode")
-	{
-		if (NULL == pParent)
-			pParent = _rootSceneNode;
-
-		SceneNode* pScnenNode = createSceneNode(pParent, utf8ToUnicode(xml->Attribute("name")));
-
-		if (NULL == pScnenNode || !pScnenNode->parseXML(xml))
-			return false;
-
-		XMLElement* pElem = xml->FirstChildElement();
-		while (pElem)
-		{
-			if (!xmlParseSceneRecursion(pElem, pScnenNode))
-				return false;
-
-			pElem = pElem->NextSiblingElement();
-		}
-
-		return true;
-	}
-	/*<FPSCamera name="第一人称摄像机" position="0,100,100" target="0,0,0" worldUp="0,1,0" fovY="45" nearZ="1" farZ="1000" moveSpeed="50"/>*/
-	ELSE_IF_CREATE_OBJECT(FPSCamera)
-	/*<OrbitCamera name="轨道摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45" nearZ="1" farZ="1000" moveSpeed="20" zoomSpeed="20"/>*/
-	ELSE_IF_CREATE_OBJECT(OrbitCamera)
-	/*<DirectionalLight name="主方向光" ambientColor="0xff808080" diffuseColor="0xffffffff" specularColor="ffcccccc" direction="-0.57735,0.57735,0.57735"/>*/
-	ELSE_IF_CREATE_OBJECT(DirectionalLight)
-	ELSE_IF_CREATE_OBJECT(PointLight)
-	ELSE_IF_CREATE_OBJECT(SpotLight)
-	/*<ManualObject name="球" material="examples/sphere" custom="Sphere,5,100,100"/>*/
-	ELSE_IF_CREATE_OBJECT(ManualObject)
-	/*<Entity name="立方体" mesh="Cube,examples/cube,10,10,10"/>*/
-	ELSE_IF_CREATE_OBJECT(Entity)
-	pParent->attachObject(pObj);
-	return true;
+	if (_sceneLoader)
+		delete _sceneLoader;
+	_sceneLoader = sceneLoader;
 }
 
 SceneManager::SceneManager(const wstring& sceneName)
 	: _name(sceneName)
 	, _activeCamera(NULL)
+	, _sceneLoader(NULL)
+	, _rootSceneNode(NULL)
+	, _collDetector(NULL)
 	, _renderQueues(this)
 {
 	static unsigned short idx = 0;
@@ -85,12 +33,14 @@ SceneManager::SceneManager(const wstring& sceneName)
 	}
 
 	_rootSceneNode = createSceneNode(NULL, L"RootSceneNode");
+	_sceneLoader = new SceneLoader(this);
 	_collDetector = new CollisionDetector(this);
 }
 
 SceneManager::~SceneManager()
 {
 	SAFE_DELETE(_collDetector);
+	setSceneLoader(NULL);
 	destroyAllAnimators();
 	destroyAllObjects();
 	destroyAllSceneNodes();
@@ -170,13 +120,18 @@ void SceneManager::showAllWireBoundingBoxes(bool bShow)
 		it->second->showWireBoundingBox(bShow);
 }
 
-SceneNode* SceneManager::findSceneNode(const wstring& name)
+bool SceneManager::loadScene(const wstring& sceneFile)
 {
-	SceneNode* ret = NULL;
-	map<wstring, SceneNode*>::iterator it = _sceneNodesPool.find(name);
-	if (it != _sceneNodesPool.end())
-		ret = it->second;
-	return ret;
+	if (_sceneLoader)
+		return _sceneLoader->loadScene(sceneFile);
+	return false;
+}
+
+bool SceneManager::saveScene(const wstring& sceneFile)
+{
+	if (_sceneLoader)
+		return _sceneLoader->saveScene(sceneFile);
+	return false;
 }
 
 SceneNode* SceneManager::createSceneNode(Node* parent, const wstring& name /*= L""*/)
@@ -193,6 +148,15 @@ SceneNode* SceneManager::createSceneNode(Node* parent, const wstring& name /*= L
 
 	_sceneNodesPool[pSceneNode->getName()] = pSceneNode;
 	return pSceneNode;
+}
+
+SceneNode* SceneManager::findSceneNode(const wstring& name)
+{
+	SceneNode* ret = NULL;
+	map<wstring, SceneNode*>::iterator it = _sceneNodesPool.find(name);
+	if (it != _sceneNodesPool.end())
+		ret = it->second;
+	return ret;
 }
 
 void SceneManager::destroySceneNode(SceneNode* sn)

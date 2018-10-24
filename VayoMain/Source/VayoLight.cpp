@@ -2,7 +2,6 @@
 #include "VayoSceneNode.h"
 #include "VayoRoot.h"
 #include "VayoRenderSystem.h"
-#include "tinyxml2/tinyxml2.h"
 #include "VayoUtils.h"
 
 NS_VAYO_BEGIN
@@ -44,20 +43,25 @@ void DirectionalLight::setDirection(float x, float y, float z)
 	_lightData._direction.set(x, y, z);
 }
 
-bool DirectionalLight::parseXML(XMLElement* xml)
+void DirectionalLight::serialize(XMLElement* outXml)
 {
-	if (!xml)
+
+}
+
+bool DirectionalLight::deserialize(XMLElement* inXml)
+{
+	if (!inXml)
 		return false;
 
-	string strTemp = xml->Attribute("ambientColor");
+	string strTemp = inXml->Attribute("ambientColor");
 	_lightData._ambientColor.set(strtoul(strTemp.c_str(), NULL, 16));
-	strTemp = xml->Attribute("diffuseColor");
+	strTemp = inXml->Attribute("diffuseColor");
 	_lightData._diffuseColor.set(strtoul(strTemp.c_str(), NULL, 16));
-	strTemp = xml->Attribute("specularColor");
+	strTemp = inXml->Attribute("specularColor");
 	_lightData._specularColor.set(strtoul(strTemp.c_str(), NULL, 16));
 
 	vector<string> container;
-	strTemp = xml->Attribute("direction");
+	strTemp = inXml->Attribute("direction");
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
 	{
@@ -104,21 +108,26 @@ void PointLight::setAtt(float a0, float a1, float a2)
 	_lightData._att.set(a0, a1, a2);
 }
 
-bool PointLight::parseXML(XMLElement* xml)
+void PointLight::serialize(XMLElement* outXml)
 {
-	if (!xml)
+
+}
+
+bool PointLight::deserialize(XMLElement* inXml)
+{
+	if (!inXml)
 		return false;
 
-	string strTemp = xml->Attribute("ambientColor");
+	string strTemp = inXml->Attribute("ambientColor");
 	_lightData._ambientColor.set(strtoul(strTemp.c_str(), NULL, 16));
-	strTemp = xml->Attribute("diffuseColor");
+	strTemp = inXml->Attribute("diffuseColor");
 	_lightData._diffuseColor.set(strtoul(strTemp.c_str(), NULL, 16));
-	strTemp = xml->Attribute("specularColor");
+	strTemp = inXml->Attribute("specularColor");
 	_lightData._specularColor.set(strtoul(strTemp.c_str(), NULL, 16));
 
-	_lightData._range = xml->FloatAttribute("range");
+	_lightData._range = inXml->FloatAttribute("range");
 	vector<string> container;
-	strTemp = xml->Attribute("att");
+	strTemp = inXml->Attribute("att");
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
 	{
@@ -163,15 +172,20 @@ void SpotLight::setCutoff(float cutoff)
 	_lightData._cutoff = cutoff;
 }
 
-bool SpotLight::parseXML(XMLElement* xml)
+void SpotLight::serialize(XMLElement* outXml)
 {
-	if (!PointLight::parseXML(xml))
+
+}
+
+bool SpotLight::deserialize(XMLElement* inXml)
+{
+	if (!PointLight::deserialize(inXml))
 		return false;
 
-	_lightData._exponent = xml->FloatAttribute("exponent");
-	_lightData._cutoff = xml->FloatAttribute("cutoff");
+	_lightData._exponent = inXml->FloatAttribute("exponent");
+	_lightData._cutoff = inXml->FloatAttribute("cutoff");
 	vector<string> container;
-	string strTemp = xml->Attribute("direction");
+	string strTemp = inXml->Attribute("direction");
 	stringtok(container, strTemp, ",");
 	if (container.size() >= 3)
 	{

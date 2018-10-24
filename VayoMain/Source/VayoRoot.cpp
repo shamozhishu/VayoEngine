@@ -15,7 +15,6 @@
 #include "VayoTextureManager.h"
 #include "VayoMaterialManager.h"
 #include "VayoMeshManager.h"
-#include "tinyxml2/tinyxml2.h"
 #include "VayoDynLibManager.h"
 #include "VayoDynLib.h"
 #include "VayoPlugin.h"
@@ -117,44 +116,6 @@ void Root::addRenderSystem(RenderSystem* newRenderer)
 		_renderers[newRenderer->getName()] = newRenderer;
 }
 
-bool Root::loadScene(const wstring& xmlFileName)
-{
-	const tagSceneConfig& sceneConfig = getConfigManager()->getSceneConfig();
-	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(w2a_(sceneConfig.ScenePath + xmlFileName).c_str()) != XML_SUCCESS)
-		return false;
-
-	XMLElement* pRoot = doc.RootElement();
-	if (NULL == pRoot)
-		return false;
-
-	setCurSceneMgr(createSceneMgr(utf8ToUnicode(pRoot->Attribute("name"))));
-	SceneManager* sceneMgr = getCurSceneMgr();
-	if (NULL == sceneMgr)
-		return false;
-
-	XMLElement* pElem = pRoot->FirstChildElement("SceneNode");
-	while (pElem)
-	{
-		if (!sceneMgr->xmlParseSceneRecursion(pElem, NULL))
-		{
-			setCurSceneMgr(NULL);
-			return false;
-		}
-		pElem = pElem->NextSiblingElement();
-	}
-
-	return true;
-}
-
-SceneManager* Root::findSceneMgr(const wstring& sceneName)
-{
-	map<wstring, SceneManager*>::iterator it = _sceneMgrPool.find(sceneName);
-	if (it != _sceneMgrPool.end())
-		return it->second;
-	return NULL;
-}
-
 SceneManager* Root::createSceneMgr(const wstring& sceneName /*= L""*/)
 {
 	SceneManager* ret = new SceneManager(sceneName);
@@ -167,6 +128,14 @@ SceneManager* Root::createSceneMgr(const wstring& sceneName /*= L""*/)
 	
 	_sceneMgrPool[ret->getName()] = ret;
 	return ret;
+}
+
+SceneManager* Root::findSceneMgr(const wstring& sceneName)
+{
+	map<wstring, SceneManager*>::iterator it = _sceneMgrPool.find(sceneName);
+	if (it != _sceneMgrPool.end())
+		return it->second;
+	return NULL;
 }
 
 void Root::destroySceneMgr(const wstring& sceneName)

@@ -1,65 +1,16 @@
 #include "VayoNode.h"
 #include "VayoEntity.h"
 #include "VayoMath.h"
-#include "tinyxml2/tinyxml2.h"
-#include "VayoUtils.h"
 #include "VayoNodeAnimator.h"
 
 NS_VAYO_BEGIN
 
-bool Node::parseXML(XMLElement* xml)
+void Node::updateAbsPosition()
 {
-	if (!xml)
-		return false;
-
-	string strTemp;
-	vector<string> container;
-	const char* szTmp = xml->Attribute("relTranslation");
-	if (szTmp)
-		strTemp = szTmp;
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		_relSpace._translation.set(x, y, z);
-	}
-
-	strTemp.clear();
-	container.clear();
-	szTmp = xml->Attribute("relRotation");
-	if (szTmp)
-		strTemp = szTmp;
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		_relSpace._rotation.set(x, y, z);
-	}
-
-	strTemp.clear();
-	container.clear();
-	szTmp = xml->Attribute("relScale");
-	if (szTmp)
-		strTemp = szTmp;
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		_relSpace._scale.set(x, y, z);
-	}
-
-	szTmp = xml->Attribute("canVisit");
-	if (szTmp)
-		strTemp = szTmp;
-	_canVisit = (strTemp == "false" ? false : true);
-
-	return true;
+	if (_parent)
+		_absTransformation = _parent->getAbsTransformation() * getRelTransformation();
+	else
+		_absTransformation = getRelTransformation();
 }
 
 Node::Node(const wstring& name, Node* parent, SceneManager* mgr)
@@ -253,14 +204,6 @@ bool Node::removeAnimator(NodeAnimator* animator)
 void Node::removeAnimators()
 {
 	_animators.clear();
-}
-
-void Node::updateAbsPosition()
-{
-	if (_parent)
-		_absTransformation = _parent->getAbsTransformation() * getRelTransformation();
-	else
-		_absTransformation = getRelTransformation();
 }
 
 NS_VAYO_END

@@ -44,6 +44,7 @@
 #include "VayoUserDataBind.h"
 #include "VayoTessGridBuilder.h"
 #include "VayoTessGridHandler.h"
+#include "VayoAttribSerializer.h"
 // ÊýÑ§¿â
 #include "VayoMath.h"
 #include "VayoVector2d.h"
@@ -66,6 +67,7 @@
 #include "VayoRenderable.h"
 #include "VayoTiledMap.h"
 #include "VayoManualObject.h"
+#include "VayoTextObject.h"
 #include "VayoNode.h"
 #include "VayoNodeAnimator.h"
 #include "VayoCollision.h"

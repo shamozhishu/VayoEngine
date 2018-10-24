@@ -46,22 +46,30 @@ MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
 {
 	static unsigned short idx = 0;
 	MaterialPtr materialPtr(new Material());
-	if (0 == name.compare(L""))
+
+	if (name == L"" || name == L"default_material")
 	{
 		std::wstringstream ss;
 		ss << L"Material" << idx;
 		++idx;
 		materialPtr->_materialName = ss.str();
 	}
+	else
+		materialPtr->_materialName = name;
+
 	_materialPool[materialPtr->_materialName] = materialPtr;
 	return materialPtr;
 }
 
 MaterialPtr MaterialManager::findMaterial(const wstring& name)
 {
+	if (name == L"" || name == L"default_material")
+		return _defaultMaterial;
+
 	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
 	if (it != _materialPool.end())
 		return it->second;
+
 	return _defaultMaterial;
 }
 
@@ -69,6 +77,7 @@ void MaterialManager::destroyMaterial(const wstring& name)
 {
 	if (name == L"")
 		return;
+
 	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
 	if (it != _materialPool.end())
 		_materialPool.erase(it);
@@ -102,7 +111,7 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 	std::ifstream fin(filePath);
 	if (!fin)
 	{
-		Log::wprint(ELL_ERROR, L"打开材质脚本失败：%s", filePath.c_str());
+		Log::wprint(ELL_ERROR, L"材质脚本[%s]打开失败", filePath.c_str());
 		return false;
 	}
 
@@ -643,7 +652,7 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			}
 		}
 		
-		Log::wprint(ELL_ERROR, L"解析材质脚本失败：%s[%s:%s]", filePath.c_str(), utf8ToUnicode(materialName).c_str(), utf8ToUnicode(strTag).c_str());
+		Log::wprint(ELL_ERROR, L"材质脚本[%s]解析失败：[%s:%s]", filePath.c_str(), utf8ToUnicode(materialName).c_str(), utf8ToUnicode(strTag).c_str());
 		return false;
 
 	} while (!fin.eof());

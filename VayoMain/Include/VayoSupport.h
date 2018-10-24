@@ -55,6 +55,7 @@ namespace Vayo
 	class Node;
 	class NodeAnimator;
 	class SceneNode;
+	class SceneLoader;
 	class SceneManager;
 	class TriContainer;
 	class SimpleTriContainer;

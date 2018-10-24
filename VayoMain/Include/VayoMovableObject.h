@@ -11,19 +11,13 @@
 #include "VayoAabbox3d.h"
 #include "VayoBitState.h"
 #include "VayoUserDataBind.h"
-
-namespace tinyxml2
-{
-	class XMLElement;
-}
-using namespace tinyxml2;
+#include "VayoAttribSerializer.h"
 
 NS_VAYO_BEGIN
 
-class _VayoExport MovableObject
+class _VayoExport MovableObject : public AttribSerializer
 {
 	friend class SceneNode;
-	friend class SceneManager;
 public:
 	MovableObject(const wstring& name);
 	virtual ~MovableObject();
@@ -41,7 +35,6 @@ public:
 	const UserDataBind&      getUserDataBind() const;
 
 protected:
-	virtual bool parseXML(XMLElement* xml) = 0;
 	DISALLOW_COPY_AND_ASSIGN(MovableObject)
 	PROPERTY_RW(unsigned int,  _queueID,      QueueID)
 	PROPERTY_RW(TriContainer*, _triContainer, TriContainer)

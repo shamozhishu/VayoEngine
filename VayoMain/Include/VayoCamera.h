@@ -109,6 +109,10 @@ protected:
 };
 
 // 第一人称摄像机
+/**
+ * Serialized template:
+ * <FPSCamera name="第一人称摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45"  zn="1" zf="1000" moveSpeed="100"/>
+**/
 class _VayoExport FPSCamera : public MovableObject, public Camera
 {
 public:
@@ -120,16 +124,21 @@ public:
 	bool keyClicked(const tagKeyInput& keyInput);
 	void createViewMemento(const wstring& name);
 	void restoreViewMemento(const wstring& name);
+	void serialize(XMLElement* outXml);
+	bool deserialize(XMLElement* inXml);
 
 protected:
 	void rebuildViewArea();
-	bool parseXML(XMLElement* xml);
 protected:
 	float    _moveSpeed[2];
 	BitState _direction;
 };
 
 // 轨道摄像机
+/**
+ * Serialized template:
+ * <OrbitCamera name="轨道摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45" zn="1" zf="1000" moveSpeed="10" zoomSpeed="2"/>
+**/
 class _VayoExport OrbitCamera : public MovableObject, public Camera
 {
 public:
@@ -147,10 +156,11 @@ public:
 	bool keyClicked(const tagKeyInput& keyInput);
 	void createViewMemento(const wstring& name);
 	void restoreViewMemento(const wstring& name);
+	void serialize(XMLElement* outXml);
+	bool deserialize(XMLElement* inXml);
 
 protected:
 	void rebuildViewArea();
-	bool parseXML(XMLElement* xml);
 protected:
 	float   _moveSpeed[2];
 	float   _zoomSpeed[2];
@@ -158,6 +168,10 @@ protected:
 };
 
 // 鹰眼摄像机
+/**
+ * Serialized template:
+ * TODO
+**/
 class _VayoExport EagleEyeCamera : public OrbitCamera
 {
 public:
@@ -180,6 +194,8 @@ public:
 	bool  keyClicked(const tagKeyInput& keyInput);
 	void  createViewMemento(const wstring& name);
 	void  restoreViewMemento(const wstring& name);
+	void  serialize(XMLElement* outXml);
+	bool  deserialize(XMLElement* inXml);
 
 protected:
 	float    _zoomFactor;

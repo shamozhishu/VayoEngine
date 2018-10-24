@@ -72,7 +72,7 @@ private:
 };
 
 /** 窗口小部件: 所有控件页面都是一个Widget */
-class _VayoExport UIWidget
+class _VayoExport UIWidget : public AttribSerializer
 {
 public:
 	UIWidget();
@@ -129,8 +129,8 @@ public:
 	virtual void updateAbsoluteRect();
 	virtual const wstring& getImage(EUIControlStatus status) const;
 	virtual void setImage(EUIControlStatus status, const wstring& iconName);
-	virtual bool loadTemplate(XMLElement* xml);
-	virtual void saveTemplate(XMLElement* xml);
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 
 	PROPERTY_RW(int,              _ID,            ID)
 	PROPERTY_RW(int,              _fontID,        FontID)
@@ -161,8 +161,8 @@ public:
 	virtual void touchBegan(const Touch& touch);
 	virtual void touchMoved(const Touch& touch);
 	virtual void touchEnded(const Touch& touch);
-	virtual bool loadTemplate(XMLElement* xml);
-	virtual void saveTemplate(XMLElement* xml);
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 
 private:
 	bool _click;
@@ -184,8 +184,8 @@ public:
 	virtual void touchBegan(const Touch& touch);
 	virtual void touchMoved(const Touch& touch);
 	virtual void touchEnded(const Touch& touch);
-	virtual bool loadTemplate(XMLElement* xml);
-	virtual void saveTemplate(XMLElement* xml);
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 
 private:
 	bool         _checked;
@@ -208,8 +208,8 @@ public:
 	virtual void updateAbsoluteRect();
 	virtual void setWordWrap(bool enable);
 	virtual void setBgColor(Colour color);
-	virtual bool loadTemplate(XMLElement* xml);
-	virtual void saveTemplate(XMLElement* xml);
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 
 private:
 	void breakText();
@@ -245,8 +245,8 @@ public:
 	virtual void touchMoved(const Touch& touch);
 	virtual void touchEnded(const Touch& touch);
 	virtual bool touchWheel(const Touch& touch, float wheel);
-	virtual bool loadTemplate(XMLElement* xml);
-	virtual void saveTemplate(XMLElement* xml);
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 
 private:
 	void  refreshControls();
@@ -291,8 +291,8 @@ public:
 	virtual void touchMoved(const Touch& touch);
 	virtual void touchEnded(const Touch& touch);
 	virtual bool touchWheel(const Touch& touch, float wheel);
-	virtual bool loadTemplate(XMLElement* xml);
-	virtual void saveTemplate(XMLElement* xml);
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 	virtual void setItemHeight(int height);
 	virtual void setDrawBg(bool drawBg);
 	virtual int  getItemCount() const;
@@ -409,14 +409,13 @@ public:
 	virtual void touchEnded(const Touch& touch);
 	virtual bool touchWheel(const Touch& touch, float wheel);
 	virtual bool keyClicked(const tagKeyInput& keyInput);
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 
 	PROPERTY_R(UIControl*,           _lastSelectedCtrl, LastSelectedCtrl)
 	PROPERTY_R_REF(list<UIControl*>, _controls,         CtrlList)
 	PROPERTY_R_REF(wstring,          _xmlFilePath,      XMLFilePath)
 	PROPERTY_RW_REF(wstring,         _image,            Image)
-
-private:
-	bool parseXMLFile(const wstring& fullPath);
 };
 
 /**

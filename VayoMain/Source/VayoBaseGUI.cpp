@@ -2,7 +2,6 @@
 #include "VayoRoot.h"
 #include "VayoLog.h"
 #include "VayoUtils.h"
-#include "tinyxml2/tinyxml2.h"
 #include "VayoRenderSystem.h"
 
 NS_VAYO_BEGIN
@@ -115,7 +114,7 @@ UISkin::UISkin(const wstring& skinFilePath)
 	}
 
 	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(w2a_(skinFilePath).c_str()) != XML_SUCCESS)
+	if (doc.LoadFile(w2a_(skinFilePath).c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		Log::wprint(ELL_ERROR, L"GUI∆§∑Ù[%s]º”‘ÿ ß∞‹", skinFilePath.c_str());
 		return;

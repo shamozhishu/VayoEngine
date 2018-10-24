@@ -17,22 +17,34 @@ Renderable::Renderable()
 
 MaterialPtr& Renderable::getMaterial()
 {
+	if (!_material)
+		_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
 	return _material;
 }
 
 const MaterialPtr& Renderable::getMaterial() const
 {
+	if (!_material)
+		_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
 	return _material;
 }
 
 void Renderable::setMaterial(const wstring& name)
 {
-	_material = Root::getSingleton().getMaterialManager()->findMaterial(name);
+	if (getMaterial()->_materialName != name)
+		_material = Root::getSingleton().getMaterialManager()->findMaterial(name);
 }
 
 void Renderable::setMaterial(const MaterialPtr& material)
 {
-	_material = material;
+	if (!material)
+	{
+		_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
+		return;
+	}
+
+	if (getMaterial().get() != material.get())
+		_material = material;
 }
 
 NS_VAYO_END

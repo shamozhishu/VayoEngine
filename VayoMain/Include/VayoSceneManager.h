@@ -6,17 +6,7 @@
 #ifndef __VAYO_SCENE_MANAGER_H__
 #define __VAYO_SCENE_MANAGER_H__
 
-#include "VayoSupport.h"
-#include "VayoSingleton.h"
-#include "VayoRenderable.h"
 #include "VayoRenderQueue.h"
-
-namespace tinyxml2
-{
-	class XMLElement;
-}
-using namespace tinyxml2;
-
 NS_VAYO_BEGIN
 
 class _VayoExport SceneManager
@@ -30,49 +20,42 @@ public:
 	bool registerForRendering(Renderable* r, unsigned int q = ERQ_MAIN_SOLID);
 	void showAllWireBoundingBoxes(bool bShow);
 
-	SceneNode* findSceneNode(const wstring& name);
+	bool loadScene(const wstring& sceneFile);
+	bool saveScene(const wstring& sceneFile);
+	void setSceneLoader(SceneLoader* sceneLoader);
+
 	SceneNode* createSceneNode(Node* parent, const wstring& name = L"");
+	SceneNode* findSceneNode(const wstring& name);
 	void       destroySceneNode(SceneNode* sn);
 	void       destroySceneNode(const wstring& name);
 	void       destroyAllSceneNodes();
-	
-	template<typename T> T* findObject(const wstring& name);
+
 	template<typename T> T* createObject(const wstring& name = L"");
+	template<typename T> T* findObject(const wstring& name);
 	void                    destroyObject(MovableObject* obj);
 	void                    destroyObject(const wstring& name);
 	void                    destroyAllObjects();
 
-	template<typename T> T* findAnimator(const wstring& name);
 	template<typename T> T* createAnimator(const wstring& name = L"");
+	template<typename T> T* findAnimator(const wstring& name);
 	void                    destroyAnimator(NodeAnimator* anim);
 	void                    destroyAnimator(const wstring& name);
 	void                    destroyAllAnimators();
 
 private:
-	friend class Root;
-	bool xmlParseSceneRecursion(XMLElement* xml, SceneNode* pParent);
 	PROPERTY_R(wstring, _name, Name)
-	PROPERTY_R(SceneNode*, _rootSceneNode, RootSceneNode)
 	PROPERTY_R(Camera*, _activeCamera, ActiveCamera)
+	PROPERTY_R(SceneNode*, _rootSceneNode, RootSceneNode)
 	PROPERTY_R(CollisionDetector*, _collDetector, CollDetector)
 	DISALLOW_COPY_AND_ASSIGN(SceneManager)
 
 private:
-	RenderQueueGroup                _renderQueues;
-	map<wstring, SceneNode*>        _sceneNodesPool;
-	map<wstring, MovableObject*>    _objectsPool;
-	map<wstring, NodeAnimator*>     _animatorsPool;
+	SceneLoader*                 _sceneLoader;
+	RenderQueueGroup             _renderQueues;
+	map<wstring, SceneNode*>     _sceneNodesPool;
+	map<wstring, MovableObject*> _objectsPool;
+	map<wstring, NodeAnimator*>  _animatorsPool;
 };
-
-template<typename T>
-T* SceneManager::findObject(const wstring& name)
-{
-	T* ret = NULL;
-	map<wstring, MovableObject*>::iterator it = _objectsPool.find(name);
-	if (it != _objectsPool.end())
-		ret = dynamic_cast<T*>(it->second);
-	return ret;
-}
 
 template<typename T>
 T* SceneManager::createObject(const wstring& name /*= L""*/)
@@ -96,11 +79,11 @@ T* SceneManager::createObject(const wstring& name /*= L""*/)
 }
 
 template<typename T>
-T* SceneManager::findAnimator(const wstring& name)
+T* SceneManager::findObject(const wstring& name)
 {
 	T* ret = NULL;
-	map<wstring, NodeAnimator*>::iterator it = _animatorsPool.find(name);
-	if (it != _animatorsPool.end())
+	map<wstring, MovableObject*>::iterator it = _objectsPool.find(name);
+	if (it != _objectsPool.end())
 		ret = dynamic_cast<T*>(it->second);
 	return ret;
 }
@@ -123,6 +106,16 @@ T* SceneManager::createAnimator(const wstring& name /*= L""*/)
 	}
 
 	_animatorsPool[pAnim->getName()] = pAnim;
+	return ret;
+}
+
+template<typename T>
+T* SceneManager::findAnimator(const wstring& name)
+{
+	T* ret = NULL;
+	map<wstring, NodeAnimator*>::iterator it = _animatorsPool.find(name);
+	if (it != _animatorsPool.end())
+		ret = dynamic_cast<T*>(it->second);
 	return ret;
 }
 

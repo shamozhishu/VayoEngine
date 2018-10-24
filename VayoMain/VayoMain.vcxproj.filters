@@ -275,9 +275,6 @@
     <ClInclude Include="ThirdParty\stb_image\stb_image_write.h">
       <Filter>ThirdParty\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h">
-      <Filter>ThirdParty\tinyxml2</Filter>
-    </ClInclude>
     <ClInclude Include="ThirdParty\zlib\crc32.h">
       <Filter>ThirdParty\zlib</Filter>
     </ClInclude>
@@ -310,6 +307,18 @@
     </ClInclude>
     <ClInclude Include="ThirdParty\zlib\zutil.h">
       <Filter>ThirdParty\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VayoTextObject.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VayoAttribSerializer.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\tinyxml2\tinyxml2.h">
+      <Filter>ThirdParty\tinyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VayoSceneLoader.h">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -463,9 +472,6 @@
     <ClCompile Include="ThirdParty\stb_image\stb_image_write.cpp">
       <Filter>ThirdParty\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
-      <Filter>ThirdParty\tinyxml2</Filter>
-    </ClCompile>
     <ClCompile Include="ThirdParty\zlib\adler32.c">
       <Filter>ThirdParty\zlib</Filter>
     </ClCompile>
@@ -510,6 +516,15 @@
     </ClCompile>
     <ClCompile Include="ThirdParty\zlib\zutil.c">
       <Filter>ThirdParty\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VayoTextObject.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\tinyxml2.cpp">
+      <Filter>ThirdParty\tinyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VayoSceneLoader.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
