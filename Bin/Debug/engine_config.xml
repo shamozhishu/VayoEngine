@@ -1,4 +1,4 @@
-<engine_config rootpath="..\..\media\">
+<engine_config rootpath="..\..\Media\">
 	<plugins>
 		<plugin name="RenderSystem_GL"/>
 	</plugins>

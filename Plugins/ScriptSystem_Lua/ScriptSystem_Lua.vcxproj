@@ -96,29 +96,29 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>..\..\VayoMain\Include;Include;Lua;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\..\VayoMain\Include;Include;Lua-5.2.4;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\Lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\..\VayoMain\Include;Include;Lua;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>..\..\VayoMain\Include;Include;Lua-5.2.4;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IncludePath>..\..\VayoMain\Include;Include;Lua;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
+    <IncludePath>..\..\VayoMain\Include;Include;Lua-5.2.4;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\Lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>..\..\lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <IncludePath>..\..\VayoMain\Include;Include;Lua;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>..\..\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\..\VayoMain\Include;Include;Lua-5.2.4;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,7 +132,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>lua5.2.4_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(SolutionDir)lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)Lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,7 +146,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(SolutionDir)lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)Lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
       <AdditionalDependencies>lua5.2.4_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -165,7 +165,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(SolutionDir)lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)Lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
       <AdditionalDependencies>lua5.2.4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -184,7 +184,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(SolutionDir)lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)Lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
       <AdditionalDependencies>lua5.2.4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
