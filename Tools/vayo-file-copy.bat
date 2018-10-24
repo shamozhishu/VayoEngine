@@ -68,7 +68,7 @@ xcopy /y %source_path%Plugins\ScriptSystem_Lua\*.* %target_path%Plugins\ScriptSy
 xcopy /y %source_path%Plugins\ScriptSystem_Lua\Include\*.* %target_path%Plugins\ScriptSystem_Lua\Include\
 xcopy /y %source_path%Plugins\ScriptSystem_Lua\Source\*.* %target_path%Plugins\ScriptSystem_Lua\Source\
 xcopy /y %source_path%Plugins\ScriptSystem_Lua\Tolua\*.* %target_path%Plugins\ScriptSystem_Lua\Tolua\
-xcopy /y %source_path%Plugins\ScriptSystem_Lua\Lua\*.* %target_path%Plugins\ScriptSystem_Lua\Lua\
+xcopy /y %source_path%Plugins\ScriptSystem_Lua\Lua-5.2.4\*.* %target_path%Plugins\ScriptSystem_Lua\Lua-5.2.4\
 
 echo ----------------------------------------SamplesĿ¼
 
