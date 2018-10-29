@@ -13,7 +13,7 @@ NS_VAYO_BEGIN
 // Axis aligned bounding box in 3d dimensional space.
 /** Has some useful methods used with occlusion culling or clipping.
 */
-template <typename T>
+template<typename T>
 class Aabbox3d
 {
 public:

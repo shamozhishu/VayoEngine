@@ -4,14 +4,11 @@
 #include "VayoCoreGUI.h"
 #include "VayoCollision.h"
 #include "VayoSceneNode.h"
+#include "VayoUtils.h"
 
 NS_VAYO_BEGIN
 
-void TextObject::setFontID(int fontid)
-{
-	_fontid = fontid;
-}
-
+VAYO_REFLEX_WITHPARA_IMPLEMENT(TextObject, const wstring&)
 TextObject::TextObject(const wstring& name)
 	: MovableObject(name)
 	, _fontid(0)
@@ -56,6 +53,11 @@ void TextObject::setTextColor(Colour color)
 	_color = color;
 }
 
+void TextObject::setFontID(int fontid)
+{
+	_fontid = fontid;
+}
+
 void TextObject::getWorldTransform(Matrix4x4& mat) const
 {
 	if (_parentNode)
@@ -66,11 +68,25 @@ void TextObject::getWorldTransform(Matrix4x4& mat) const
 
 void TextObject::serialize(XMLElement* outXml)
 {
-
+	MovableObject::serialize(outXml);
+	outXml->SetAttribute("text", unicodeToUtf8(_text).c_str());
+	char szbuf[256];
+	sprintf_s(szbuf, sizeof(szbuf), "0x%08x", _color._clr);
+	outXml->SetAttribute("color", szbuf);
+	outXml->SetAttribute("fontid", _fontid);
 }
 
 bool TextObject::deserialize(XMLElement* inXml)
 {
+	if (!MovableObject::deserialize(inXml))
+		return false;
+
+	const char* szText = inXml->Attribute("text");
+	if (szText)
+		_text = utf8ToUnicode(szText);
+
+	_color = inXml->UnsignedAttribute("color");
+	_fontid = inXml->IntAttribute("fontid");
 	return true;
 }
 

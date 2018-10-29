@@ -5,6 +5,7 @@
 #include "VayoMaterialManager.h"
 #include "VayoRenderQueue.h"
 #include "VayoMesh.h"
+#include "VayoUtils.h"
 
 NS_VAYO_BEGIN
 
@@ -98,6 +99,24 @@ UserDataBind& MovableObject::getUserDataBind()
 const UserDataBind& MovableObject::getUserDataBind() const
 {
 	return _userDataBind;
+}
+
+void MovableObject::serialize(XMLElement* outXml)
+{
+	outXml->SetAttribute("name", unicodeToUtf8(_name).c_str());
+	if (!_visible)
+		outXml->SetAttribute("visible", _visible);
+	if (!_collideMask.isEmptyState())
+		outXml->SetAttribute("collideMask", _collideMask());
+}
+
+bool MovableObject::deserialize(XMLElement* inXml)
+{
+	if (!inXml)
+		return false;
+	inXml->QueryBoolAttribute("visible", &_visible);
+	_collideMask(inXml->UnsignedAttribute("collideMask"));
+	return true;
 }
 
 NS_VAYO_END

@@ -21,9 +21,9 @@ class _VayoExport MovableObject : public AttribSerializer
 public:
 	MovableObject(const wstring& name);
 	virtual ~MovableObject();
+	virtual void             update(float dt) = 0;
 	virtual const wstring&   getName() const;
 	virtual SceneNode*       getParentNode() const;
-	virtual void             update(float dt) {}
 	virtual bool             isVisible() const;
 	virtual void             setVisible(bool visible);
 	virtual MeshPtr          getMesh() const;
@@ -33,6 +33,8 @@ public:
 	BitState&                getCollideMask();
 	UserDataBind&            getUserDataBind();
 	const UserDataBind&      getUserDataBind() const;
+	void                     serialize(XMLElement* outXml);
+	bool                     deserialize(XMLElement* inXml);
 
 protected:
 	DISALLOW_COPY_AND_ASSIGN(MovableObject)

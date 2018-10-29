@@ -1,24 +1,24 @@
 #include "VayoSceneManager.h"
 #include "VayoSceneNode.h"
+#include "VayoLog.h"
 #include "VayoRoot.h"
+#include "VayoUtils.h"
 #include "VayoCamera.h"
 #include "VayoNodeAnimator.h"
 #include "VayoCollision.h"
-#include "VayoSceneLoader.h"
+#include "VayoConfigManager.h"
+#include "VayoTessGridHandler.h"
 
 NS_VAYO_BEGIN
 
-void SceneManager::setSceneLoader(SceneLoader* sceneLoader)
+void SceneManager::updateRenderQueue()
 {
-	if (_sceneLoader)
-		delete _sceneLoader;
-	_sceneLoader = sceneLoader;
+	_renderQueues.update();
 }
 
 SceneManager::SceneManager(const wstring& sceneName)
 	: _name(sceneName)
 	, _activeCamera(NULL)
-	, _sceneLoader(NULL)
 	, _rootSceneNode(NULL)
 	, _collDetector(NULL)
 	, _renderQueues(this)
@@ -32,23 +32,17 @@ SceneManager::SceneManager(const wstring& sceneName)
 		_name = ss.str();
 	}
 
-	_rootSceneNode = createSceneNode(NULL, L"RootSceneNode");
-	_sceneLoader = new SceneLoader(this);
+	_rootSceneNode = new SceneNode(_name + L"_RootSceneNode", NULL, this);
 	_collDetector = new CollisionDetector(this);
 }
 
 SceneManager::~SceneManager()
 {
 	SAFE_DELETE(_collDetector);
-	setSceneLoader(NULL);
 	destroyAllAnimators();
 	destroyAllObjects();
 	destroyAllSceneNodes();
-}
-
-void SceneManager::updateRenderQueue()
-{
-	_renderQueues.update();
+	SAFE_DELETE(_rootSceneNode);
 }
 
 void SceneManager::setActiveCamera(Camera* pActiveCamera)
@@ -105,11 +99,11 @@ bool SceneManager::isCulled(SceneNode* sceneNode) const
 	return result;
 }
 
-bool SceneManager::registerForRendering(Renderable* r, unsigned int q /*= ERQ_MAIN_SOLID*/)
+bool SceneManager::registerForRendering(Renderable* pRend, unsigned int queueID /*= ERQ_MAIN_SOLID*/)
 {
-	if (NULL == r)
+	if (NULL == pRend)
 		return false;
-	_renderQueues.addRenderable(r, q);
+	_renderQueues.addRenderable(pRend, queueID);
 	return true;
 }
 
@@ -122,41 +116,167 @@ void SceneManager::showAllWireBoundingBoxes(bool bShow)
 
 bool SceneManager::loadScene(const wstring& sceneFile)
 {
-	if (_sceneLoader)
-		return _sceneLoader->loadScene(sceneFile);
-	return false;
+	if (sceneFile.rfind(L".scene") == wstring::npos)
+	{
+		Log::wprint(ELL_WARNING, L"场景[%s]文件格式错误", sceneFile.c_str());
+		return false;
+	}
+
+	const tagSceneConfig& sceneConfig = Root::getSingleton().getConfigManager()->getSceneConfig();
+	wstring filename = sceneConfig.ScenePath + sceneFile;
+	tinyxml2::XMLDocument doc;
+	if (doc.LoadFile(w2a_(filename).c_str()) != tinyxml2::XML_SUCCESS)
+	{
+		Log::wprint(ELL_WARNING, L"场景[%s]加载失败", filename.c_str());
+		return false;
+	}
+
+	XMLElement* root = doc.RootElement();
+	if (NULL == root)
+	{
+		Log::wprint(ELL_WARNING, L"场景[%s]解析失败", filename.c_str());
+		return false;
+	}
+
+	_rootSceneNode->deserialize(root);
+	destroyAllAnimators();
+	destroyAllObjects();
+	destroyAllSceneNodes();
+	Root::getSingleton().setCurSceneMgr(this);
+	XMLElement* element = root->FirstChildElement();
+	while (element)
+	{
+		if (!recursionLoading(element, _rootSceneNode))
+		{
+			Root::getSingleton().setCurSceneMgr(NULL);
+			destroyAllAnimators();
+			destroyAllObjects();
+			destroyAllSceneNodes();
+			Log::wprint(ELL_WARNING, L"场景[%s]创建失败", filename.c_str());
+			return false;
+		}
+		element = element->NextSiblingElement();
+	}
+
+	do 
+	{
+		bool parseOK = true;
+
+		if (parseOK)
+		{
+			const char* szbuf = root->GetText();
+			if (szbuf)
+			{
+				TessGridHandler girdHandler;
+				wstring tessgridFiles = utf8ToUnicode(szbuf);
+				vector<wstring> container;
+				wstringtok(container, tessgridFiles, L",");
+				unsigned int size = container.size();
+				for (unsigned int i = 0; i < size; ++i)
+				{
+					if (!girdHandler.parseTessgridFile(container[i]))
+					{
+						parseOK = false;
+						break;
+					}
+				}
+			}
+		}
+
+		if (parseOK)
+		{
+			SceneNode* sceneNode = NULL;
+			map<wstring, SceneNode*>::iterator itNode = _sceneNodesPool.begin();
+			for (; itNode != _sceneNodesPool.end(); ++itNode)
+			{
+				sceneNode = itNode->second;
+				if (!(sceneNode->parseCustomAttrib()))
+				{
+					Log::wprint(ELL_WARNING, L"场景节点%s[%s]定制属性解析失败", itNode->first.c_str(), a2w_(sceneNode->getType()).c_str());
+					parseOK = false;
+					break;
+				}
+			}
+		}
+
+		if (parseOK)
+		{
+			MovableObject* obj = NULL;
+			map<wstring, MovableObject*>::iterator itObj = _objectsPool.begin();
+			for (; itObj != _objectsPool.end(); ++itObj)
+			{
+				obj = itObj->second;
+				if (!(obj->parseCustomAttrib()))
+				{
+					Log::wprint(ELL_WARNING, L"对象%s[%s]定制属性解析失败", itObj->first.c_str(), a2w_(obj->getType()).c_str());
+					parseOK = false;
+					break;
+				}
+			}
+		}
+
+		if (parseOK)
+		{
+			NodeAnimator* anim = NULL;
+			map<wstring, NodeAnimator*>::iterator itAnim = _animatorsPool.begin();
+			for (; itAnim != _animatorsPool.end(); ++itAnim)
+			{
+				anim = itAnim->second;
+				if (!(anim->parseCustomAttrib()))
+				{
+					Log::wprint(ELL_WARNING, L"节点动画%s[%s]定制属性解析失败", itAnim->first.c_str(), a2w_(anim->getType()).c_str());
+					parseOK = false;
+					break;
+				}
+			}
+		}
+
+		if (!parseOK)
+		{
+			Root::getSingleton().setCurSceneMgr(NULL);
+			destroyAllAnimators();
+			destroyAllObjects();
+			destroyAllSceneNodes();
+			return false;
+		}
+
+	} while (0);
+
+	Log::wprint(ELL_DEBUG, L"场景[%s]创建成功", filename.c_str());
+	return true;
 }
 
 bool SceneManager::saveScene(const wstring& sceneFile)
 {
-	if (_sceneLoader)
-		return _sceneLoader->saveScene(sceneFile);
-	return false;
-}
+	const tagSceneConfig& sceneConfig = Root::getSingleton().getConfigManager()->getSceneConfig();
+	wstring filename = sceneConfig.ScenePath + sceneFile;
+	tinyxml2::XMLDocument doc;
+	doc.InsertFirstChild(doc.NewDeclaration());
+	XMLElement* root = doc.NewElement("Scene");
+	doc.InsertEndChild(root);
+	_rootSceneNode->serialize(root);
+	recursionSaving(root, _rootSceneNode, doc);
 
-SceneNode* SceneManager::createSceneNode(Node* parent, const wstring& name /*= L""*/)
-{
-	SceneNode* pSceneNode = new SceneNode(name, parent, this);
-	if (!pSceneNode)
-		return NULL;
-
-	SceneNode* pFindedSceneNode = findSceneNode(pSceneNode->getName());
-	if (pFindedSceneNode)
+	if (tinyxml2::XML_SUCCESS != doc.SaveFile(w2a_(filename).c_str()))
 	{
-		SAFE_DELETE(pFindedSceneNode);
+		Log::wprint(ELL_ERROR, L"场景[%s]保存失败", filename.c_str());
+		return false;
 	}
 
-	_sceneNodesPool[pSceneNode->getName()] = pSceneNode;
-	return pSceneNode;
+	Log::wprint(ELL_DEBUG, L"场景[%s]保存成功", filename.c_str());
+	return true;
 }
 
-SceneNode* SceneManager::findSceneNode(const wstring& name)
+void SceneManager::destroySceneNode(const wstring& name)
 {
-	SceneNode* ret = NULL;
+	SceneNode* node = NULL;
 	map<wstring, SceneNode*>::iterator it = _sceneNodesPool.find(name);
 	if (it != _sceneNodesPool.end())
-		ret = it->second;
-	return ret;
+	{
+		node = it->second;
+		delete node;
+		_sceneNodesPool.erase(it);
+	}
 }
 
 void SceneManager::destroySceneNode(SceneNode* sn)
@@ -165,22 +285,28 @@ void SceneManager::destroySceneNode(SceneNode* sn)
 		destroySceneNode(sn->getName());
 }
 
-void SceneManager::destroySceneNode(const wstring& name)
-{
-	map<wstring, SceneNode*>::iterator it = _sceneNodesPool.find(name);
-	if (it != _sceneNodesPool.end())
-	{
-		delete it->second;
-		_sceneNodesPool.erase(it);
-	}
-}
-
 void SceneManager::destroyAllSceneNodes()
 {
+	SceneNode* node = NULL;
 	map<wstring, SceneNode*>::iterator it = _sceneNodesPool.begin();
 	for (; it != _sceneNodesPool.end(); ++it)
-		delete it->second;
+	{
+		node = it->second;
+		delete node;
+	}
 	_sceneNodesPool.clear();
+}
+
+void SceneManager::destroyObject(const wstring& name)
+{
+	MovableObject* obj = NULL;
+	map<wstring, MovableObject*>::iterator it = _objectsPool.find(name);
+	if (it != _objectsPool.end())
+	{
+		obj = it->second;
+		delete obj;
+		_objectsPool.erase(it);
+	}
 }
 
 void SceneManager::destroyObject(MovableObject* obj)
@@ -189,22 +315,28 @@ void SceneManager::destroyObject(MovableObject* obj)
 		destroyObject(obj->getName());
 }
 
-void SceneManager::destroyObject(const wstring& name)
-{
-	map<wstring, MovableObject*>::iterator it = _objectsPool.find(name);
-	if (it != _objectsPool.end())
-	{
-		delete it->second;
-		_objectsPool.erase(it);
-	}
-}
-
 void SceneManager::destroyAllObjects()
 {
+	MovableObject* obj = NULL;
 	map<wstring, MovableObject*>::iterator it = _objectsPool.begin();
 	for (; it != _objectsPool.end(); ++it)
-		delete it->second;
+	{
+		obj = it->second;
+		delete obj;
+	}
 	_objectsPool.clear();
+}
+
+void SceneManager::destroyAnimator(const wstring& name)
+{
+	NodeAnimator* anim = NULL;
+	map<wstring, NodeAnimator*>::iterator it = _animatorsPool.find(name);
+	if (it != _animatorsPool.end())
+	{
+		anim = it->second;
+		delete anim;
+		_animatorsPool.erase(it);
+	}
 }
 
 void SceneManager::destroyAnimator(NodeAnimator* anim)
@@ -213,22 +345,200 @@ void SceneManager::destroyAnimator(NodeAnimator* anim)
 		destroyAnimator(anim->getName());
 }
 
-void SceneManager::destroyAnimator(const wstring& name)
-{
-	map<wstring, NodeAnimator*>::iterator it = _animatorsPool.find(name);
-	if (it != _animatorsPool.end())
-	{
-		delete it->second;
-		_animatorsPool.erase(it);
-	}
-}
-
 void SceneManager::destroyAllAnimators()
 {
+	NodeAnimator* anim = NULL;
 	map<wstring, NodeAnimator*>::iterator it = _animatorsPool.begin();
 	for (; it != _animatorsPool.end(); ++it)
-		delete it->second;
+	{
+		anim = it->second;
+		delete anim;
+	}
 	_animatorsPool.clear();
+}
+
+bool SceneManager::recursionLoading(XMLElement* element, SceneNode* parent)
+{
+	if (NULL == parent)
+		parent = _rootSceneNode;
+
+	const char* szname = NULL;
+	wstring typeTag = utf8ToUnicode(element->Value());
+	if (typeTag == L"Objects")
+	{
+		MovableObject* pObj = NULL;
+		XMLElement* child = element->FirstChildElement();
+		while (child)
+		{
+			typeTag = utf8ToUnicode(child->Value());
+			szname = child->Attribute("name");
+			wstring objName;
+			if (szname && 0 != strcmp(szname, ""))
+				objName = utf8ToUnicode(szname);
+
+			pObj = findObject<MovableObject>(objName);
+			if (pObj)
+			{
+				Log::wprint(ELL_WARNING, L"对象%s[%s]已存在", objName.c_str(), typeTag.c_str());
+				return false;
+			}
+
+			pObj = ReflexFactory<const wstring&>::getInstance().create<MovableObject>(w2a_(typeTag), objName);
+			if (!pObj)
+			{
+				Log::wprint(ELL_WARNING, L"非法标签[%s]", typeTag.c_str());
+				return false;
+			}
+
+			objName = pObj->getName();
+			if (!pObj->deserialize(child))
+			{
+				delete pObj;
+				Log::wprint(ELL_WARNING, L"对象%s[%s]反序列化失败", objName.c_str(), typeTag.c_str());
+				return false;
+			}
+
+			_objectsPool.insert(make_pair(objName, pObj));
+			parent->attachObject(pObj);
+			child = child->NextSiblingElement();
+		}
+
+		return true;
+	}
+	else if (typeTag == L"Animators")
+	{
+		NodeAnimator* pAnim = NULL;
+		XMLElement* child = element->FirstChildElement();
+		while (child)
+		{
+			typeTag = utf8ToUnicode(child->Value());
+			szname = child->Attribute("name");
+			wstring animName;
+			if (szname && 0 != strcmp(szname, ""))
+				animName = utf8ToUnicode(szname);
+
+			pAnim = findAnimator<NodeAnimator>(animName);
+			if (!pAnim)
+			{
+				pAnim = ReflexFactory<const wstring&>::getInstance().create<NodeAnimator>(w2a_(typeTag), animName);
+				if (!pAnim)
+				{
+					Log::wprint(ELL_WARNING, L"非法标签[%s]", typeTag.c_str());
+					return false;
+				}
+
+				animName = pAnim->getName();
+				if (!pAnim->deserialize(child))
+				{
+					delete pAnim;
+					Log::wprint(ELL_WARNING, L"节点动画%s[%s]反序列化失败", animName.c_str(), typeTag.c_str());
+					return false;
+				}
+
+				_animatorsPool.insert(make_pair(animName, pAnim));
+			}
+
+			parent->addAnimator(pAnim);
+			child = child->NextSiblingElement();
+		}
+
+		return true;
+	}
+	else
+	{
+		szname = element->Attribute("name");
+		wstring nodeName;
+		if (szname && 0 != strcmp(szname, ""))
+			nodeName = utf8ToUnicode(szname);
+
+		SceneNode* pScnenNode = findSceneNode<SceneNode>(nodeName);
+		if (pScnenNode)
+		{
+			Log::wprint(ELL_WARNING, L"场景节点%s[%s]已存在", nodeName.c_str(), typeTag.c_str());
+			return false;
+		}
+
+		pScnenNode = ReflexFactory<const wstring&, Node*, SceneManager*>::getInstance().create<SceneNode>(w2a_(typeTag), nodeName, parent, this);
+		if (!pScnenNode)
+		{
+			Log::wprint(ELL_WARNING, L"非法标签[%s]", typeTag.c_str());
+			return false;
+		}
+
+		nodeName = pScnenNode->getName();
+		if (!pScnenNode->deserialize(element))
+		{
+			delete pScnenNode;
+			Log::wprint(ELL_WARNING, L"场景节点%s[%s]反序列化失败", nodeName.c_str(), typeTag.c_str());
+			return false;
+		}
+
+		_sceneNodesPool.insert(make_pair(nodeName, pScnenNode));
+		XMLElement* child = element->FirstChildElement();
+		while (child)
+		{
+			if (!recursionLoading(child, pScnenNode))
+				return false;
+			child = child->NextSiblingElement();
+		}
+
+		return true;
+	}
+
+	Log::wprint(ELL_WARNING, L"非法标签[%s]", typeTag.c_str());
+	return false;
+}
+
+void SceneManager::recursionSaving(XMLElement* element, SceneNode* parent, tinyxml2::XMLDocument& document)
+{
+	XMLElement* child = NULL;
+	if (NULL == parent)
+		parent = _rootSceneNode;
+
+	if (parent->getAttachedObjsCount() > 0)
+	{
+		XMLElement* objectsElem = document.NewElement("Objects");
+		element->InsertEndChild(objectsElem);
+
+		MovableObject* pObj = NULL;
+		const map<wstring, MovableObject*>& objects = parent->getObjects();
+		map<wstring, MovableObject*>::const_iterator cit = objects.cbegin();
+		for (; cit != objects.cend(); ++cit)
+		{
+			pObj = cit->second;
+			child = document.NewElement(pObj->getType().c_str());
+			objectsElem->InsertEndChild(child);
+			pObj->serialize(child);
+		}
+	}
+
+	const list<NodeAnimator*>& animators = parent->getAnimators();
+	if (animators.size() > 0)
+	{
+		XMLElement* animatorsElem = document.NewElement("Animators");
+		element->InsertEndChild(animatorsElem);
+
+		NodeAnimator* pAnim = NULL;
+		list<NodeAnimator*>::const_iterator cit = animators.cbegin();
+		for (; cit != animators.cend(); ++cit)
+		{
+			pAnim = *cit;
+			child = document.NewElement(pAnim->getType().c_str());
+			animatorsElem->InsertEndChild(child);
+			pAnim->serialize(child);
+		}
+	}
+
+	const list<Node*>& children = parent->getChildren();
+	list<Node*>::const_iterator it = children.cbegin();
+	for (; it != children.cend(); ++it)
+	{
+		parent = (SceneNode*)(*it);
+		child = document.NewElement(parent->getType().c_str());
+		element->InsertEndChild(child);
+		parent->serialize(child);
+		recursionSaving(child, parent, document);
+	}
 }
 
 NS_VAYO_END

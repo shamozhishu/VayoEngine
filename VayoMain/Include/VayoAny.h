@@ -7,7 +7,6 @@
 #define __VAYO_ANY_H__
 
 #include "VayoSupport.h"
-#include "VayoLog.h"
 NS_VAYO_BEGIN
 
 class Any
@@ -224,9 +223,7 @@ ValueType any_cast(const Any& operand)
 	const ValueType* result = any_cast<ValueType>(&operand);
 	if (!result)
 	{
-		std::stringstream str;
-		str << "Bad cast from type '" << operand.type().name() << "' " << "to '" << typeid(ValueType).name() << "'";
-		Log::print(ELL_ERROR, "%s(%s)", str.str().c_str(), "Vayo::any_cast");
+		VAYO_ASSERT(false && "Bad cast!(any_cast)");
 	}
 	return *result;
 }

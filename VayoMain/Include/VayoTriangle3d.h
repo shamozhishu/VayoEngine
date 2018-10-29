@@ -10,7 +10,7 @@
 NS_VAYO_BEGIN
 
 // 3d triangle template class for doing collision detection and other things.
-template <typename T>
+template<typename T>
 class Triangle3d
 {
 public:

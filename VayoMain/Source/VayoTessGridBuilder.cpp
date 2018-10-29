@@ -211,7 +211,7 @@ wstringstream& TessGridBuilder::getStream()
 	return _stream;
 }
 
-void TessGridBuilder::save(const wstring& fileName, bool append/*=false*/)
+void TessGridBuilder::save(const wstring& fileName, bool append/*=true*/)
 {
 	WriteFile fout(fileName + L".tessgrid", append);
 	wstring strtmp = getStream().str();

@@ -225,12 +225,6 @@ CollisionDetector::~CollisionDetector()
 	destroyAllTriContainers();
 }
 
-void CollisionDetector::destroyTriContainer(TriContainer* triContainer)
-{
-	if (triContainer)
-		destroyTriContainer(triContainer->getName());
-}
-
 void CollisionDetector::destroyTriContainer(const wstring& name)
 {
 	map<wstring, TriContainer*>::iterator it = _triContainersPool.find(name);
@@ -239,6 +233,12 @@ void CollisionDetector::destroyTriContainer(const wstring& name)
 		delete it->second;
 		_triContainersPool.erase(it);
 	}
+}
+
+void CollisionDetector::destroyTriContainer(TriContainer* triContainer)
+{
+	if (triContainer)
+		destroyTriContainer(triContainer->getName());
 }
 
 void CollisionDetector::destroyAllTriContainers()
@@ -350,7 +350,7 @@ Line3df CollisionDetector::getRayFromScreenCoordinates(const Position2di& pos, C
 	float dx = pos._x / (float)screenSize._width;
 	float dy = pos._y / (float)screenSize._height;
 
-	if (camera->getType() == Camera::ET_ORTHOGONAL)
+	if (camera->isOrthogonal())
 		ln._start = furstum._cameraPosition + (lefttoright * (dx - 0.5f)) + (uptodown * (dy - 0.5f));
 	else
 		ln._start = furstum._cameraPosition;

@@ -326,6 +326,7 @@ void Camera::recalculateViewArea()
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_WITHPARA_IMPLEMENT(FPSCamera, const wstring&)
 FPSCamera::FPSCamera(const wstring& name)
 	: MovableObject(name)
 {
@@ -473,15 +474,25 @@ void FPSCamera::rebuildViewArea()
 
 void FPSCamera::serialize(XMLElement* outXml)
 {
-
+	MovableObject::serialize(outXml);
+	char szbuf[256];
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _position._x, _position._y, _position._z);
+	outXml->SetAttribute("position", szbuf);
+	Vector3df targetPos = _position + (_look*10.0f);
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", targetPos._x, targetPos._y, targetPos._z);
+	outXml->SetAttribute("target", szbuf);
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _up._x, _up._y, _up._z);
+	outXml->SetAttribute("worldUp", szbuf);
+	outXml->SetAttribute("fovY", getFovY());
+	outXml->SetAttribute("zn", getNearZ());
+	outXml->SetAttribute("zf", getFarZ());
+	outXml->SetAttribute("moveSpeed", _moveSpeed[1]);
 }
 
 bool FPSCamera::deserialize(XMLElement* inXml)
 {
-	if (!inXml)
+	if (!MovableObject::deserialize(inXml))
 		return false;
-
-	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
 
 	Vector3df position(0, 0, 0), target(0, 0, -1), worldUp(0, 1, 0);
 	vector<string> container;
@@ -524,11 +535,12 @@ bool FPSCamera::deserialize(XMLElement* inXml)
 	float zf = inXml->FloatAttribute("zf");
 
 	setLens(fovY, getAspect(), zn, zf);
-
+	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_WITHPARA_IMPLEMENT(OrbitCamera, const wstring&)
 OrbitCamera::OrbitCamera(const wstring& name)
 	: MovableObject(name)
 	, _arcball(0, 0)
@@ -722,17 +734,27 @@ void OrbitCamera::rebuildViewArea()
 
 void OrbitCamera::serialize(XMLElement* outXml)
 {
-
+	MovableObject::serialize(outXml);
+	char szbuf[256];
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _position._x, _position._y, _position._z);
+	outXml->SetAttribute("position", szbuf);
+	Vector3df targetPos = _position + (_look*10.0f);
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", targetPos._x, targetPos._y, targetPos._z);
+	outXml->SetAttribute("target", szbuf);
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _up._x, _up._y, _up._z);
+	outXml->SetAttribute("worldUp", szbuf);
+	outXml->SetAttribute("fovY", getFovY());
+	outXml->SetAttribute("zn", getNearZ());
+	outXml->SetAttribute("zf", getFarZ());
+	outXml->SetAttribute("moveSpeed", _moveSpeed[1]);
+	outXml->SetAttribute("zoomSpeed", _zoomSpeed[1]);
 }
 
 bool OrbitCamera::deserialize(XMLElement* inXml)
 {
-	if (!inXml)
+	if (!MovableObject::deserialize(inXml))
 		return false;
 
-	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
-	_zoomSpeed[0] = _zoomSpeed[1] = inXml->FloatAttribute("zoomSpeed");
-	
 	Vector3df position(0, 0, 0), target(0, 0, -1), worldUp(0, 1, 0);
 	vector<string> container;
 	string strTemp = inXml->Attribute("position");
@@ -774,11 +796,13 @@ bool OrbitCamera::deserialize(XMLElement* inXml)
 	float zf = inXml->FloatAttribute("zf");
 
 	setLens(fovY, getAspect(), zn, zf);
-
+	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
+	_zoomSpeed[0] = _zoomSpeed[1] = inXml->FloatAttribute("zoomSpeed");
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_WITHPARA_IMPLEMENT(EagleEyeCamera, const wstring&)
 EagleEyeCamera::EagleEyeCamera(const wstring& name)
 	: OrbitCamera(name)
 	, _zoomFactor(1.0f)
@@ -814,17 +838,9 @@ void EagleEyeCamera::setZoomFactor(float zoom)
 
 void EagleEyeCamera::setLens(float widthOfViewVolume, float heightOfViewVolume, float zn, float zf)
 {
-	Dimension2di size = Root::getSingleton().getDevice()->getScreenSize();
-	_arcball.setBounds(size._width, size._height);
-	float w = size._width;
-	float h = size._height;
-	if (0 == size._height)
-		h = 1.0f;
-	if (!equals(widthOfViewVolume, 180.0f) || !equals(w / h, heightOfViewVolume))
-	{
-		_nearWindowHeight = widthOfViewVolume;
-		_farWindowHeight = heightOfViewVolume;
-	}
+	_arcball.setBounds(widthOfViewVolume, heightOfViewVolume);
+	_nearWindowHeight = widthOfViewVolume;
+	_farWindowHeight = heightOfViewVolume;
 	_nearZ = zn;
 	_farZ = zf;
 	_viewArea.getTransform(Frustum::EFT_PROJECTION).buildProjectionMatrixOrthoRH(_nearWindowHeight, _farWindowHeight, _nearZ, _farZ);
@@ -853,11 +869,6 @@ float EagleEyeCamera::getNearWindowHeight() const
 float EagleEyeCamera::getFarWindowWidth() const
 {
 	return _nearWindowHeight;
-}
-
-float EagleEyeCamera::getFarWindowHeight() const
-{
-	return _farWindowHeight;
 }
 
 bool EagleEyeCamera::touchBegan(const Touch& touch, EMouseKeys key)
@@ -981,11 +992,16 @@ void EagleEyeCamera::restoreViewMemento(const wstring& name)
 
 void EagleEyeCamera::serialize(XMLElement* outXml)
 {
-
+	OrbitCamera::serialize(outXml);
+	outXml->SetAttribute("zoomFactor", _zoomFactor);
 }
 
 bool EagleEyeCamera::deserialize(XMLElement* inXml)
 {
+	if (!OrbitCamera::deserialize(inXml))
+		return false;
+	inXml->QueryFloatAttribute("zoomFactor", &_zoomFactor);
+	setZoomFactor(_zoomFactor);
 	return true;
 }
 

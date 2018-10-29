@@ -12,6 +12,7 @@ NS_VAYO_BEGIN
 
 class _VayoExport TextObject : public MovableObject, public Renderable
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(TextObject, const wstring&)
 public:
 	TextObject(const wstring& name);
 	~TextObject();

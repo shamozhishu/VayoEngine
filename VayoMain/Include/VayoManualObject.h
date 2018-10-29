@@ -15,12 +15,9 @@
 
 NS_VAYO_BEGIN
 
-/**
- * Serialized template:
- * <ManualObject name="球" model="Sphere,examples/sphere,5,100,100"/>
-**/
 class _VayoExport ManualObject : public MovableObject, public Renderable
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(ManualObject, const wstring&)
 public:
 	ManualObject(const wstring& name);
 	~ManualObject();
@@ -56,6 +53,7 @@ public:
 	/* 属性序列化与反序列化 */
 	void serialize(XMLElement* outXml);
 	bool deserialize(XMLElement* inXml);
+	bool parseCustomAttrib();
 
 protected:
 	void submitDisplay();

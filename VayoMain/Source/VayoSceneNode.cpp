@@ -9,11 +9,7 @@
 
 NS_VAYO_BEGIN
 
-int SceneNode::getAttachedObjsCount() const
-{
-	return (int)_objects.size();
-}
-
+Reflex<SceneNode, const wstring&, Node*, SceneManager*> SceneNode::_dynReflex;
 SceneNode::SceneNode(const wstring& name, Node* parent, SceneManager* mgr)
 	: Node(name, parent, mgr)
 	, _wireBoundingBox(NULL)
@@ -110,6 +106,11 @@ void SceneNode::attachObject(MovableObject* obj)
 	}
 }
 
+int SceneNode::getAttachedObjsCount() const
+{
+	return (int)_objects.size();
+}
+
 MovableObject* SceneNode::getAttacheObject(const wstring& name)
 {
 	MovableObject* ret = NULL;
@@ -152,13 +153,35 @@ SceneNode* SceneNode::createChildSceneNode(const wstring& name /*= L""*/)
 {
 	SceneNode* pRet = NULL;
 	if (_sceneMgr)
-		pRet = _sceneMgr->createSceneNode(this, name);
+		pRet = _sceneMgr->createSceneNode<SceneNode>(this, name);
 	return pRet;
 }
 
 void SceneNode::serialize(XMLElement* outXml)
 {
+	char szbuf[256];
+	outXml->SetAttribute("name", unicodeToUtf8(_name).c_str());
 
+	if (_relSpace._translation != Vector3df::Origin)
+	{
+		sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _relSpace._translation._x, _relSpace._translation._y, _relSpace._translation._z);
+		outXml->SetAttribute("translation", szbuf);
+	}
+
+	if (_relSpace._rotation != Vector3df::Origin)
+	{
+		sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _relSpace._rotation._x, _relSpace._rotation._y, _relSpace._rotation._z);
+		outXml->SetAttribute("rotation", szbuf);
+	}
+	
+	if (_relSpace._scale != Vector3df(1, 1, 1))
+	{
+		sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _relSpace._scale._x, _relSpace._scale._y, _relSpace._scale._z);
+		outXml->SetAttribute("scale", szbuf);
+	}
+
+	if (!_canVisit)
+		outXml->SetAttribute("visit", _canVisit);
 }
 
 bool SceneNode::deserialize(XMLElement* inXml)
@@ -168,7 +191,7 @@ bool SceneNode::deserialize(XMLElement* inXml)
 
 	string strTemp;
 	vector<string> container;
-	const char* szTmp = inXml->Attribute("relTranslation");
+	const char* szTmp = inXml->Attribute("translation");
 	if (szTmp)
 		strTemp = szTmp;
 	stringtok(container, strTemp, ",");
@@ -182,7 +205,7 @@ bool SceneNode::deserialize(XMLElement* inXml)
 
 	strTemp.clear();
 	container.clear();
-	szTmp = inXml->Attribute("relRotation");
+	szTmp = inXml->Attribute("rotation");
 	if (szTmp)
 		strTemp = szTmp;
 	stringtok(container, strTemp, ",");
@@ -196,7 +219,7 @@ bool SceneNode::deserialize(XMLElement* inXml)
 
 	strTemp.clear();
 	container.clear();
-	szTmp = inXml->Attribute("relScale");
+	szTmp = inXml->Attribute("scale");
 	if (szTmp)
 		strTemp = szTmp;
 	stringtok(container, strTemp, ",");
@@ -208,11 +231,7 @@ bool SceneNode::deserialize(XMLElement* inXml)
 		_relSpace._scale.set(x, y, z);
 	}
 
-	szTmp = inXml->Attribute("canVisit");
-	if (szTmp)
-		strTemp = szTmp;
-	_canVisit = (strTemp == "false" ? false : true);
-
+	inXml->QueryBoolAttribute("visit", &_canVisit);
 	return true;
 }
 

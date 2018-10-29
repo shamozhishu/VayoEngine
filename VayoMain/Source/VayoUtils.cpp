@@ -211,7 +211,7 @@ Vector3df getRayInViewSpace(int xScreen, int yScreen)
 	float xN = (float)(xScreen - viewPort._upperLeftCorner._x) * 2.0f / (float)viewPort.getWidth() - 1.0f;
 	float yN = (float)(-yScreen + viewPort._upperLeftCorner._y) * 2.0f / (float)viewPort.getHeight() + 1.0f;
 	float wC = pCamera->getNearZ();
-	bool isOrtho = (pCamera->getType() == Camera::ET_ORTHOGONAL);
+	bool isOrtho = pCamera->isOrthogonal();
 	float xC = isOrtho ? xN : xN * wC;
 	float yC = isOrtho ? yN : yN * wC;
 	Vector3df rayDir(xC, yC, 0.0f);

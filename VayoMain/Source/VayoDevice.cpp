@@ -39,7 +39,11 @@ void Device::onResize()
 			float h = _screenSize._height;
 			if (0 == _screenSize._height)
 				h = 1.0f;
-			pActiveCamera->setLens(pActiveCamera->getFovY(), w / h, pActiveCamera->getNearZ(), pActiveCamera->getFarZ());
+
+			if (pActiveCamera->isOrthogonal())
+				pActiveCamera->setLens(w, h, pActiveCamera->getNearZ(), pActiveCamera->getFarZ());
+			else
+				pActiveCamera->setLens(pActiveCamera->getFovY(), w / h, pActiveCamera->getNearZ(), pActiveCamera->getFarZ());
 		}
 	}
 }

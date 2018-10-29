@@ -41,6 +41,7 @@
 #include "VayoBitState.h"
 #include "VayoSharedPtr.h"
 #include "VayoSingleton.h"
+#include "VayoReflection.h"
 #include "VayoUserDataBind.h"
 #include "VayoTessGridBuilder.h"
 #include "VayoTessGridHandler.h"

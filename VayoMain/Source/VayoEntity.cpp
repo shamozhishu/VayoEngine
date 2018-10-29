@@ -50,6 +50,7 @@ SubMesh* SubEntity::getSubMesh() const
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_WITHPARA_IMPLEMENT(Entity, const wstring&)
 Entity::Entity(const wstring& name)
 	: MovableObject(name)
 	, _changedMeshID(0)
@@ -142,99 +143,103 @@ void Entity::buildSubEntities()
 
 void Entity::serialize(XMLElement* outXml)
 {
-
+	MovableObject::serialize(outXml);
+	if (_customAttribute != L"")
+		outXml->SetAttribute("model", unicodeToUtf8(_customAttribute).c_str());
 }
 
 bool Entity::deserialize(XMLElement* inXml)
 {
-	if (!inXml)
+	if (!MovableObject::deserialize(inXml))
 		return false;
 
 	const char* pszTmp = inXml->Attribute("model");
-	if (NULL == pszTmp)
+	if (pszTmp && strcmp(pszTmp, ""))
+		_customAttribute = utf8ToUnicode(pszTmp);
+
+	return true;
+}
+
+bool Entity::parseCustomAttrib()
+{
+	if (_customAttribute == L"")
 		return true;
 
-	string strTemp = pszTmp;
-	vector<string> container;
-	stringtok(container, strTemp, ",");
+	vector<wstring> container;
+	wstringtok(container, _customAttribute, L",");
 	int size = container.size();
 	if (size > 0)
 	{
-		if (container[0] == "Cube")
+		if (container[0] == L"Cube")
 		{
 			if (size >= 5)
 			{
-				wstring materialName = utf8ToUnicode(container[1]);
-				Vector3df size = Vector3df((float)atof(container[2].c_str()),
-					(float)atof(container[3].c_str()),
-					(float)atof(container[4].c_str()));
-				setMesh(Root::getSingleton().getMeshManager()->createCubeMesh(size, materialName));
+				Vector3df size = Vector3df((float)_wtof(container[2].c_str()),
+					(float)_wtof(container[3].c_str()),
+					(float)_wtof(container[4].c_str()));
+				setMesh(Root::getSingleton().getMeshManager()->createCubeMesh(size, container[1]));
 			}
 			else
 				Log::wprint(ELL_WARNING, L"Entity:Cube参数不足");
 		}
-		else if (container[0] == "Sphere")
+		else if (container[0] == L"Sphere")
 		{
 			if (size >= 5)
 			{
-				wstring materialName = utf8ToUnicode(container[1]);
 				setMesh(Root::getSingleton().getMeshManager()->createSphereMesh(
-					(float)atof(container[2].c_str()),
-					(unsigned)atoi(container[3].c_str()),
-					(unsigned)atoi(container[4].c_str()),
-					materialName));
+					(float)_wtof(container[2].c_str()),
+					(unsigned)_wtoi(container[3].c_str()),
+					(unsigned)_wtoi(container[4].c_str()),
+					container[1]));
 			}
 			else
 				Log::wprint(ELL_WARNING, L"Entity:Sphere参数不足");
 		}
-		else if (container[0] == "Cylinder")
+		else if (container[0] == L"Cylinder")
 		{
 			if (size >= 8)
 			{
-				bool closeTop = (container[6] == "false" ? false : true);
-				wstring materialName = utf8ToUnicode(container[1]);
+				bool closeTop = (container[6] == L"false" ? false : true);
 				setMesh(Root::getSingleton().getMeshManager()->createCylinderMesh(
-					(float)atof(container[2].c_str()),
-					(float)atof(container[3].c_str()),
-					(unsigned)atoi(container[4].c_str()),
-					(unsigned int)strtoul(container[5].c_str(), NULL, 16),
+					(float)_wtof(container[2].c_str()),
+					(float)_wtof(container[3].c_str()),
+					(unsigned)_wtoi(container[4].c_str()),
+					(unsigned int)strtoul(w2a_(container[5]).c_str(), NULL, 16),
 					closeTop,
-					(float)atof(container[7].c_str()),
-					materialName));
+					(float)_wtof(container[7].c_str()),
+					container[1]));
 			}
 			else
 				Log::wprint(ELL_WARNING, L"Entity:Cylinder参数不足");
 		}
-		else if (container[0] == "Cone")
+		else if (container[0] == L"Cone")
 		{
 			if (size >= 8)
 			{
-				wstring materialName = utf8ToUnicode(container[1]);
 				setMesh(Root::getSingleton().getMeshManager()->createConeMesh(
-					(float)atof(container[2].c_str()),
-					(float)atof(container[3].c_str()),
-					(unsigned)atoi(container[4].c_str()),
-					(unsigned int)strtoul(container[5].c_str(), NULL, 16),
-					(unsigned int)strtoul(container[6].c_str(), NULL, 16),
-					(float)atof(container[7].c_str()),
-					materialName));
+					(float)_wtof(container[2].c_str()),
+					(float)_wtof(container[3].c_str()),
+					(unsigned)_wtoi(container[4].c_str()),
+					(unsigned int)strtoul(w2a_(container[5]).c_str(), NULL, 16),
+					(unsigned int)strtoul(w2a_(container[6]).c_str(), NULL, 16),
+					(float)_wtof(container[7].c_str()),
+					container[1]));
 			}
 			else
 				Log::wprint(ELL_WARNING, L"Entity:Cone参数不足");
 		}
 		else
 		{
-			wstring objName = utf8ToUnicode(container[0]);
-			ManualObject* pObj = Root::getSingleton().getCurSceneMgr()->findObject<ManualObject>(objName);
+			ManualObject* pObj = Root::getSingleton().getCurSceneMgr()->findObject<ManualObject>(container[0]);
 			if (pObj)
 			{
 				EHardwareMapping mappingHint = EHM_NEVER;
 				if (size >= 2)
-					mappingHint = (EHardwareMapping)atoi(container[1].c_str());
+					mappingHint = (EHardwareMapping)_wtoi(container[1].c_str());
 				setMesh(pObj->convertToMesh(mappingHint));
 			}
 			else
-				Log::wprint(ELL_WARNING, L"模型[%s]在创建实体[%s]时不存在", objName.c_str(), getName());
+				Log::wprint(ELL_WARNING, L"模型[%s]在创建实体[%s]时不存在", container[0].c_str(), getName());
 		}
 	}
 

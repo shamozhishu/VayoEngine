@@ -1,4 +1,5 @@
 #include "VayoSigslot.h"
+#include "VayoLog.h"
 
 NS_VAYO_BEGIN
 

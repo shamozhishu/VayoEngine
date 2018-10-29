@@ -53,10 +53,10 @@ class _VayoExport CollisionDetector
 public:
 	CollisionDetector(SceneManager* sceneMgr);
 	~CollisionDetector();
-	template<typename T> T* findTriContainer(const wstring& name);
 	template<typename T> T* createTriContainer(const wstring& name = L"");
-	void destroyTriContainer(TriContainer* triContainer);
+	template<typename T> T* findTriContainer(const wstring& name);
 	void destroyTriContainer(const wstring& name);
+	void destroyTriContainer(TriContainer* triContainer);
 	void destroyAllTriContainers();
 
 public:
@@ -151,16 +151,6 @@ private:
 };
 
 template<typename T>
-T* CollisionDetector::findTriContainer(const wstring& name)
-{
-	T* ret = NULL;
-	map<wstring, TriContainer*>::iterator it = _triContainersPool.find(name);
-	if (it != _triContainersPool.end())
-		ret = dynamic_cast<T*>(it->second);
-	return ret;
-}
-
-template<typename T>
 T* CollisionDetector::createTriContainer(const wstring& name /*= L""*/)
 {
 	T* ret = new T(name);
@@ -178,6 +168,16 @@ T* CollisionDetector::createTriContainer(const wstring& name /*= L""*/)
 	}
 
 	_triContainersPool[pTri->getName()] = pTri;
+	return ret;
+}
+
+template<typename T>
+T* CollisionDetector::findTriContainer(const wstring& name)
+{
+	T* ret = NULL;
+	map<wstring, TriContainer*>::iterator it = _triContainersPool.find(name);
+	if (it != _triContainersPool.end())
+		ret = dynamic_cast<T*>(it->second);
 	return ret;
 }
 

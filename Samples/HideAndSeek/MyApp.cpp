@@ -36,20 +36,6 @@ bool ModelViewer::startup()
 
 	{
 		TessGridHandler gridder;
-		gridder.parseTessgridFile(L"连接器_J599I_26FG41SHN.tessgrid");
-		gridder.parseTessgridFile(L"连接器_J599I_26FH55PHN.tessgrid");
-		gridder.parseTessgridFile(L"连接器_J599I_26FJ61PA.tessgrid");
-		gridder.parseTessgridFile(L"连接器_J599I_26FJ61PN.tessgrid");
-		gridder.parseTessgridFile(L"连接器_J599I_26FJ61SA.tessgrid");
-		gridder.parseTessgridFile(L"连接器_J599I_26FJ61SHN.tessgrid");
-		gridder.parseTessgridFile(L"连接器_J599I_26FJ61SN.tessgrid");
-		gridder.parseTessgridFile(L"尾罩_J1784A_18B_21N08.tessgrid");
-		gridder.parseTessgridFile(L"尾罩_J1784A_18B_23N09.tessgrid");
-		gridder.parseTessgridFile(L"尾罩_J1784A_18B_25N10.tessgrid");
-		gridder.parseTessgridFile(L"导线_AF_250.tessgrid");
-		gridder.parseTessgridFile(L"导线_609C55A0812_22_6.tessgrid");
-		gridder.parseTessgridFile(L"star.tessgrid");
-
 		TessGridBuilder builder;
 		builder.setProp(L"testmodel", L"examples/sphere");
 		builder.setPlace(TessGridBuilder::EP_XY, Vector3df(0,0,2), Vector3df(0,0,0), Vector3df(1,1,1));
@@ -72,7 +58,7 @@ bool ModelViewer::startup()
 		builder.addSingleStret(Vector3df(0, 0, -4), Vector3df(0, 0, 0), Vector3df(1, 1, 1));
 		builder.endAddStretBody();
 		gridder.parseTessgridFile(builder.getStream());
-		builder.save(Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + L"testmodel2");
+		builder.save(Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + L"testmodel2", false);
 	}
 
 	// 激活轨道摄像机

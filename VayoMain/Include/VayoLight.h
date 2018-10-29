@@ -20,12 +20,9 @@ protected:
 	LightData _lightData;
 };
 
-/**
- * Serialized template:
- * <DirectionalLight name="主方向光" ambientColor="0xff808080" diffuseColor="0xffffffff" specularColor="ffcccccc" direction="-0.57735,0.57735,0.57735"/>
-**/
 class _VayoExport DirectionalLight : public MovableObject, public Light
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(DirectionalLight, const wstring&)
 public:
 	DirectionalLight(const wstring& name);
 	void update(float dt);
@@ -34,12 +31,9 @@ public:
 	bool deserialize(XMLElement* inXml);
 };
 
-/**
- * Serialized template:
- * TODO
-**/
 class _VayoExport PointLight : public MovableObject, public Light
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(PointLight, const wstring&)
 public:
 	PointLight(const wstring& name);
 	void update(float dt);
@@ -50,12 +44,9 @@ public:
 	bool deserialize(XMLElement* inXml);
 };
 
-/**
- * Serialized template:
- * TODO
-**/
 class _VayoExport SpotLight : public PointLight
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(SpotLight, const wstring&)
 public:
 	SpotLight(const wstring& name);
 	void update(float dt);

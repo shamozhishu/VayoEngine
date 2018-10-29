@@ -251,9 +251,6 @@
     <ClInclude Include="Source\VayoFontManager.h">
       <Filter>Source\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Source\VayoUIFactory.h">
-      <Filter>Source\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Source\VayoWin32Device.h">
       <Filter>Source\Headers</Filter>
     </ClInclude>
@@ -317,7 +314,7 @@
     <ClInclude Include="Include\tinyxml2\tinyxml2.h">
       <Filter>ThirdParty\tinyxml2</Filter>
     </ClInclude>
-    <ClInclude Include="Include\VayoSceneLoader.h">
+    <ClInclude Include="Include\VayoReflection.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -522,9 +519,6 @@
     </ClCompile>
     <ClCompile Include="ThirdParty\tinyxml2.cpp">
       <Filter>ThirdParty\tinyxml2</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\VayoSceneLoader.cpp">
-      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

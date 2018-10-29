@@ -1,4 +1,5 @@
 #include "VayoNodeAnimator.h"
+#include "VayoUtils.h"
 
 NS_VAYO_BEGIN
 
@@ -27,6 +28,16 @@ NodeAnimator::~NodeAnimator()
 bool NodeAnimator::isInputEnabled() const
 {
 	return false;
+}
+
+void NodeAnimator::serialize(XMLElement* outXml)
+{
+	outXml->SetAttribute("name", unicodeToUtf8(_name).c_str());
+}
+
+bool NodeAnimator::deserialize(XMLElement* inXml)
+{
+	return inXml != NULL;
 }
 
 NS_VAYO_END

@@ -6,18 +6,23 @@
 #ifndef __VAYO_ATTRIB_SERIALIZER_H__
 #define __VAYO_ATTRIB_SERIALIZER_H__
 
-#include "VayoCommon.h"
+#include "VayoSupport.h"
+#include "VayoReflection.h"
 #include "tinyxml2/tinyxml2.h"
 using tinyxml2::XMLElement;
 
 NS_VAYO_BEGIN
 
-class _VayoExport AttribSerializer
+class _VayoExport AttribSerializer : public Type
 {
 public:
 	virtual ~AttribSerializer() {}
 	virtual void serialize(XMLElement* outXml) = 0;
 	virtual bool deserialize(XMLElement* inXml) = 0;
+	virtual bool parseCustomAttrib() { return true; }
+
+protected:
+	wstring _customAttribute;
 };
 
 NS_VAYO_END

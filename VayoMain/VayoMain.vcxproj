@@ -66,11 +66,11 @@
     <ClInclude Include="Include\VayoPlugin.h" />
     <ClInclude Include="Include\VayoQuaternion.h" />
     <ClInclude Include="Include\VayoRectangle.h" />
+    <ClInclude Include="Include\VayoReflection.h" />
     <ClInclude Include="Include\VayoRenderable.h" />
     <ClInclude Include="Include\VayoRenderQueue.h" />
     <ClInclude Include="Include\VayoRenderSystem.h" />
     <ClInclude Include="Include\VayoRoot.h" />
-    <ClInclude Include="Include\VayoSceneLoader.h" />
     <ClInclude Include="Include\VayoSceneManager.h" />
     <ClInclude Include="Include\VayoSceneNode.h" />
     <ClInclude Include="Include\VayoScriptSystem.h" />
@@ -97,7 +97,6 @@
     <ClInclude Include="Include\VayoVector3d.h" />
     <ClInclude Include="Include\VayoVertex.h" />
     <ClInclude Include="Source\VayoFontManager.h" />
-    <ClInclude Include="Source\VayoUIFactory.h" />
     <ClInclude Include="Source\VayoWin32Device.h" />
     <ClInclude Include="Source\VayoWireBoundingBox.h" />
     <ClInclude Include="ThirdParty\rc5\rc5.h" />
@@ -149,7 +148,6 @@
     <ClCompile Include="Source\VayoRenderQueue.cpp" />
     <ClCompile Include="Source\VayoRenderSystem.cpp" />
     <ClCompile Include="Source\VayoRoot.cpp" />
-    <ClCompile Include="Source\VayoSceneLoader.cpp" />
     <ClCompile Include="Source\VayoSceneManager.cpp" />
     <ClCompile Include="Source\VayoSceneNode.cpp" />
     <ClCompile Include="Source\VayoScriptSystem.cpp" />

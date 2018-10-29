@@ -18,6 +18,8 @@ public:
 	virtual void animateNode(Node* node, float dt) = 0;
 	virtual bool hasFinished(void) const;
 	virtual bool isInputEnabled() const;
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 
 private:
 	PROPERTY_R_REF(wstring, _name, Name)

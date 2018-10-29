@@ -9,7 +9,7 @@
 #include "VayoMath.h"
 NS_VAYO_BEGIN
 
-template <typename T>
+template<typename T>
 class Vector2d
 {
 public:

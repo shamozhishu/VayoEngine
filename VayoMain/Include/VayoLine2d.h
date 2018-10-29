@@ -11,7 +11,7 @@
 NS_VAYO_BEGIN
 
 // 2D line between two points with intersection methods.
-template <typename T>
+template<typename T>
 class Line2d
 {
 public:

@@ -1,14 +1,15 @@
-<Dialog rect="153,16,1014,111" imageset="0" image="">
-    <Button id="1" rect="303,8,72,92" imageset="0" image="MGO2-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-1" disableimage="MGO2-2"/>
-    <Button id="3" rect="557,6,90,99" imageset="0" image="MGO2-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-1" disableimage="MGO2-2"/>
-    <Button id="10" rect="831,5,82,99" imageset="0" image="MGO2-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-1" disableimage="MGO2-2"/>
-    <Button id="2" rect="752,6,69,97" imageset="0" image="MGO2-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-1" disableimage="MGO2-2"/>
-    <Button id="4" rect="385,7,67,92" imageset="0" image="MGO2-3" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-4" disableimage="MGO2-2"/>
-    <Button id="5" rect="919,6,82,100" imageset="1" image="MGO97-9" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO99-10" disableimage="MGO97-9"/>
-    <Button id="6" rect="141,10,73,90" imageset="1" image="MGO98-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO98-1" disableimage="MGO98-0"/>
-    <Button id="7" rect="461,3,82,104" imageset="1" image="MGO98-1" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO98-2" disableimage="MGO98-1"/>
-    <Button id="8" rect="3,10,62,88" imageset="1" image="MGO98-2" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO98-3" disableimage="MGO98-2"/>
-    <Button id="9" rect="660,5,82,99" imageset="1" image="MGO98-3" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO98-1" disableimage="MGO98-3"/>
-    <Button id="11" rect="68,9,67,90" imageset="1" image="MGO99-7" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO99-8" disableimage="MGO99-0"/>
-    <Button id="12" rect="223,8,69,92" imageset="1" image="MGO99-4" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO99-5" disableimage="MGO99-1"/>
-</Dialog>
+<?xml version="1.0" encoding="UTF-8"?>
+<TestPage rect="153,16,1014,111" imageset="0" image="">
+    <Vayo::UIButton id="1" rect="303,8,72,92" imageset="0" image="MGO2-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-1" disableimage="MGO2-2"/>
+    <Vayo::UIButton id="3" rect="557,6,90,99" imageset="0" image="MGO2-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-1" disableimage="MGO2-2"/>
+    <Vayo::UIButton id="10" rect="831,5,82,99" imageset="0" image="MGO2-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-1" disableimage="MGO2-2"/>
+    <Vayo::UIButton id="2" rect="752,6,69,97" imageset="0" image="MGO2-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-1" disableimage="MGO2-2"/>
+    <Vayo::UIButton id="4" rect="385,7,67,92" imageset="0" image="MGO2-3" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO2-4" disableimage="MGO2-2"/>
+    <Vayo::UIButton id="5" rect="919,6,82,100" imageset="1" image="MGO97-9" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO99-10" disableimage="MGO97-9"/>
+    <Vayo::UIButton id="6" rect="141,10,73,90" imageset="1" image="MGO98-0" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO98-1" disableimage="MGO98-0"/>
+    <Vayo::UIButton id="7" rect="461,3,82,104" imageset="1" image="MGO98-1" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO98-2" disableimage="MGO98-1"/>
+    <Vayo::UIButton id="8" rect="3,10,62,88" imageset="1" image="MGO98-2" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO98-3" disableimage="MGO98-2"/>
+    <Vayo::UIButton id="9" rect="660,5,82,99" imageset="1" image="MGO98-3" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO98-1" disableimage="MGO98-3"/>
+    <Vayo::UIButton id="11" rect="68,9,67,90" imageset="1" image="MGO99-7" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO99-8" disableimage="MGO99-0"/>
+    <Vayo::UIButton id="12" rect="223,8,69,92" imageset="1" image="MGO99-4" textid="0" textscale="1.0" textcolor="0xffffffff" textalignhori="1" textalignvert="1" fontid="0" pushimage="MGO99-5" disableimage="MGO99-1"/>
+</TestPage>

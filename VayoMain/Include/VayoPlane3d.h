@@ -18,7 +18,7 @@ enum EIntersectionRelation
 	EIR_CLIPPED
 };
 
-template <typename T>
+template<typename T>
 class Plane3d
 {
 public:

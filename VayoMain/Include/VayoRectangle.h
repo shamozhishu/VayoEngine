@@ -10,7 +10,7 @@
 #include "VayoDimension2d.h"
 NS_VAYO_BEGIN
 
-template <typename T>
+template<typename T>
 class Rectangle
 {
 public:

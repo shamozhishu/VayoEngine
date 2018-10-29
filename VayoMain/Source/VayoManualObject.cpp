@@ -11,11 +11,7 @@
 
 NS_VAYO_BEGIN
 
-void ManualObject::update(float dt)
-{
-	Root::getSingleton().getCurSceneMgr()->registerForRendering(this, getQueueID());
-}
-
+VAYO_REFLEX_WITHPARA_IMPLEMENT(ManualObject, const wstring&)
 ManualObject::ManualObject(const wstring& name)
 	: MovableObject(name)
 	, _needSubmit(true)
@@ -32,6 +28,11 @@ ManualObject::~ManualObject()
 {
 	Root::getSingleton().getMeshManager()->destroyMesh(_meshData);
 	Root::getSingleton().getActiveRenderer()->destroyDisplayList(_displayList->getName());
+}
+
+void ManualObject::update(float dt)
+{
+	Root::getSingleton().getCurSceneMgr()->registerForRendering(this, getQueueID());
 }
 
 void ManualObject::render()
@@ -379,53 +380,53 @@ void ManualObject::submitDisplay()
 
 void ManualObject::serialize(XMLElement* outXml)
 {
-
+	MovableObject::serialize(outXml);
+	if (_customAttribute != L"")
+		outXml->SetAttribute("model", unicodeToUtf8(_customAttribute).c_str());
 }
 
 bool ManualObject::deserialize(XMLElement* inXml)
 {
-	if (!inXml)
+	if (!MovableObject::deserialize(inXml))
 		return false;
 
-	vector<string> container;
 	const char* pszTmp = inXml->Attribute("model");
-	if (NULL == pszTmp)
+	if (pszTmp && strcmp(pszTmp, ""))
+		_customAttribute = utf8ToUnicode(pszTmp);
+
+	return true;
+}
+
+bool ManualObject::parseCustomAttrib()
+{
+	if (_customAttribute == L"")
 		return true;
 
-	string strTemp = pszTmp;
-	stringtok(container, strTemp, ",");
+	vector<wstring> container;
+	wstringtok(container, _customAttribute, L",");
 	int size = container.size();
 	if (size > 0)
 	{
-		if (container[0] == "Plane")
+		if (container[0] == L"Plane")
 		{
 			if (size >= 4)
-			{
-				wstring materialName = utf8ToUnicode(container[1]);
-				generatePlane((float)atof(container[2].c_str()), (float)atof(container[3].c_str()), materialName);
-			}
+				generatePlane((float)_wtof(container[2].c_str()), (float)_wtof(container[3].c_str()), container[1]);
 			else
 				Log::wprint(ELL_WARNING, L"ManualObject::generatePlane()参数不足");
 		}
-		else if (container[0] == "Torus")
+		else if (container[0] == L"Torus")
 		{
 			if (size >= 6)
-			{
-				wstring materialName = utf8ToUnicode(container[1]);
-				generateTorus((float)atof(container[2].c_str()), (float)atof(container[3].c_str()),
-					(float)atof(container[4].c_str()), (float)atof(container[5].c_str()), materialName);
-			}
+				generateTorus((float)_wtof(container[2].c_str()), (float)_wtof(container[3].c_str()),
+				(float)_wtof(container[4].c_str()), (float)_wtof(container[5].c_str()), container[1]);
 			else
 				Log::wprint(ELL_WARNING, L"ManualObject::generateTorus()参数不足");
 		}
-		else if (container[0] == "Sphere")
+		else if (container[0] == L"Sphere")
 		{
 			if (size >= 5)
-			{
-				wstring materialName = utf8ToUnicode(container[1]);
-				generateSphere((float)atof(container[2].c_str()), (float)atof(container[3].c_str()),
-					(float)atof(container[4].c_str()), materialName);
-			}
+				generateSphere((float)_wtof(container[2].c_str()), (float)_wtof(container[3].c_str()),
+				(float)_wtof(container[4].c_str()), container[1]);
 			else
 				Log::wprint(ELL_WARNING, L"ManualObject::generateSphere()参数不足");
 		}

@@ -10,12 +10,9 @@
 #include "VayoNode.h"
 NS_VAYO_BEGIN
 
-/**
- * Serialized template:
- * <SceneNode name="灯光场景节点" relTranslation="0,0,0" relRotation="0,0,0" relScale="1,1,1" canVisit="true">
-**/
 class _VayoExport SceneNode : public Node
 {
+	static Reflex<SceneNode, const wstring&, Node*, SceneManager*> _dynReflex;
 public:
 	SceneNode(const wstring& name, Node* parent, SceneManager* mgr);
 	virtual ~SceneNode();

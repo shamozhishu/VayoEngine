@@ -19,17 +19,11 @@ NS_VAYO_BEGIN
 class _VayoExport Camera : public TouchDelegate, public KeypadDelegate
 {
 public:
-	enum EType
-	{
-		ET_PERSPECTIVE,
-		ET_ORTHOGONAL
-	};
-
 	Camera();
 	virtual ~Camera();
 	virtual void  refresh();
 	virtual void  setNeedUpdate(bool isUpdate);
-	virtual EType getType() { return ET_PERSPECTIVE; }
+	virtual bool  isOrthogonal() { return false; }
 	virtual bool  getWorldPos(Vector3df& outWorldPos) const;
 	virtual bool  getWorldLook(Vector3df& outWorldLook) const;
 
@@ -109,12 +103,9 @@ protected:
 };
 
 // 第一人称摄像机
-/**
- * Serialized template:
- * <FPSCamera name="第一人称摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45"  zn="1" zf="1000" moveSpeed="100"/>
-**/
 class _VayoExport FPSCamera : public MovableObject, public Camera
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(FPSCamera, const wstring&)
 public:
 	FPSCamera(const wstring& name);
 	~FPSCamera();
@@ -135,12 +126,9 @@ protected:
 };
 
 // 轨道摄像机
-/**
- * Serialized template:
- * <OrbitCamera name="轨道摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45" zn="1" zf="1000" moveSpeed="10" zoomSpeed="2"/>
-**/
 class _VayoExport OrbitCamera : public MovableObject, public Camera
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(OrbitCamera, const wstring&)
 public:
 	OrbitCamera(const wstring& name);
 	~OrbitCamera();
@@ -168,17 +156,14 @@ protected:
 };
 
 // 鹰眼摄像机
-/**
- * Serialized template:
- * TODO
-**/
 class _VayoExport EagleEyeCamera : public OrbitCamera
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(EagleEyeCamera, const wstring&)
 public:
 	EagleEyeCamera(const wstring& name);
 	~EagleEyeCamera();
 	void  update(float dt);
-	EType getType() { return ET_ORTHOGONAL; }
+	bool  isOrthogonal() { return true; }
 	void  setZoomFactor(float zoom);
 	void  setLens(float widthOfViewVolume, float heightOfViewVolume, float zn, float zf);
 	float getFovY() const;
@@ -186,7 +171,6 @@ public:
 	float getNearWindowWidth() const;
 	float getNearWindowHeight() const;
 	float getFarWindowWidth() const;
-	float getFarWindowHeight() const;
 	bool  touchBegan(const Touch& touch, EMouseKeys key);
 	void  touchMoved(const Touch& touch, EMouseKeys key);
 	void  touchEnded(const Touch& touch, EMouseKeys key);

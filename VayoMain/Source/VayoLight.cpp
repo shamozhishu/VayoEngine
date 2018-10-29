@@ -22,6 +22,7 @@ void Light::setSpecular(int r, int g, int b, int a)
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_WITHPARA_IMPLEMENT(DirectionalLight, const wstring&)
 DirectionalLight::DirectionalLight(const wstring& name)
 	: MovableObject(name)
 {
@@ -45,12 +46,21 @@ void DirectionalLight::setDirection(float x, float y, float z)
 
 void DirectionalLight::serialize(XMLElement* outXml)
 {
-
+	MovableObject::serialize(outXml);
+	char szbuf[256];
+	sprintf_s(szbuf, sizeof(szbuf), "0x%08x", _lightData._ambientColor._clr);
+	outXml->SetAttribute("ambientColor", szbuf);
+	sprintf_s(szbuf, sizeof(szbuf), "0x%08x", _lightData._diffuseColor._clr);
+	outXml->SetAttribute("diffuseColor", szbuf);
+	sprintf_s(szbuf, sizeof(szbuf), "0x%08x", _lightData._specularColor._clr);
+	outXml->SetAttribute("specularColor", szbuf);
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _lightData._direction._x, _lightData._direction._y, _lightData._direction._z);
+	outXml->SetAttribute("direction", szbuf);
 }
 
 bool DirectionalLight::deserialize(XMLElement* inXml)
 {
-	if (!inXml)
+	if (!MovableObject::deserialize(inXml))
 		return false;
 
 	string strTemp = inXml->Attribute("ambientColor");
@@ -75,6 +85,7 @@ bool DirectionalLight::deserialize(XMLElement* inXml)
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_WITHPARA_IMPLEMENT(PointLight, const wstring&)
 PointLight::PointLight(const wstring& name)
 	: MovableObject(name)
 {
@@ -110,12 +121,22 @@ void PointLight::setAtt(float a0, float a1, float a2)
 
 void PointLight::serialize(XMLElement* outXml)
 {
-
+	MovableObject::serialize(outXml);
+	char szbuf[256];
+	sprintf_s(szbuf, sizeof(szbuf), "0x%08x", _lightData._ambientColor._clr);
+	outXml->SetAttribute("ambientColor", szbuf);
+	sprintf_s(szbuf, sizeof(szbuf), "0x%08x", _lightData._diffuseColor._clr);
+	outXml->SetAttribute("diffuseColor", szbuf);
+	sprintf_s(szbuf, sizeof(szbuf), "0x%08x", _lightData._specularColor._clr);
+	outXml->SetAttribute("specularColor", szbuf);
+	outXml->SetAttribute("range", _lightData._range);
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _lightData._att._x, _lightData._att._y, _lightData._att._z);
+	outXml->SetAttribute("att", szbuf);
 }
 
 bool PointLight::deserialize(XMLElement* inXml)
 {
-	if (!inXml)
+	if (!MovableObject::deserialize(inXml))
 		return false;
 
 	string strTemp = inXml->Attribute("ambientColor");
@@ -141,6 +162,7 @@ bool PointLight::deserialize(XMLElement* inXml)
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_WITHPARA_IMPLEMENT(SpotLight, const wstring&)
 SpotLight::SpotLight(const wstring& name)
 	: PointLight(name)
 {
@@ -174,7 +196,12 @@ void SpotLight::setCutoff(float cutoff)
 
 void SpotLight::serialize(XMLElement* outXml)
 {
-
+	PointLight::serialize(outXml);
+	outXml->SetAttribute("exponent", _lightData._exponent);
+	outXml->SetAttribute("cutoff", _lightData._cutoff);
+	char szbuf[256];
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _lightData._direction._x, _lightData._direction._y, _lightData._direction._z);
+	outXml->SetAttribute("direction", szbuf);
 }
 
 bool SpotLight::deserialize(XMLElement* inXml)

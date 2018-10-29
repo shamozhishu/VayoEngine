@@ -628,13 +628,15 @@ void TessGridHandler::reset(int vertexSize /*= 0*/, int contourSize /*= 0*/)
 
 bool TessGridHandler::parseTessgridFile(const wstring& filename)
 {
-	if (filename != L"" && filename.substr(filename.rfind(L'.')) == L".tessgrid")
+	wstring fileName = filename;
+	trim(fileName);
+	if (fileName != L"" && fileName.substr(fileName.rfind(L'.')) == L".tessgrid")
 	{
-		wstring filePath = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + filename;
+		wstring filePath = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + fileName;
 		std::wifstream fin(filePath);
 		if (!fin)
 		{
-			Log::wprint(ELL_ERROR, L"文件[%s]打开失败", filename.c_str());
+			Log::wprint(ELL_ERROR, L"文件[%s]打开失败", fileName.c_str());
 			return false;
 		}
 
@@ -644,11 +646,11 @@ bool TessGridHandler::parseTessgridFile(const wstring& filename)
 		
 		if (parseTessgridFile(filestream))
 		{
-			Log::wprint(ELL_INFORMATION, L"文件[%s]解析成功", filename.c_str());
+			Log::wprint(ELL_INFORMATION, L"文件[%s]解析成功", fileName.c_str());
 			return true;
 		}
 		
-		Log::wprint(ELL_ERROR, L"文件[%s]解析失败", filename.c_str());
+		Log::wprint(ELL_ERROR, L"文件[%s]解析失败", fileName.c_str());
 	}
 
 	return false;

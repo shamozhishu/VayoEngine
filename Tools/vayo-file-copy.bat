@@ -1,6 +1,6 @@
 @echo off
-set source_path=D:\______svn-code\vayo-engine-master\
-set target_path=D:\_____git-code\VayoEngine\
+set source_path=C:\MyApp\###repository###\svn-repository\VayoEngine\
+set target_path=C:\MyApp\###repository###\git-repository\VayoEngine\
 echo copy[%source_path%]to[%target_path%]:
 pause
 

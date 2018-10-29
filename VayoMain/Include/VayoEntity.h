@@ -31,12 +31,9 @@ private:
 	SubMesh*    _subMesh;
 };
 
-/**
- * Serialized template:
- * <Entity name="Ô²Öù" model="Cylinder,examples/cube,5,10,50,0xffffffff,true,0"/>
-**/
 class _VayoExport Entity : public MovableObject
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(Entity, const wstring&)
 public:
 	Entity(const wstring& name);
 	~Entity();
@@ -48,6 +45,7 @@ public:
 	unsigned int getSubEntCount(void);
 	void         serialize(XMLElement* outXml);
 	bool         deserialize(XMLElement* inXml);
+	bool         parseCustomAttrib();
 
 protected:
 	void buildSubEntities();

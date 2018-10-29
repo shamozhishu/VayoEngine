@@ -6,12 +6,7 @@
 #ifndef __VAYO_MATH_H__
 #define __VAYO_MATH_H__
 
-#include <math.h>
-#include <limits.h>
-#include <float.h>
-#include <string.h>
-#include <typeinfo>
-#include "VayoCommon.h"
+#include "VayoSupport.h"
 
 #define M3D_PI                       (3.14159265358979323846)
 #define M3D_2PI                      (2.0 * M3D_PI)

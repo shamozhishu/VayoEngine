@@ -10,7 +10,7 @@
 NS_VAYO_BEGIN
 
 // 3D line between two points with intersection methods.
-template <typename T>
+template<typename T>
 class Line3d
 {
 public:

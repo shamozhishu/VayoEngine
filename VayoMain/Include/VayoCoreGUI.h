@@ -135,14 +135,12 @@ public:
 	PROPERTY_RW(int,              _ID,            ID)
 	PROPERTY_RW(int,              _fontID,        FontID)
 	PROPERTY_RW(UIDialog*,        _parent,        Parent)
-	PROPERTY_RW(EUIControlType,   _type,          Type)
 	PROPERTY_RW(EUIControlStatus, _status,        Status)
 	PROPERTY_RW(EUIAlignment,     _textAlignHori, TextAlignHori)
 	PROPERTY_RW(EUIAlignment,     _textAlignVert, TextAlignVert)
 	PROPERTY_RW(float,            _textScale,     TextScale)
 	PROPERTY_RW_REF(Colour,       _textColor,     TextColor)
 	PROPERTY_RW_REF(wstring,      _text,          Text)
-	PROPERTY_RW_REF(wstring,      _name,          Name)
 
 protected:
 	string  _textID;
@@ -152,6 +150,7 @@ protected:
 /** 按钮 */
 class _VayoExport UIButton : public UIControl
 {
+	VAYO_REFLEX_DECLARE(UIButton)
 public:
 	UIButton();
 	virtual ~UIButton();
@@ -175,6 +174,7 @@ signals:
 /** 复选框 */
 class _VayoExport UICheckBox : public UIControl
 {
+	VAYO_REFLEX_DECLARE(UICheckBox)
 public:
 	UICheckBox();
 	virtual ~UICheckBox();
@@ -198,6 +198,7 @@ signals:
 /** 静态文本 */
 class _VayoExport UIStatic : public UIControl
 {
+	VAYO_REFLEX_DECLARE(UIStatic)
 public:
 	UIStatic();
 	virtual ~UIStatic();
@@ -231,6 +232,7 @@ private:
 /** 滚动条 */
 class _VayoExport UIScrollBar : public UIControl
 {
+	VAYO_REFLEX_DECLARE(UIScrollBar)
 public:
 	UIScrollBar();
 	virtual ~UIScrollBar();
@@ -281,6 +283,7 @@ signals:
 /** 列表框 */
 class _VayoExport UIListBox : public UIControl
 {
+	VAYO_REFLEX_DECLARE(UIListBox)
 public:
 	UIListBox();
 	virtual ~UIListBox();
@@ -361,6 +364,7 @@ private:
 /** 组合框 */
 class _VayoExport UIComboBox : public UIControl
 {
+	VAYO_REFLEX_DECLARE(UIComboBox)
 public:
 	UIComboBox();
 	virtual ~UIComboBox();
@@ -391,6 +395,7 @@ private:
 /** 对话框: 它包含各种类型的控件 */
 class _VayoExport UIDialog : public UIWidget
 {
+	VAYO_REFLEX_WITHPARA_DECLARE(UIDialog, const wstring&)
 public:
 	UIDialog(const wstring& fileName);
 	virtual ~UIDialog();

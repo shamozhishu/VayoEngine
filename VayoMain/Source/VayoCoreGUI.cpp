@@ -7,7 +7,6 @@
 #include "VayoLog.h"
 #include "VayoTextureManager.h"
 #include "VayoFontManager.h"
-#include "VayoUIFactory.h"
 
 NS_VAYO_BEGIN
 
@@ -579,10 +578,8 @@ bool UIWidget::keyClicked(const tagKeyInput& keyInput)
 
 //////////////////////////////////////////////////////////////////////////
 UIControl::UIControl()
-	: _name(L"Control")
-	, _ID(-1)
+	: _ID(-1)
 	, _parent(NULL)
-	, _type(EUICT_UNKNOWN)
 	, _status(EUICS_NORMAL)
 	, _textScale(1.0f)
 	, _textColor(0xffffffff)
@@ -606,7 +603,7 @@ void UIControl::render()
 			wchar_t szTemp[256] = {};
 			UIFont* pFont = pUIMgr->getFont(EUIFT_TOOLTIP);
 			swprintf(szTemp, 256, L"%s,ID[%d]Rect[%d %d %d %d]",
-				getName().c_str(),
+				a2w_(getType()).c_str(),
 				getID(),
 				getAnimatedRelativeRect()._upperLeftCorner._x,
 				getAnimatedRelativeRect()._upperLeftCorner._y,
@@ -728,12 +725,11 @@ bool UIControl::deserialize(XMLElement* inXml)
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_IMPLEMENT(UIButton)
 UIButton::UIButton()
 	: _click(false)
 	, _hover(false)
 {
-	_name = L"Button";
-	_type = EUICT_BUTTON;
 }
 
 UIButton::~UIButton()
@@ -854,12 +850,11 @@ bool UIButton::deserialize(XMLElement* inXml)
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_IMPLEMENT(UICheckBox)
 UICheckBox::UICheckBox()
 	: _checked(false)
 	, _pressed(false)
 {
-	_name = L"CheckBox";
-	_type = EUICT_CHECK_BOX;
 }
 
 UICheckBox::~UICheckBox()
@@ -976,6 +971,7 @@ bool UICheckBox::deserialize(XMLElement* inXml)
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_IMPLEMENT(UIStatic)
 UIStatic::UIStatic()
 	: _lastFontID(_fontID)
 	, _border(true)
@@ -985,8 +981,6 @@ UIStatic::UIStatic()
 	, _bgColorEnabled(false)
 	, _bgColor(Root::getSingleton().getUIManager()->getSkin()->getColor(EUIC_FACE_3D))
 {
-	_name = L"Static";
-	_type = EUICT_STATIC_TEXT;
 }
 
 UIStatic::~UIStatic()
@@ -1306,6 +1300,7 @@ void UIStatic::breakLine(vector<wstring>& outLines, const wstring& inLine)
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_IMPLEMENT(UIScrollBar)
 UIScrollBar::UIScrollBar()
 	: _upButton(NULL)
 	, _downButton(NULL)
@@ -1323,9 +1318,6 @@ UIScrollBar::UIScrollBar()
 	, _desiredPos(0)
 	, _timeGap(0)
 {
-	_name = L"ScrollBar";
-	_type = EUICT_SCROLL_BAR;
-
 	refreshControls();
 	setPos(0);
 }
@@ -1711,6 +1703,7 @@ int UIScrollBar::getPosFromMousePt(const Position2di& pt) const
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_IMPLEMENT(UIListBox)
 UIListBox::UIListBox()
 	: _selected(-1)
 	, _itemHeight(0)
@@ -1726,8 +1719,6 @@ UIListBox::UIListBox()
 	, _autoScroll(true)
 	, _highlightWhenNotFocused(true)
 {
-	_name = L"ListBox";
-	_type = EUICT_LIST_BOX;
 	_scrollBar = new UIScrollBar();
 	updateAbsoluteRect();
 }
@@ -2184,10 +2175,9 @@ void UIListBox::recalculateItemHeight()
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_IMPLEMENT(UIComboBox)
 UIComboBox::UIComboBox()
 {
-	_name = L"ComboBox";
-	_type = EUICT_COMBO_BOX;
 }
 
 UIComboBox::~UIComboBox()
@@ -2199,6 +2189,7 @@ void UIComboBox::render()
 }
 
 //////////////////////////////////////////////////////////////////////////
+VAYO_REFLEX_WITHPARA_IMPLEMENT(UIDialog, const wstring&)
 UIDialog::UIDialog(const wstring& fileName)
 	: _lastSelectedCtrl(NULL)
 {
@@ -2265,7 +2256,8 @@ void UIDialog::render()
 
 			wchar_t szTemp[256] = {};
 			UIFont* pFont = Root::getSingleton().getUIManager()->getFont(EUIFT_TOOLTIP);
-			swprintf(szTemp, 256, L"Dialog,Rect[%d %d %d %d]Path[%s]",
+			swprintf(szTemp, 256, L"%s,Rect[%d %d %d %d]Path[%s]",
+				a2w_(getType()).c_str(),
 				getAnimatedRelativeRect()._upperLeftCorner._x,
 				getAnimatedRelativeRect()._upperLeftCorner._y,
 				getAnimatedRelativeRect().getWidth(),
@@ -2472,11 +2464,10 @@ bool UIDialog::deserialize(XMLElement* inXml)
 	setImgsetID(atoi(inXml->Attribute("imageset")));
 	setImage(utf8ToUnicode(inXml->Attribute("image")));
 
-	UIFactory uiFactory;
 	XMLElement* pElem = inXml->FirstChildElement();
 	while (pElem)
 	{
-		UIControl* pCtrl = uiFactory.createCtrl(utf8ToUnicode(pElem->Name()));
+		UIControl* pCtrl = ReflexFactory<>::getInstance().create<UIControl>(pElem->Name());
 		if (NULL != pCtrl)
 		{
 			pCtrl->setParent(this);
@@ -2864,10 +2855,10 @@ bool UIManager::keyClicked(const tagKeyInput& keyInput)
 
 			// save widget rect area.
 			tinyxml2::XMLDocument doc;
-			doc.NewDeclaration();
-			XMLElement* root = doc.NewElement("Dialog");
-			pCurSelectedDlg->serialize(root);
+			doc.InsertEndChild(doc.NewDeclaration());
+			XMLElement* root = doc.NewElement(pCurSelectedDlg->getType().c_str());
 			doc.InsertEndChild(root);
+			pCurSelectedDlg->serialize(root);
 
 			UIControl* pCtrl = NULL;
 			list<UIControl*>::const_iterator constItor = pCurSelectedDlg->getCtrlList().cbegin();
@@ -2875,9 +2866,9 @@ bool UIManager::keyClicked(const tagKeyInput& keyInput)
 			for (; constItor != constItorEnd; ++constItor)
 			{
 				pCtrl = (*constItor);
-				XMLElement* pCtrlElem = doc.NewElement(w2a_(pCtrl->getName()).c_str());
-				pCtrl->serialize(pCtrlElem);
+				XMLElement* pCtrlElem = doc.NewElement(pCtrl->getType().c_str());
 				root->InsertEndChild(pCtrlElem);
+				pCtrl->serialize(pCtrlElem);
 			}
 
 			if (tinyxml2::XML_SUCCESS != doc.SaveFile(w2a_(pCurSelectedDlg->getXMLFilePath()).c_str()))

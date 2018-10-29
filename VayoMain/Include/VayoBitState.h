@@ -51,6 +51,16 @@ public:
 	BitState(unsigned int state) :_bitSet(state) {}
 	~BitState() {}
 
+	unsigned int operator()() const
+	{
+		return _bitSet;
+	}
+
+	void operator()(unsigned int state)
+	{
+		_bitSet = state;
+	}
+
 	void addState(unsigned int state)
 	{
 		_bitSet |= state;
