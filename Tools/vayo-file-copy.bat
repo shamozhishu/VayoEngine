@@ -80,8 +80,8 @@ xcopy /y /s /e %source_path%Tools\*.* %target_path%Tools\
 echo ----------------------------------------VayoMainĿ¼
 
 xcopy /y %source_path%VayoMain\*.* %target_path%VayoMain\*.*
-xcopy /y %source_path%VayoMain\Include\*.* %target_path%VayoMain\Include\
-xcopy /y %source_path%VayoMain\Source\*.* %target_path%VayoMain\Source\
+xcopy /y /s /e %source_path%VayoMain\Include\*.* %target_path%VayoMain\Include\
+xcopy /y /s /e %source_path%VayoMain\Source\*.* %target_path%VayoMain\Source\
 xcopy /y /s /e %source_path%VayoMain\ThirdParty\*.* %target_path%VayoMain\ThirdParty\
 
 echo ----------------------------------------
