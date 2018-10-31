@@ -21,14 +21,13 @@ public:
 public:
 	Device();
 	virtual ~Device() {}
-	virtual void* getMainWnd() const = 0;
-	virtual float aspectRatio() const;
 	virtual bool  init() = 0;
+	virtual void* getWndHandle() const = 0;
+	virtual float getAspectRatio() const;
 	virtual bool  handleEvents(bool& idle) = 0;
 	virtual void  onResize();
-	virtual void  onSleep(unsigned int milliSeconds = 0) = 0;
-	virtual void  onDestroy() = 0;
-	virtual void  setMainWndCaption(const wstring& wndCaption);
+	virtual void  sleep(unsigned int milliSeconds, bool pauseTimer) = 0;
+	virtual void  setWndCaption(const wstring& wndCaption);
 	virtual void  setScreenSize(const Dimension2di& screenSize);
 
 	// ÊÂ¼þ×¢Èë
@@ -37,22 +36,25 @@ public:
 	virtual void  injectMouseUp(unsigned int btnState, int x, int y);
 	virtual void  injectMouseWheel(float wheel);
 	virtual void  injectKeyboard(unsigned int keyCode, unsigned int scanCode, bool keyDown);
+	virtual void  injectPaint();
+	virtual void  injectDestroy();
+	virtual void  injectActivate();
+	virtual void  injectInactive();
 	virtual void  injectSizeMinimized(int w, int h);
 	virtual void  injectSizeMaximized(int w, int h);
 	virtual void  injectSizeRestored(int w, int h);
-	virtual void  injectActivate();
-	virtual void  injectInactive();
 	virtual void  injectEnterSizeMove();
 	virtual void  injectExitSizeMove();
+	virtual void  injectInputLanguageChange();
 
 protected:
-	PROPERTY_R(bool,              _appPaused,      AppPaused)
-	PROPERTY_R(bool,              _minimized,      Minimized)
-	PROPERTY_R(bool,              _maximized,      Maximized)
-	PROPERTY_R(bool,              _resizing,       Resizing)
-	PROPERTY_R(BitState,          _mouseIsDown,    MouseIsDown)
-	PROPERTY_R_REF(wstring,       _mainWndCaption, MainWndCaption)
-	PROPERTY_R_REF(Dimension2di,  _screenSize,     ScreenSize)
+	PROPERTY_R(bool,             _appPaused,   AppPaused)
+	PROPERTY_R(bool,             _minimized,   Minimized)
+	PROPERTY_R(bool,             _maximized,   Maximized)
+	PROPERTY_R(bool,             _resizing,    Resizing)
+	PROPERTY_R(BitState,         _mouseIsDown, MouseIsDown)
+	PROPERTY_R_REF(wstring,      _wndCaption,  WndCaption)
+	PROPERTY_R_REF(Dimension2di, _screenSize,  ScreenSize)
 };
 
 NS_VAYO_END

@@ -12,7 +12,7 @@ namespace
 
 NS_VAYO_BEGIN
 
-float Device::aspectRatio() const
+float Device::getAspectRatio() const
 {
 	return static_cast<float>(_screenSize._width) / _screenSize._height;
 }
@@ -48,16 +48,16 @@ void Device::onResize()
 	}
 }
 
-void Device::setMainWndCaption(const wstring& wndCaption)
+void Device::setWndCaption(const wstring& wndCaption)
 {
-	_mainWndCaption = wndCaption;
-	const_cast<wstring&>(Root::getSingleton().getConfig().WindowName) = _mainWndCaption;
+	_wndCaption = wndCaption;
+	const_cast<wstring&>(Root::getSingleton().getConfig().WndCaption) = _wndCaption;
 }
 
 void Device::setScreenSize(const Dimension2di& screenSize)
 {
 	_screenSize = screenSize;
-	const_cast<Dimension2di&>(Root::getSingleton().getConfig().WindowSize) = _screenSize;
+	const_cast<Dimension2di&>(Root::getSingleton().getConfig().ScreenSize) = _screenSize;
 }
 
 void Device::injectMouseDown(unsigned int btnState, int x, int y)
@@ -79,6 +79,29 @@ void Device::injectMouseWheel(float wheel)
 
 void Device::injectKeyboard(unsigned int keyCode, unsigned int scanCode, bool keyDown)
 {
+}
+
+void Device::injectPaint()
+{
+}
+
+void Device::injectDestroy()
+{
+}
+
+void Device::injectActivate()
+{
+	_appPaused = false;
+	Root::getSingleton().getTimer().start();
+	RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
+	if (pRenderer)
+		pRenderer->restoreContext();
+}
+
+void Device::injectInactive()
+{
+	_appPaused = true;
+	Root::getSingleton().getTimer().stop();
 }
 
 void Device::injectSizeMinimized(int w, int h)
@@ -135,18 +158,6 @@ void Device::injectSizeRestored(int w, int h)
 	}
 }
 
-void Device::injectActivate()
-{
-	_appPaused = false;
-	Root::getSingleton().getTimer().start();
-}
-
-void Device::injectInactive()
-{
-	_appPaused = true;
-	Root::getSingleton().getTimer().stop();
-}
-
 void Device::injectEnterSizeMove()
 {
 	_appPaused = true;
@@ -160,6 +171,10 @@ void Device::injectExitSizeMove()
 	_resizing = false;
 	Root::getSingleton().getTimer().start();
 	onResize();
+}
+
+void Device::injectInputLanguageChange()
+{
 }
 
 NS_VAYO_END

@@ -93,6 +93,7 @@ bool Root::launch()
 
 bool Root::renderOneFrame()
 {
+	_timer.tick();
 	updateFrameStats();
 
 	if (!_activeRenderer->beginScene(true, true, true, _configuration.BgClearColor))
@@ -108,6 +109,11 @@ bool Root::renderOneFrame()
 
 	_uiManager->render();
 	return _activeRenderer->endScene();
+}
+
+void Root::setBgClearColor(unsigned int bgColor)
+{
+	_configuration.BgClearColor = bgColor;
 }
 
 void Root::addRenderSystem(RenderSystem* newRenderer)

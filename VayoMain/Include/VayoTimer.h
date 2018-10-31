@@ -13,6 +13,7 @@ class _VayoExport Timer
 {
 public:
 	Timer();
+	bool isStopped() const { return _stopped; }
 
 	float totalTime() const;  // in seconds
 	float deltaTime() const; // in seconds
@@ -26,6 +27,8 @@ public:
 	void tick();  // Call every frame.
 
 private:
+	bool _stopped;
+
 	double _secondsPerCount;
 	double _deltaTime;
 
@@ -34,8 +37,6 @@ private:
 	__int64 _stopTime;
 	__int64 _prevTime;
 	__int64 _currTime;
-
-	bool _stopped;
 };
 
 NS_VAYO_END

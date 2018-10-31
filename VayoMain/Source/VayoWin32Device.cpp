@@ -199,7 +199,7 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			injectInactive();
 		else
 			injectActivate();
-		InvalidateRect(_mainWnd, NULL, FALSE);
+		InvalidateRect(hwnd, NULL, FALSE);
 		return 0;
 
 		// WM_SIZE is sent when the user resizes the window.
@@ -226,7 +226,7 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		// WM_DESTROY is sent when the window is being destroyed.
 	case WM_DESTROY:
-		onDestroy();
+		injectDestroy();
 		return 0;
 
 		// The WM_MENUCHAR message is sent when a menu is active and the user presses
@@ -243,23 +243,23 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOUSEWHEEL:
 		injectMouseWheel((float)((short)HIWORD(wParam)) / (float)WHEEL_DELTA);
-		InvalidateRect(_mainWnd, NULL, FALSE);
+		InvalidateRect(hwnd, NULL, FALSE);
 		return 0;
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
 		injectMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		InvalidateRect(_mainWnd, NULL, FALSE);
+		InvalidateRect(hwnd, NULL, FALSE);
 		return 0;
 	case WM_LBUTTONUP:
 	case WM_MBUTTONUP:
 	case WM_RBUTTONUP:
 		injectMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		InvalidateRect(_mainWnd, NULL, FALSE);
+		InvalidateRect(hwnd, NULL, FALSE);
 		return 0;
 	case WM_MOUSEMOVE:
 		injectMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		InvalidateRect(_mainWnd, NULL, FALSE);
+		InvalidateRect(hwnd, NULL, FALSE);
 		return 0;
 	case WM_SYSKEYDOWN:
 	case WM_SYSKEYUP:
@@ -268,7 +268,7 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		bool keyDown = (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN);
 		injectKeyboard(wParam, lParam, keyDown);
-		InvalidateRect(_mainWnd, NULL, FALSE);
+		InvalidateRect(hwnd, NULL, FALSE);
 
 		if (msg == WM_SYSKEYDOWN || msg == WM_SYSKEYUP)
 			return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -277,19 +277,10 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		BeginPaint(_mainWnd, &ps);
-		Root* pRoot = Root::getSingletonPtr();
-		if (pRoot->getConfig().OwnerDraw && pRoot->IsLaunched())
-			pRoot->renderOneFrame();
-		EndPaint(_mainWnd, &ps);
+		injectPaint();
 		return 0;
-	}
 	case WM_INPUTLANGCHANGE:
-		// get the new codepage used for keyboard input
-		KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
-		KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
+		injectInputLanguageChange();
 		return 0;
 	}
 
@@ -297,9 +288,8 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 //////////////////////////////////////////////////////////////////////////
-
 Win32Device::Win32Device()
-	: _mainWnd(NULL)
+	: _wndHandle(NULL)
 	, _externalWindow(false)
 {
 	gWin32Device = this;
@@ -311,18 +301,13 @@ Win32Device::~Win32Device()
 {
 }
 
-void* Win32Device::getMainWnd() const
-{
-	return _mainWnd;
-}
-
 bool Win32Device::init()
 {
 	if (Root::getSingleton().getConfig().WndHandle)
 	{
-		_mainWnd = static_cast<HWND>(Root::getSingleton().getConfig().WndHandle);
+		_wndHandle = static_cast<HWND>(Root::getSingleton().getConfig().WndHandle);
 		RECT rc;
-		GetClientRect(_mainWnd, &rc);
+		GetClientRect(_wndHandle, &rc);
 		setScreenSize(Dimension2di(rc.right - rc.left, rc.bottom - rc.top));
 		const_cast<bool&>(Root::getSingleton().getConfig().FullScreen) = false;
 		_externalWindow = true;
@@ -369,30 +354,31 @@ bool Win32Device::init()
 			realHeight = GetSystemMetrics(SM_CYSCREEN);
 		}
 
-		_mainWnd = CreateWindow(L"VayoEngine", _mainWndCaption.c_str(), style,
+		_wndHandle = CreateWindow(L"VayoEngine", _wndCaption.c_str(), style,
 			windowLeft, windowTop, realWidth, realHeight, NULL, NULL, hInst, NULL);
-		if (!_mainWnd)
+		if (!_wndHandle)
 		{
 			MessageBox(0, L"CreateWindow Failed.", 0, 0);
 			return false;
 		}
 
-		MoveWindow(_mainWnd, windowLeft, windowTop, realWidth, realHeight, TRUE);
-		ShowWindow(_mainWnd, SW_SHOW);
-		UpdateWindow(_mainWnd);
-		const_cast<void*&>(Root::getSingleton().getConfig().WndHandle) = _mainWnd;
-	}
-
-	if (!_externalWindow)
-	{
-		SetActiveWindow(_mainWnd);
-		SetForegroundWindow(_mainWnd);
+		MoveWindow(_wndHandle, windowLeft, windowTop, realWidth, realHeight, TRUE);
+		ShowWindow(_wndHandle, SW_SHOW);
+		UpdateWindow(_wndHandle);
+		SetActiveWindow(_wndHandle);
+		SetForegroundWindow(_wndHandle);
+		const_cast<void*&>(Root::getSingleton().getConfig().WndHandle) = _wndHandle;
 	}
 
 	KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
 	KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
 
 	return true;
+}
+
+void* Win32Device::getWndHandle() const
+{
+	return _wndHandle;
 }
 
 bool Win32Device::handleEvents(bool& idle)
@@ -403,8 +389,8 @@ bool Win32Device::handleEvents(bool& idle)
 		if (msg.message == WM_QUIT)
 			return false;
 
-		if (_externalWindow && msg.hwnd == _mainWnd)
-			msgProc(_mainWnd, msg.message, msg.wParam, msg.lParam);
+		if (_externalWindow && msg.hwnd == _wndHandle)
+			msgProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
 		else
 		{
 			TranslateMessage(&msg);
@@ -419,31 +405,33 @@ bool Win32Device::handleEvents(bool& idle)
 	return true;
 }
 
-void Win32Device::onSleep(unsigned int milliSeconds /*= 0*/)
+void Win32Device::sleep(unsigned int milliSeconds, bool pauseTimer)
 {
+	Timer& timer = Root::getSingleton().getTimer();
+	const bool wasStopped = timer.isStopped();
+	if (pauseTimer && !wasStopped)
+		timer.stop();
+
 	Sleep(milliSeconds);
+
+	if (pauseTimer && !wasStopped)
+		timer.start();
 }
 
-void Win32Device::onDestroy()
+void Win32Device::setWndCaption(const wstring& wndCaption)
 {
-	if (Root::getSingleton().getConfig().PostQuit)
-		PostQuitMessage(0);
-}
-
-void Win32Device::setMainWndCaption(const wstring& wndCaption)
-{
-	if (wndCaption != _mainWndCaption)
+	if (wndCaption != _wndCaption)
 	{
-		Device::setMainWndCaption(wndCaption);
-		if (_mainWnd)
-			SetWindowText(_mainWnd, _mainWndCaption.c_str());
+		Device::setWndCaption(wndCaption);
+		if (_wndHandle)
+			SetWindowText(_wndHandle, _wndCaption.c_str());
 	}
 }
 
 void Win32Device::injectMouseDown(unsigned int btnState, int x, int y)
 {
 	_mouseIsDown = btnState;
-	SetCapture(_mainWnd);
+	SetCapture(_wndHandle);
 	if (_mouseIsDown.checkState(MK_LBUTTON))
 		gTouchDispatcher->handleTouchBegan(x, y, EMK_LEFT);
 	if (_mouseIsDown.checkState(MK_MBUTTON))
@@ -543,12 +531,27 @@ void Win32Device::injectKeyboard(unsigned int keyCode, unsigned int scanCode, bo
 	gKeypadDispatcher->handleKeyClicked(evt);
 }
 
-void Win32Device::injectActivate()
+void Win32Device::injectPaint()
 {
-	Device::injectActivate();
-	RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
-	if (pRenderer)
-		pRenderer->restoreContext();
+	PAINTSTRUCT ps;
+	BeginPaint(_wndHandle, &ps);
+	Root& root = Root::getSingleton();
+	if (root.getConfig().OwnerDraw && root.IsLaunched())
+		root.renderOneFrame();
+	EndPaint(_wndHandle, &ps);
+}
+
+void Win32Device::injectDestroy()
+{
+	if (Root::getSingleton().getConfig().PostQuit)
+		PostQuitMessage(0);
+}
+
+void Win32Device::injectInputLanguageChange()
+{
+	// get the new codepage used for keyboard input
+	KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
+	KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage(LOWORD(KEYBOARD_INPUT_HKL));
 }
 
 Device* Device::create()
@@ -556,8 +559,8 @@ Device* Device::create()
 	Device* pDevice = NULL;
 	// create win32 device.
 	pDevice = new Win32Device();
-	pDevice->setMainWndCaption(Root::getSingleton().getConfig().WindowName);
-	pDevice->setScreenSize(Root::getSingleton().getConfig().WindowSize);
+	pDevice->setWndCaption(Root::getSingleton().getConfig().WndCaption);
+	pDevice->setScreenSize(Root::getSingleton().getConfig().ScreenSize);
 	return pDevice;
 }
 

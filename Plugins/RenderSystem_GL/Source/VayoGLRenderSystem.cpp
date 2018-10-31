@@ -59,7 +59,7 @@ GLRenderSystem::~GLRenderSystem()
 	}
 
 	if (_hCurrentDC)
-		ReleaseDC((HWND)Root::getSingleton().getDevice()->getMainWnd(), _hCurrentDC);
+		ReleaseDC((HWND)Root::getSingleton().getDevice()->getWndHandle(), _hCurrentDC);
 }
 
 bool GLRenderSystem::init()
@@ -113,8 +113,8 @@ bool GLRenderSystem::init()
 		RECT clientSize;
 		clientSize.top = 0;
 		clientSize.left = 0;
-		clientSize.right = conf.WindowSize._width;
-		clientSize.bottom = conf.WindowSize._height;
+		clientSize.right = conf.ScreenSize._width;
+		clientSize.bottom = conf.ScreenSize._height;
 
 		DWORD style = WS_POPUP;
 		if (!conf.FullScreen)
@@ -289,7 +289,7 @@ bool GLRenderSystem::init()
 		UnregisterClass(szClassName, lhInstance);
 	}
 
-	_hCurrentDC = GetDC((HWND)Root::getSingleton().getDevice()->getMainWnd());
+	_hCurrentDC = GetDC((HWND)Root::getSingleton().getDevice()->getWndHandle());
 	if (!_hCurrentDC)
 	{
 		Log::print(ELL_ERROR, "Cannot create a GL device context.");

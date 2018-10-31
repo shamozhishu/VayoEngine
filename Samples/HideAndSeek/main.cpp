@@ -8,8 +8,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	EnableMemLeakCheck();
 	Root::Config configData;
-	configData.WindowSize = Dimension2di(1280, 720);
-	configData.WindowName = L"模型测试";
+	configData.ScreenSize = Dimension2di(1280, 720);
+	configData.WndCaption = L"模型测试";
 	configData.RendererName = L"RenderSystem_GL";
 	configData.BgClearColor = 0xff0f0f0f;
 	ModelViewer viewer(configData);

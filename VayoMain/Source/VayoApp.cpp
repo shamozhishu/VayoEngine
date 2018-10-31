@@ -10,9 +10,6 @@ void App::run()
 	if (!root.launch())
 		return;
 
-	root.getTouchDispatcher()->addTouchDelegate(this);
-	root.getKeypadDispatcher()->addKeypadDelegate(this);
-
 	if (!startup())
 	{
 		cleanup();
@@ -26,10 +23,8 @@ void App::run()
 	{
 		if (idle)
 		{
-			root.getTimer().tick();
-
 			if (pDevice->getAppPaused())
-				pDevice->onSleep();
+				pDevice->sleep(0, false);
 			else
 				root.renderOneFrame();
 		}
@@ -40,16 +35,24 @@ void App::run()
 
 App::App(const Root::Config& config)
 {
-	Log::wprint(ELL_INFORMATION, L"Vayo Engine version 1.0");
-	new Root(config);
+	Log::wprint(ELL_DEBUG, L"Vayo Engine version 1.0");
+	Root* pRoot = new Root(config);
+	if (pRoot)
+	{
+		pRoot->getTouchDispatcher()->addTouchDelegate(this);
+		pRoot->getKeypadDispatcher()->addKeypadDelegate(this);
+	}
 }
 
 App::~App()
 {
 	Root* pRoot = Root::getSingletonPtr();
-	pRoot->getTouchDispatcher()->removeTouchDelegate(this);
-	pRoot->getKeypadDispatcher()->removeKeypadDelegate(this);
-	delete pRoot;
+	if (pRoot)
+	{
+		pRoot->getTouchDispatcher()->removeTouchDelegate(this);
+		pRoot->getKeypadDispatcher()->removeKeypadDelegate(this);
+		delete pRoot;
+	}
 }
 
 NS_VAYO_END

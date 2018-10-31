@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scene name="默认场景_RootSceneNode">
     <Objects>
-        <Vayo::EagleEyeCamera name="鹰眼摄像机" position="0.000000,0.000000,100.000000" target="0.000000,0.000000,90.000000" worldUp="0.000000,1.000000,0.000000" fovY="180" zn="-1000" zf="1000" moveSpeed="100" zoomSpeed="0.1" zoomFactor="0.800001"/>
+        <Vayo::EagleEyeCamera name="鹰眼摄像机" position="0.000000,0.000000,100.000000" target="0.000000,0.000000,90.000000" worldUp="0.000000,1.000000,0.000000" fovY="180" zn="-1000" zf="1000" moveSpeed="100" zoomSpeed="0.1" zoomFactor="0.9"/>
     </Objects>
     <Vayo::SceneNode name="灯光场景节点">
         <Objects>
@@ -15,7 +15,7 @@
             <Vayo::ManualObject name="main_line"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode1" translation="-576.666687,196.666672,0.000000">
+    <Vayo::SceneNode name="SceneNode1" translation="-571.000000,215.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XP.223" collideMask="1"/>
         </Objects>
@@ -23,7 +23,7 @@
             <NodeAnimatorMoveCable name="CableMoveAnimation"/>
         </Animators>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode2" translation="-440.222229,0.222228,0.000000">
+    <Vayo::SceneNode name="SceneNode2" translation="-440.000000,0.000010,0.000000">
         <Objects>
             <Vayo::ManualObject name="XP.223_endpoint" collideMask="1"/>
         </Objects>
@@ -36,7 +36,7 @@
             <Vayo::ManualObject name="XP.223_connect_line"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode4" translation="-576.666687,216.666672,0.000000">
+    <Vayo::SceneNode name="SceneNode4" translation="-571.000000,235.000000,0.000000">
         <Objects>
             <Vayo::TextObject name="XP.223_text" text="XP.223" color="0x00000000" fontid="2"/>
         </Objects>
@@ -67,7 +67,7 @@
             <Vayo::TextObject name="XS.224_text" text="XS.224" color="0x00000000" fontid="2"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode9" translation="630.000000,203.333328,0.000000">
+    <Vayo::SceneNode name="SceneNode9" translation="586.000000,124.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XS.222" collideMask="1"/>
         </Objects>
@@ -88,7 +88,7 @@
             <Vayo::ManualObject name="XS.222_connect_line"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode12" translation="630.000000,223.333328,0.000000">
+    <Vayo::SceneNode name="SceneNode12" translation="586.000000,144.000000,0.000000">
         <Objects>
             <Vayo::TextObject name="XS.222_text" text="XS.222" color="0x00000000" fontid="2"/>
         </Objects>
@@ -101,7 +101,7 @@
             <NodeAnimatorMoveCable name="CableMoveAnimation"/>
         </Animators>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode14" translation="-139.999985,134.444458,0.000000">
+    <Vayo::SceneNode name="SceneNode14" translation="-80.000015,74.999992,0.000000">
         <Objects>
             <Vayo::ManualObject name="XP.211_endpoint" collideMask="1"/>
         </Objects>
@@ -127,7 +127,7 @@
             <NodeAnimatorMoveCable name="CableMoveAnimation"/>
         </Animators>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode18" translation="-338.603394,-100.721436,0.000000">
+    <Vayo::SceneNode name="SceneNode18" translation="-188.571411,0.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XP.212_endpoint" collideMask="1"/>
         </Objects>
@@ -145,7 +145,7 @@
             <Vayo::TextObject name="XP.212_text" text="XP.212" color="0x00000000" fontid="2"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode21" translation="-57.777786,243.333344,0.000000">
+    <Vayo::SceneNode name="SceneNode21" translation="-125.714264,260.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XS.213" collideMask="1"/>
         </Objects>
@@ -153,7 +153,7 @@
             <NodeAnimatorMoveCable name="CableMoveAnimation"/>
         </Animators>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode22" translation="-139.999985,134.444458,0.000000">
+    <Vayo::SceneNode name="SceneNode22" translation="-62.857124,0.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XS.213_endpoint" collideMask="1"/>
         </Objects>
@@ -166,7 +166,7 @@
             <Vayo::ManualObject name="XS.213_connect_line"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode24" translation="-57.777786,263.333344,0.000000">
+    <Vayo::SceneNode name="SceneNode24" translation="-125.714264,280.000000,0.000000">
         <Objects>
             <Vayo::TextObject name="XS.213_text" text="XS.213" color="0x00000000" fontid="2"/>
         </Objects>
@@ -197,7 +197,7 @@
             <Vayo::TextObject name="XS.214_text" text="XS.214" color="0x00000000" fontid="2"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode29" translation="-139.888901,134.333328,0.000000">
+    <Vayo::SceneNode name="SceneNode29" translation="0.000019,260.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XS.1F10" collideMask="1"/>
         </Objects>
@@ -205,7 +205,7 @@
             <NodeAnimatorMoveCable name="CableMoveAnimation"/>
         </Animators>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode30" translation="-62.666672,-0.222203,0.000000">
+    <Vayo::SceneNode name="SceneNode30" translation="62.857162,0.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XS.1F10_endpoint" collideMask="1"/>
         </Objects>
@@ -218,7 +218,7 @@
             <Vayo::ManualObject name="XS.1F10_connect_line"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode32" translation="-139.888901,154.333328,0.000000">
+    <Vayo::SceneNode name="SceneNode32" translation="0.000019,280.000000,0.000000">
         <Objects>
             <Vayo::TextObject name="XS.1F10_text" text="XS.1F10" color="0x00000000" fontid="2"/>
         </Objects>
@@ -231,7 +231,7 @@
             <NodeAnimatorMoveCable name="CableMoveAnimation"/>
         </Animators>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode34" translation="-85.444435,-91.111084,0.000000">
+    <Vayo::SceneNode name="SceneNode34" translation="62.857162,0.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XS.1F11_endpoint" collideMask="1"/>
         </Objects>
@@ -275,7 +275,7 @@
             <Vayo::TextObject name="XS.1F1_text" text="XS.1F1" color="0x00000000" fontid="2"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode41" translation="-598.888916,-155.555542,0.000000">
+    <Vayo::SceneNode name="SceneNode41" translation="-530.000000,-149.999985,0.000000">
         <Objects>
             <Vayo::ManualObject name="XS.1F3" collideMask="1"/>
         </Objects>
@@ -296,7 +296,7 @@
             <Vayo::ManualObject name="XS.1F3_connect_line"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode44" translation="-598.888916,-175.555542,0.000000">
+    <Vayo::SceneNode name="SceneNode44" translation="-530.000000,-169.999985,0.000000">
         <Objects>
             <Vayo::TextObject name="XS.1F3_text" text="XS.1F3" color="0x00000000" fontid="2"/>
         </Objects>
@@ -335,7 +335,7 @@
             <NodeAnimatorMoveCable name="CableMoveAnimation"/>
         </Animators>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode50" translation="523.333313,88.888885,0.000000">
+    <Vayo::SceneNode name="SceneNode50" translation="314.285736,0.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XS.1F2_endpoint" collideMask="1"/>
         </Objects>
@@ -353,7 +353,7 @@
             <Vayo::TextObject name="XS.1F2_text" text="XS.1F2" color="0x00000000" fontid="2"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode53" translation="365.555603,142.222214,0.000000">
+    <Vayo::SceneNode name="SceneNode53" translation="251.428589,-260.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XB19" collideMask="1"/>
         </Objects>
@@ -361,7 +361,7 @@
             <NodeAnimatorMoveCable name="CableMoveAnimation"/>
         </Animators>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode54" translation="188.777802,-0.111125,0.000000">
+    <Vayo::SceneNode name="SceneNode54" translation="314.285736,0.000000,0.000000">
         <Objects>
             <Vayo::ManualObject name="XB19_endpoint" collideMask="1"/>
         </Objects>
@@ -374,7 +374,7 @@
             <Vayo::ManualObject name="XB19_connect_line"/>
         </Objects>
     </Vayo::SceneNode>
-    <Vayo::SceneNode name="SceneNode56" translation="365.555603,167.222214,0.000000">
+    <Vayo::SceneNode name="SceneNode56" translation="251.428589,-285.000000,0.000000">
         <Objects>
             <Vayo::TextObject name="XB19_text" text="XB19" color="0x00000000" fontid="2"/>
         </Objects>

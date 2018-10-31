@@ -24,8 +24,8 @@ public:
 		bool          FullScreen;
 		bool          HandleSRGB;
 		Colour        BgClearColor;
-		Dimension2di  WindowSize;
-		wstring       WindowName;
+		Dimension2di  ScreenSize;
+		wstring       WndCaption;
 		wstring       RendererName;
 		wstring       RootDirectory;
 		unsigned char AntiAliasFactor;
@@ -36,8 +36,8 @@ public:
 			, FullScreen(false)
 			, HandleSRGB(false)
 			, BgClearColor(0)
-			, WindowSize(1280, 720)
-			, WindowName(L"VayoEngine1.0")
+			, ScreenSize(1280, 720)
+			, WndCaption(L"VayoEngine1.0")
 			, RendererName(L"RenderSystem_GL")
 		    , AntiAliasFactor(0) {}
 	} Config;
@@ -47,6 +47,7 @@ public:
 	~Root();
 	bool          launch();
 	bool          renderOneFrame();
+	void          setBgClearColor(unsigned int bgColor);
 	Timer&        getTimer() { return _timer; }
 	const Timer&  getTimer() const { return _timer; }
 	int           getFrameCnt() const { return _frameCnt; }

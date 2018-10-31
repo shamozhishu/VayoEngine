@@ -19,24 +19,25 @@ class Win32Device : public Device
 public:
 	Win32Device();
 	~Win32Device();
-	void*   getMainWnd() const;
 	bool    init();
+	void*   getWndHandle() const;
 	bool    handleEvents(bool& idle);
-	void    onSleep(unsigned int milliSeconds = 0);
-	void    onDestroy();
-	void    setMainWndCaption(const wstring& wndCaption);
+	void    sleep(unsigned int milliSeconds, bool pauseTimer);
+	void    setWndCaption(const wstring& wndCaption);
 
 	// ÊÂ¼þ×¢Èë
 	void    injectMouseDown(unsigned int btnState, int x, int y);
 	void    injectMouseMove(unsigned int btnState, int x, int y);
 	void    injectMouseUp(unsigned int btnState, int x, int y);
 	void    injectKeyboard(unsigned int keyCode, unsigned int scanCode, bool keyDown);
-	void    injectActivate();
+	void    injectPaint();
+	void    injectDestroy();
+	void    injectInputLanguageChange();
 
 	LRESULT msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
-	HWND _mainWnd;
+	HWND _wndHandle;
 	bool _externalWindow;
 };
 
