@@ -106,6 +106,8 @@ void MovableObject::serialize(XMLElement* outXml)
 	outXml->SetAttribute("name", unicodeToUtf8(_name).c_str());
 	if (!_visible)
 		outXml->SetAttribute("visible", _visible);
+	if (_queueID != ERQ_MAIN_SOLID)
+		outXml->SetAttribute("queueid", _queueID);
 	if (!_collideMask.isEmptyState())
 		outXml->SetAttribute("collideMask", _collideMask());
 }
@@ -115,6 +117,7 @@ bool MovableObject::deserialize(XMLElement* inXml)
 	if (!inXml)
 		return false;
 	inXml->QueryBoolAttribute("visible", &_visible);
+	inXml->QueryUnsignedAttribute("queueid", &_queueID);
 	_collideMask(inXml->UnsignedAttribute("collideMask"));
 	return true;
 }

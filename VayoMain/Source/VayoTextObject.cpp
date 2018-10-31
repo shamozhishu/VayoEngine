@@ -81,11 +81,14 @@ bool TextObject::deserialize(XMLElement* inXml)
 	if (!MovableObject::deserialize(inXml))
 		return false;
 
-	const char* szText = inXml->Attribute("text");
-	if (szText)
-		_text = utf8ToUnicode(szText);
+	const char* szTmp = inXml->Attribute("text");
+	if (szTmp)
+		_text = utf8ToUnicode(szTmp);
 
-	_color = inXml->UnsignedAttribute("color");
+	szTmp = inXml->Attribute("color");
+	if (szTmp)
+		_color.set(strtoul(szTmp, NULL, 16));
+
 	_fontid = inXml->IntAttribute("fontid");
 	return true;
 }
