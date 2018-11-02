@@ -87,14 +87,14 @@ void TouchDispatcher::handleTouchWheel(float wheel)
 	list<TouchDelegate*>::iterator itor = _touchDelegates.begin();
 	for (; itor != _touchDelegates.end(); itor++)
 	{
-		if ((*itor)->touchWheel(_curTouch[EMK_CURPOS], wheel))
+		if ((*itor)->touchWheel(_curPosition, wheel))
 			break;
 	}
 }
 
 void TouchDispatcher::setTouchCurPos(int x, int y)
 {
-	_curTouch[EMK_CURPOS].setTouchPoint(x, y);
+	_curPosition.setTouchPoint(x, y);
 }
 
 void TouchDispatcher::addTouchDelegate(TouchDelegate* pDelegate)

@@ -1,5 +1,4 @@
 #include "VayoDevice.h"
-#include "VayoInput.h"
 #include "VayoRoot.h"
 #include "VayoCamera.h"
 #include "VayoRenderSystem.h"
@@ -60,16 +59,46 @@ void Device::setScreenSize(const Dimension2di& screenSize)
 	const_cast<Dimension2di&>(Root::getSingleton().getConfig().ScreenSize) = _screenSize;
 }
 
-void Device::injectMouseDown(unsigned int btnState, int x, int y)
+void Device::injectMouseDown(EMouseKeys mouseKey, int x, int y)
 {
+	_mouseIsDown.addState(mouseKey);
+	if (_mouseIsDown.checkState(EMK_LEFT))
+		gTouchDispatcher->handleTouchBegan(x, y, EMK_LEFT);
+	if (_mouseIsDown.checkState(EMK_RIGHT))
+		gTouchDispatcher->handleTouchBegan(x, y, EMK_RIGHT);
+	if (_mouseIsDown.checkState(EMK_MIDDLE))
+		gTouchDispatcher->handleTouchBegan(x, y, EMK_MIDDLE);
 }
 
-void Device::injectMouseMove(unsigned int btnState, int x, int y)
+void Device::injectMouseUp(EMouseKeys mouseKey, int x, int y)
 {
+	BitState mouseIsUp = mouseKey;
+	if (_mouseIsDown.checkState(EMK_LEFT) && mouseIsUp.checkState(EMK_LEFT))
+	{
+		_mouseIsDown.eraseState(EMK_LEFT);
+		gTouchDispatcher->handleTouchEnded(x, y, EMK_LEFT);
+	}
+	if (_mouseIsDown.checkState(EMK_RIGHT) && mouseIsUp.checkState(EMK_RIGHT))
+	{
+		_mouseIsDown.eraseState(EMK_RIGHT);
+		gTouchDispatcher->handleTouchEnded(x, y, EMK_RIGHT);
+	}
+	if (_mouseIsDown.checkState(EMK_MIDDLE) && mouseIsUp.checkState(EMK_MIDDLE))
+	{
+		_mouseIsDown.eraseState(EMK_MIDDLE);
+		gTouchDispatcher->handleTouchEnded(x, y, EMK_MIDDLE);
+	}
 }
 
-void Device::injectMouseUp(unsigned int btnState, int x, int y)
+void Device::injectMouseMove(int x, int y)
 {
+	gTouchDispatcher->setTouchCurPos(x, y);
+	if (_mouseIsDown.checkState(EMK_LEFT))
+		gTouchDispatcher->handleTouchMoved(x, y, EMK_LEFT);
+	if (_mouseIsDown.checkState(EMK_RIGHT))
+		gTouchDispatcher->handleTouchMoved(x, y, EMK_RIGHT);
+	if (_mouseIsDown.checkState(EMK_MIDDLE))
+		gTouchDispatcher->handleTouchMoved(x, y, EMK_MIDDLE);
 }
 
 void Device::injectMouseWheel(float wheel)

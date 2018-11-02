@@ -192,11 +192,10 @@ public:
 
 enum EMouseKeys
 {
-	EMK_LEFT,
-	EMK_MIDDLE,
-	EMK_RIGHT,
-	EMK_CURPOS,
-	EMK_COUNT
+	EMK_LEFT = 1 << 0,
+	EMK_RIGHT = 1 << 1,
+	EMK_MIDDLE = 1 << 2,
+	EMK_COUNT = 3
 };
 
 enum ETouchType
@@ -284,6 +283,7 @@ public:
 
 private:
 	list<TouchDelegate*> _touchDelegates;
+	Touch                _curPosition;
 	Touch                _curTouch[EMK_COUNT];
 };
 

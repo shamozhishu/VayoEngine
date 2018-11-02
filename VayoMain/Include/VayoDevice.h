@@ -7,6 +7,7 @@
 #define __VAYO_DEVICE_H__
 
 #include "VayoSupport.h"
+#include "VayoInput.h"
 #include "VayoBitState.h"
 #include "VayoVector2d.h"
 #include "VayoDimension2d.h"
@@ -31,9 +32,9 @@ public:
 	virtual void  setScreenSize(const Dimension2di& screenSize);
 
 	// ÊÂ¼þ×¢Èë
-	virtual void  injectMouseDown(unsigned int btnState, int x, int y);
-	virtual void  injectMouseMove(unsigned int btnState, int x, int y);
-	virtual void  injectMouseUp(unsigned int btnState, int x, int y);
+	virtual void  injectMouseDown(EMouseKeys mouseKey, int x, int y);
+	virtual void  injectMouseUp(EMouseKeys mouseKey, int x, int y);
+	virtual void  injectMouseMove(int x, int y);
 	virtual void  injectMouseWheel(float wheel);
 	virtual void  injectKeyboard(unsigned int keyCode, unsigned int scanCode, bool keyDown);
 	virtual void  injectPaint();

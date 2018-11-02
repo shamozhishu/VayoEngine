@@ -19,8 +19,8 @@ public:
 	typedef struct tagConfig
 	{
 		void*         WndHandle;
-		bool          PostQuit;
-		bool          OwnerDraw;
+		bool          WndQuit;
+		bool          WndPaint;
 		bool          FullScreen;
 		bool          HandleSRGB;
 		Colour        BgClearColor;
@@ -31,8 +31,8 @@ public:
 		unsigned char AntiAliasFactor;
 		tagConfig()
 			: WndHandle(NULL)
-			, PostQuit(true)
-			, OwnerDraw(false)
+			, WndQuit(true)
+			, WndPaint(false)
 			, FullScreen(false)
 			, HandleSRGB(false)
 			, BgClearColor(0)

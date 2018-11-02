@@ -26,15 +26,18 @@ public:
 	void    setWndCaption(const wstring& wndCaption);
 
 	// ÊÂ¼þ×¢Èë
-	void    injectMouseDown(unsigned int btnState, int x, int y);
-	void    injectMouseMove(unsigned int btnState, int x, int y);
-	void    injectMouseUp(unsigned int btnState, int x, int y);
+	void    injectMouseDown(EMouseKeys mouseKey, int x, int y);
+	void    injectMouseUp(EMouseKeys mouseKey, int x, int y);
+	void    injectMouseMove(int x, int y);
+	void    injectMouseWheel(float wheel);
 	void    injectKeyboard(unsigned int keyCode, unsigned int scanCode, bool keyDown);
 	void    injectPaint();
 	void    injectDestroy();
+	void    injectActivate();
+	void    injectInactive();
 	void    injectInputLanguageChange();
 
-	LRESULT msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
 	HWND _wndHandle;

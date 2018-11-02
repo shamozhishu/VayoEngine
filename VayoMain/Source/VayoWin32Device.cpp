@@ -3,7 +3,6 @@
 #ifdef _WIN32
 
 #include "VayoRoot.h"
-#include "VayoInput.h"
 #include "VayoRenderSystem.h"
 
 namespace
@@ -180,14 +179,14 @@ static unsigned int LocaleIdToCodepage(unsigned int lcid)
 	return 65001;   // utf-8
 }
 
-LRESULT CALLBACK mainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 	// before CreateWindow returns, and thus before mhMainWnd is valid.
-	return gWin32Device->msgProc(hwnd, msg, wParam, lParam);
+	return gWin32Device->windowProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Win32Device::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -199,7 +198,6 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			injectInactive();
 		else
 			injectActivate();
-		InvalidateRect(hwnd, NULL, FALSE);
 		return 0;
 
 		// WM_SIZE is sent when the user resizes the window.
@@ -243,23 +241,27 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOUSEWHEEL:
 		injectMouseWheel((float)((short)HIWORD(wParam)) / (float)WHEEL_DELTA);
-		InvalidateRect(hwnd, NULL, FALSE);
 		return 0;
 	case WM_LBUTTONDOWN:
-	case WM_MBUTTONDOWN:
+		injectMouseDown(EMK_LEFT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
 	case WM_RBUTTONDOWN:
-		injectMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		InvalidateRect(hwnd, NULL, FALSE);
+		injectMouseDown(EMK_RIGHT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+	case WM_MBUTTONDOWN:
+		injectMouseDown(EMK_MIDDLE, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
 	case WM_LBUTTONUP:
-	case WM_MBUTTONUP:
+		injectMouseUp(EMK_LEFT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
 	case WM_RBUTTONUP:
-		injectMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		InvalidateRect(hwnd, NULL, FALSE);
+		injectMouseUp(EMK_RIGHT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+	case WM_MBUTTONUP:
+		injectMouseUp(EMK_MIDDLE, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
 	case WM_MOUSEMOVE:
-		injectMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-		InvalidateRect(hwnd, NULL, FALSE);
+		injectMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
 	case WM_SYSKEYDOWN:
 	case WM_SYSKEYUP:
@@ -268,8 +270,6 @@ LRESULT Win32Device::msgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		bool keyDown = (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN);
 		injectKeyboard(wParam, lParam, keyDown);
-		InvalidateRect(hwnd, NULL, FALSE);
-
 		if (msg == WM_SYSKEYDOWN || msg == WM_SYSKEYUP)
 			return DefWindowProc(hwnd, msg, wParam, lParam);
 		else
@@ -317,7 +317,7 @@ bool Win32Device::init()
 		HINSTANCE hInst = GetModuleHandle(NULL);
 		WNDCLASS wc;
 		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-		wc.lpfnWndProc = mainWndProc;
+		wc.lpfnWndProc = wndProc;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
 		wc.hInstance = hInst;
@@ -390,7 +390,7 @@ bool Win32Device::handleEvents(bool& idle)
 			return false;
 
 		if (_externalWindow && msg.hwnd == _wndHandle)
-			msgProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
+			windowProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
 		else
 		{
 			TranslateMessage(&msg);
@@ -428,48 +428,34 @@ void Win32Device::setWndCaption(const wstring& wndCaption)
 	}
 }
 
-void Win32Device::injectMouseDown(unsigned int btnState, int x, int y)
+void Win32Device::injectMouseDown(EMouseKeys mouseKey, int x, int y)
 {
-	_mouseIsDown = btnState;
 	SetCapture(_wndHandle);
-	if (_mouseIsDown.checkState(MK_LBUTTON))
-		gTouchDispatcher->handleTouchBegan(x, y, EMK_LEFT);
-	if (_mouseIsDown.checkState(MK_MBUTTON))
-		gTouchDispatcher->handleTouchBegan(x, y, EMK_MIDDLE);
-	if (_mouseIsDown.checkState(MK_RBUTTON))
-		gTouchDispatcher->handleTouchBegan(x, y, EMK_RIGHT);
+	Device::injectMouseDown(mouseKey, x, y);
+	if (Root::getSingleton().getConfig().WndPaint)
+		InvalidateRect(_wndHandle, NULL, FALSE);
 }
 
-void Win32Device::injectMouseMove(unsigned int btnState, int x, int y)
+void Win32Device::injectMouseUp(EMouseKeys mouseKey, int x, int y)
 {
-	gTouchDispatcher->setTouchCurPos(x, y);
-	if (_mouseIsDown.checkState(MK_LBUTTON))
-		gTouchDispatcher->handleTouchMoved(x, y, EMK_LEFT);
-	if (_mouseIsDown.checkState(MK_MBUTTON))
-		gTouchDispatcher->handleTouchMoved(x, y, EMK_MIDDLE);
-	if (_mouseIsDown.checkState(MK_RBUTTON))
-		gTouchDispatcher->handleTouchMoved(x, y, EMK_RIGHT);
-}
-
-void Win32Device::injectMouseUp(unsigned int btnState, int x, int y)
-{
-	BitState mouseIsUp = btnState;
-	if (_mouseIsDown.checkState(MK_LBUTTON) && !mouseIsUp.checkState(MK_LBUTTON))
-	{
-		_mouseIsDown.eraseState(MK_LBUTTON);
-		gTouchDispatcher->handleTouchEnded(x, y, EMK_LEFT);
-	}
-	if (_mouseIsDown.checkState(MK_MBUTTON) && !mouseIsUp.checkState(MK_MBUTTON))
-	{
-		_mouseIsDown.eraseState(MK_MBUTTON);
-		gTouchDispatcher->handleTouchEnded(x, y, EMK_MIDDLE);
-	}
-	if (_mouseIsDown.checkState(MK_RBUTTON) && !mouseIsUp.checkState(MK_RBUTTON))
-	{
-		_mouseIsDown.eraseState(MK_RBUTTON);
-		gTouchDispatcher->handleTouchEnded(x, y, EMK_RIGHT);
-	}
+	Device::injectMouseUp(mouseKey, x, y);
 	ReleaseCapture();
+	if (Root::getSingleton().getConfig().WndPaint)
+		InvalidateRect(_wndHandle, NULL, FALSE);
+}
+
+void Win32Device::injectMouseMove(int x, int y)
+{
+	Device::injectMouseMove(x, y);
+	if (Root::getSingleton().getConfig().WndPaint)
+		InvalidateRect(_wndHandle, NULL, FALSE);
+}
+
+void Win32Device::injectMouseWheel(float wheel)
+{
+	Device::injectMouseWheel(wheel);
+	if (Root::getSingleton().getConfig().WndPaint)
+		InvalidateRect(_wndHandle, NULL, FALSE);
 }
 
 void Win32Device::injectKeyboard(unsigned int keyCode, unsigned int scanCode, bool keyDown)
@@ -529,6 +515,8 @@ void Win32Device::injectKeyboard(unsigned int keyCode, unsigned int scanCode, bo
 		evt.Control = 0;
 
 	gKeypadDispatcher->handleKeyClicked(evt);
+	if (Root::getSingleton().getConfig().WndPaint)
+		InvalidateRect(_wndHandle, NULL, FALSE);
 }
 
 void Win32Device::injectPaint()
@@ -536,15 +524,29 @@ void Win32Device::injectPaint()
 	PAINTSTRUCT ps;
 	BeginPaint(_wndHandle, &ps);
 	Root& root = Root::getSingleton();
-	if (root.getConfig().OwnerDraw && root.IsLaunched())
+	if (root.getConfig().WndPaint && root.IsLaunched())
 		root.renderOneFrame();
 	EndPaint(_wndHandle, &ps);
 }
 
 void Win32Device::injectDestroy()
 {
-	if (Root::getSingleton().getConfig().PostQuit)
+	if (Root::getSingleton().getConfig().WndQuit)
 		PostQuitMessage(0);
+}
+
+void Win32Device::injectActivate()
+{
+	Device::injectActivate();
+	if (Root::getSingleton().getConfig().WndPaint)
+		InvalidateRect(_wndHandle, NULL, FALSE);
+}
+
+void Win32Device::injectInactive()
+{
+	Device::injectInactive();
+	if (Root::getSingleton().getConfig().WndPaint)
+		InvalidateRect(_wndHandle, NULL, FALSE);
 }
 
 void Win32Device::injectInputLanguageChange()
