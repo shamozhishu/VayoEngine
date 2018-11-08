@@ -87,31 +87,55 @@ ModelPage::ModelPage()
 	m_pCurSceneMgr = Root::getSingleton().getCurSceneMgr();
 
 	m_pObj1 = m_pCurSceneMgr->findObject<ManualObject>(m_btn1->getText());
+	m_pObj1->setVisible(false);
 	m_pObj2 = m_pCurSceneMgr->findObject<ManualObject>(m_btn2->getText());
+	m_pObj2->setVisible(false);
 	m_pObj3 = m_pCurSceneMgr->findObject<ManualObject>(m_btn3->getText());
+	m_pObj3->setVisible(false);
 	m_pObj4 = m_pCurSceneMgr->findObject<ManualObject>(m_btn4->getText());
+	m_pObj4->setVisible(false);
 	m_pObj5 = m_pCurSceneMgr->findObject<ManualObject>(m_btn5->getText());
+	m_pObj5->setVisible(false);
 	m_pObj6 = m_pCurSceneMgr->findObject<ManualObject>(m_btn6->getText());
+	m_pObj6->setVisible(false);
 	m_pObj7 = m_pCurSceneMgr->findObject<ManualObject>(m_btn7->getText());
+	m_pObj7->setVisible(false);
 	m_pObj8 = m_pCurSceneMgr->findObject<ManualObject>(m_btn8->getText());
+	m_pObj8->setVisible(false);
 	m_pObj9 = m_pCurSceneMgr->findObject<ManualObject>(m_btn9->getText());
+	m_pObj9->setVisible(false);
 	m_pObj10 = m_pCurSceneMgr->findObject<ManualObject>(m_btn10->getText());
+	m_pObj10->setVisible(false);
 	m_pObj11 = m_pCurSceneMgr->findObject<ManualObject>(m_btn11->getText());
+	m_pObj11->setVisible(false);
 	m_pObj12 = m_pCurSceneMgr->findObject<ManualObject>(m_btn12->getText());
+	m_pObj12->setVisible(false);
 	m_pObj13 = m_pCurSceneMgr->findObject<ManualObject>(m_btn13->getText());
+	m_pObj13->setVisible(false);
 	m_pObj14 = m_pCurSceneMgr->findObject<ManualObject>(m_btn14->getText());
+	m_pObj14->setVisible(false);
 
 	m_pCube1 = m_pCurSceneMgr->findObject<Entity>(Root::getSingleton().getLanguage()->getLanguageByID(21));
+	m_pCube1->setVisible(false);
 	m_pCubeBorder1 = m_pCurSceneMgr->findObject<Entity>(Root::getSingleton().getLanguage()->getLanguageByID(22));
+	m_pCubeBorder1->setVisible(false);
 	m_pCube2 = m_pCurSceneMgr->findObject<Entity>(Root::getSingleton().getLanguage()->getLanguageByID(23));
+	m_pCube2->setVisible(false);
 	m_pCubeBorder2 = m_pCurSceneMgr->findObject<Entity>(Root::getSingleton().getLanguage()->getLanguageByID(24));
+	m_pCubeBorder2->setVisible(false);
 
 	m_pSphere1 = m_pCurSceneMgr->findObject<ManualObject>(Root::getSingleton().getLanguage()->getLanguageByID(25));
+	m_pSphere1->setVisible(false);
 	m_pSphereBorder1 = m_pCurSceneMgr->findObject<ManualObject>(Root::getSingleton().getLanguage()->getLanguageByID(26));
+	m_pSphereBorder1->setVisible(false);
 	m_pSphere2 = m_pCurSceneMgr->findObject<ManualObject>(Root::getSingleton().getLanguage()->getLanguageByID(27));
+	m_pSphere2->setVisible(false);
 	m_pSphereBorder2 = m_pCurSceneMgr->findObject<ManualObject>(Root::getSingleton().getLanguage()->getLanguageByID(28));
+	m_pSphereBorder2->setVisible(false);
 
-	initAllViewState();
+	initAllViewState(ModelViewer::getSingleton().getFPSCamera());
+	initAllViewState(ModelViewer::getSingleton().getOrbitCamera());
+	initAllViewState(ModelViewer::getSingleton().getEagleEyeCamera());
 }
 
 ModelPage::~ModelPage()
@@ -235,9 +259,9 @@ void ModelPage::switchShow(MovableObject* pObj, bool isShow, Camera* camera, boo
 	if (saveViewMemento)
 	{
 		if (isShow)
-			camera->restoreViewMemento(pObj->getName());
+			camera->getViewMemento(pObj->getName());
 		else
-			camera->createViewMemento(pObj->getName());
+			camera->setViewMemento(pObj->getName());
 	}
 }
 
@@ -267,32 +291,27 @@ void ModelPage::hideAllModel(Camera* camera)
 	switchShow(m_pSphereBorder2, false, camera, false);
 }
 
-void ModelPage::initAllViewState()
+void ModelPage::initAllViewState(Camera* camera)
 {
-	Camera* camera = Root::getSingleton().getCurSceneMgr()->getActiveCamera();
-	camera->lookAt(Vector3df(0, 0, 150));
-	switchShow(m_pObj1, false, camera);
-	switchShow(m_pObj2, false, camera);
-	switchShow(m_pObj3, false, camera);
-	camera->lookAt(Vector3df(20, 0, 0));
-	switchShow(m_pObj4, false, camera);
-	switchShow(m_pObj5, false, camera);
-	camera->lookAt(Vector3df(0, 0, 100));
-	switchShow(m_pObj6, false, camera);
-	switchShow(m_pObj7, false, camera);
-	switchShow(m_pObj8, false, camera);
-	switchShow(m_pObj9, false, camera);
-	switchShow(m_pObj10, false, camera);
-	switchShow(m_pObj11, false, camera);
-	switchShow(m_pObj12, false, camera);
-	switchShow(m_pObj13, false, camera);
-	switchShow(m_pObj14, false, camera);
-	switchShow(m_pCube1, false, camera);
-	switchShow(m_pCubeBorder1, false, camera, false);
-	switchShow(m_pCube2, false, camera, false);
-	switchShow(m_pCubeBorder2, false, camera, false);
-	switchShow(m_pSphere1, false, camera, false);
-	switchShow(m_pSphereBorder1, false, camera, false);
-	switchShow(m_pSphere2, false, camera, false);
-	switchShow(m_pSphereBorder2, false, camera, false);
+	if (camera)
+	{
+		camera->lookAt(Vector3df(0, 0, 150));
+		camera->setViewMemento(m_pObj1->getName());
+		camera->setViewMemento(m_pObj2->getName());
+		camera->setViewMemento(m_pObj3->getName());
+		camera->lookAt(Vector3df(20, 0, 0));
+		camera->setViewMemento(m_pObj4->getName());
+		camera->setViewMemento(m_pObj5->getName());
+		camera->lookAt(Vector3df(0, 0, 100));
+		camera->setViewMemento(m_pObj6->getName());
+		camera->setViewMemento(m_pObj7->getName());
+		camera->setViewMemento(m_pObj8->getName());
+		camera->setViewMemento(m_pObj9->getName());
+		camera->setViewMemento(m_pObj10->getName());
+		camera->setViewMemento(m_pObj11->getName());
+		camera->setViewMemento(m_pObj12->getName());
+		camera->setViewMemento(m_pObj13->getName());
+		camera->setViewMemento(m_pObj14->getName());
+		camera->setViewMemento(m_pCube1->getName());
+	}
 }

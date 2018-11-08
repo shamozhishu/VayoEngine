@@ -317,6 +317,9 @@
     <ClInclude Include="Include\VayoReflection.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\VayoViewMemento.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\VayoApp.cpp">
@@ -519,6 +522,9 @@
     </ClCompile>
     <ClCompile Include="ThirdParty\tinyxml2.cpp">
       <Filter>ThirdParty\tinyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VayoViewMemento.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

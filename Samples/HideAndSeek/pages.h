@@ -38,7 +38,7 @@ public:
 private:
 	void switchShow(MovableObject* pObj, bool isShow, Camera* camera, bool saveViewMemento = true);
 	void hideAllModel(Camera* camera);
-	void initAllViewState();
+	void initAllViewState(Camera* camera);
 
 private:
 	UIButton* m_btn1;

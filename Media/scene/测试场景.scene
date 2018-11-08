@@ -5,8 +5,9 @@
 	尾罩_J1784A_18B_25N10.tessgrid,导线_AF_250.tessgrid,导线_609C55A0812_22_6.tessgrid,star.tessgrid,testmodel.tessgrid
 	<Vayo::SceneNode name="灯光场景节点" translation="0,0,0" rotation="0,0,0" scale="1,1,1" visit="true">
 		<Objects>
-			<Vayo::FPSCamera name="第一人称摄像机" visible="false" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45"  zn="1" zf="1000" moveSpeed="100"/>
+			<Vayo::FPSCamera name="第一人称摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45"  zn="1" zf="1000" moveSpeed="100"/>
 			<Vayo::OrbitCamera name="轨道摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" fovY="45" zn="1" zf="1000" moveSpeed="10" zoomSpeed="2"/>
+			<Vayo::EagleEyeCamera name="鹰眼摄像机" position="0,0,100" target="0,0,0" worldUp="0,1,0" zn="-10000" zf="10000" moveSpeed="100" zoomSpeed="0.1" zoomFactor="0.9"/>
 			<Vayo::DirectionalLight name="主方向光" ambientColor="0xff808080" diffuseColor="0xffffffff" specularColor="0xffcccccc" direction="-0.57735,0.57735,0.57735"/>
 			<Vayo::DirectionalLight name="辅助方向光1" ambientColor="0xff000000" diffuseColor="0xff666666" specularColor="0xff333333" direction="0.707,-0.707,0.0"/>
 			<Vayo::DirectionalLight name="辅助方向光2" ambientColor="0xff000000" diffuseColor="0xff666666" specularColor="0xff333333" direction="0.0,0.0,-1.0"/>

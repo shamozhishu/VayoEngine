@@ -8,27 +8,10 @@
 
 NS_VAYO_BEGIN
 
-class ViewMementoFPS : public Camera::ViewMemento
+void Camera::setNeedUpdate(bool isUpdate)
 {
-public:
-	vector<SpatialInfo> _placement;
-	Matrix4x4 _affector;
-};
-
-class ViewMementoOrbit : public ViewMementoFPS
-{
-public:
-	Matrix4x4 _transform;
-	Matrix4x4 _thisRot;
-	Matrix4x4 _lastRot;
-};
-
-class ViewMementoEagleEye : public ViewMementoFPS
-{
-public:
-	float     _zoomFactor;
-	Matrix4x4 _transform;
-};
+	_needUpdate = isUpdate;
+}
 
 Camera::Camera()
 	: _right(1.0f, 0.0f, 0.0f)
@@ -36,8 +19,7 @@ Camera::Camera()
 	, _look(0.0f, 0.0f, -1.0f)
 	, _needUpdate(true)
 {
-	Device* pDevice = Root::getSingleton().getDevice();
-	const Dimension2di& size = pDevice->getScreenSize();
+	const Dimension2di& size = Root::getSingleton().getDevice()->getScreenSize();
 	_aspect = (float)size._width / size._height;
 	_nearZ = 1.0f;
 	_farZ = 1000.0f;
@@ -45,13 +27,6 @@ Camera::Camera()
 
 Camera::~Camera()
 {
-	map<wstring, ViewMemento*>::iterator it = _viewMementoPool.begin();
-	for (; it != _viewMementoPool.end(); ++it)
-	{
-		SAFE_DELETE(it->second);
-	}
-
-	_viewMementoPool.clear();
 	Root::getSingleton().getTouchDispatcher()->removeTouchDelegate(this);
 	Root::getSingleton().getKeypadDispatcher()->removeKeypadDelegate(this);
 }
@@ -64,15 +39,10 @@ void Camera::refresh()
 		_needUpdate = false;
 	}
 
-	rebuildViewArea();
+	regenerateViewArea();
 	recalculateViewArea();
 	Root::getSingleton().getActiveRenderer()->setTransform(ETS_VIEW, getView());
 	Root::getSingleton().getActiveRenderer()->setTransform(ETS_PROJECTION, getProj());
-}
-
-void Camera::setNeedUpdate(bool isUpdate)
-{
-	_needUpdate = isUpdate;
 }
 
 bool Camera::getWorldPos(Vector3df& outWorldPos) const
@@ -313,7 +283,30 @@ void Camera::updateViewTransform()
 	_view(3, 3) = 1.0f;
 }
 
-void Camera::rebuildViewArea()
+bool Camera::setViewMemento(const wstring& name)
+{
+	if (name == L"")
+		return false;
+	ViewMementoPtr viewPtr = createViewMemento();
+	viewPtr->storage(this);
+	_viewMementoPool[name] = viewPtr;
+	return true;
+}
+
+bool Camera::getViewMemento(const wstring& name)
+{
+	map<wstring, ViewMementoPtr>::iterator it = _viewMementoPool.find(name);
+	if (it == _viewMementoPool.end())
+		return false;
+
+	ViewMementoPtr viewPtr = it->second;
+	viewPtr->recover(this);
+	_viewMementoPool.erase(it);
+	_needUpdate = true;
+	return true;
+}
+
+void Camera::regenerateViewArea()
 {
 	_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _affector;
 }
@@ -400,76 +393,18 @@ bool FPSCamera::keyClicked(const tagKeyInput& keyInput)
 	return ret;
 }
 
-void FPSCamera::createViewMemento(const wstring& name)
-{
-	if (name != L"")
-	{
-		ViewMementoFPS* viewPtr = new ViewMementoFPS();
-		viewPtr->_position = _position;
-		viewPtr->_right = _right;
-		viewPtr->_up = _up;
-		viewPtr->_look = _look;
-		viewPtr->_affector = _affector;
-
-		SpatialInfo place;
-		Node* pParent = getParentNode();
-		while (pParent)
-		{
-			place._translation = pParent->getPosition();
-			place._rotation = pParent->getRotation();
-			place._scale = pParent->getScale();
-			viewPtr->_placement.push_back(place);
-			pParent = pParent->getParent();
-		}
-
-		_viewMementoPool[name] = viewPtr;
-	}
-}
-
-void FPSCamera::restoreViewMemento(const wstring& name)
-{
-	map<wstring, ViewMemento*>::iterator it = _viewMementoPool.find(name);
-	if (it != _viewMementoPool.end())
-	{
-		ViewMementoFPS* viewPtr = dynamic_cast<ViewMementoFPS*>(it->second);
-
-		if (viewPtr)
-		{
-			_position = viewPtr->_position;
-			_right = viewPtr->_right;
-			_up = viewPtr->_up;
-			_look = viewPtr->_look;
-			_affector = viewPtr->_affector;
-
-			Node* pParent = getParentNode();
-			if (pParent)
-			{
-				vector<SpatialInfo>::iterator itor = viewPtr->_placement.begin();
-				for (; itor != viewPtr->_placement.end() && pParent; ++itor)
-				{
-					const SpatialInfo& place = *itor;
-					pParent->setPosition(place._translation);
-					pParent->setRotation(place._rotation);
-					pParent->setScale(place._scale);
-					pParent = pParent->getParent();
-				}
-			}
-
-			_needUpdate = true;
-		}
-
-		SAFE_DELETE(it->second);
-		_viewMementoPool.erase(it);
-	}
-}
-
-void FPSCamera::rebuildViewArea()
+void FPSCamera::regenerateViewArea()
 {
 	SceneNode* pParent = getParentNode();
 	if (pParent)
 		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * pParent->getAbsTransformation() * _affector;
 	else
-		Camera::rebuildViewArea();
+		Camera::regenerateViewArea();
+}
+
+ViewMementoPtr FPSCamera::createViewMemento()
+{
+	return ViewMementoPtr(new ViewMementoFPS());
 }
 
 void FPSCamera::serialize(XMLElement* outXml)
@@ -654,82 +589,18 @@ bool OrbitCamera::keyClicked(const tagKeyInput& keyInput)
 	return false;
 }
 
-void OrbitCamera::createViewMemento(const wstring& name)
-{
-	if (name != L"")
-	{
-		ViewMementoOrbit* viewPtr = new ViewMementoOrbit();
-		viewPtr->_position = _position;
-		viewPtr->_right = _right;
-		viewPtr->_up = _up;
-		viewPtr->_look = _look;
-		viewPtr->_affector = _affector;
-		viewPtr->_transform = _arcball._transform;
-		viewPtr->_lastRot = _arcball._lastRot;
-		viewPtr->_thisRot = _arcball._thisRot;
-
-		SpatialInfo place;
-		Node* pParent = getParentNode();
-		while (pParent)
-		{
-			place._translation = pParent->getPosition();
-			place._rotation = pParent->getRotation();
-			place._scale = pParent->getScale();
-			viewPtr->_placement.push_back(place);
-			pParent = pParent->getParent();
-		}
-
-		_viewMementoPool[name] = viewPtr;
-	}
-}
-
-void OrbitCamera::restoreViewMemento(const wstring& name)
-{
-	map<wstring, ViewMemento*>::iterator it = _viewMementoPool.find(name);
-	if (it != _viewMementoPool.end())
-	{
-		ViewMementoOrbit* viewPtr = dynamic_cast<ViewMementoOrbit*>(it->second);
-
-		if (viewPtr)
-		{
-			_position = viewPtr->_position;
-			_right = viewPtr->_right;
-			_up = viewPtr->_up;
-			_look = viewPtr->_look;
-			_affector = viewPtr->_affector;
-			_arcball._transform = viewPtr->_transform;
-			_arcball._lastRot = viewPtr->_lastRot;
-			_arcball._thisRot = viewPtr->_thisRot;
-
-			Node* pParent = getParentNode();
-			if (pParent)
-			{
-				vector<SpatialInfo>::iterator itor = viewPtr->_placement.begin();
-				for (; itor != viewPtr->_placement.end() && pParent; ++itor)
-				{
-					const SpatialInfo& place = *itor;
-					pParent->setPosition(place._translation);
-					pParent->setRotation(place._rotation);
-					pParent->setScale(place._scale);
-					pParent = pParent->getParent();
-				}
-			}
-
-			_needUpdate = true;
-		}
-
-		SAFE_DELETE(it->second);
-		_viewMementoPool.erase(it);
-	}
-}
-
-void OrbitCamera::rebuildViewArea()
+void OrbitCamera::regenerateViewArea()
 {
 	SceneNode* pParent = getParentNode();
 	if (pParent)
 		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * pParent->getAbsTransformation() * _arcball._transform * _affector;
 	else
 		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _arcball._transform * _affector;
+}
+
+ViewMementoPtr OrbitCamera::createViewMemento()
+{
+	return ViewMementoPtr(new ViewMementoOrbit());
 }
 
 void OrbitCamera::serialize(XMLElement* outXml)
@@ -743,7 +614,8 @@ void OrbitCamera::serialize(XMLElement* outXml)
 	outXml->SetAttribute("target", szbuf);
 	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _up._x, _up._y, _up._z);
 	outXml->SetAttribute("worldUp", szbuf);
-	outXml->SetAttribute("fovY", getFovY());
+	if (!isOrthogonal())
+		outXml->SetAttribute("fovY", getFovY());
 	outXml->SetAttribute("zn", getNearZ());
 	outXml->SetAttribute("zf", getFarZ());
 	outXml->SetAttribute("moveSpeed", _moveSpeed[1]);
@@ -791,11 +663,14 @@ bool OrbitCamera::deserialize(XMLElement* inXml)
 
 	lookAt(position, target, worldUp);
 
-	float fovY = inXml->FloatAttribute("fovY");
 	float zn = inXml->FloatAttribute("zn");
 	float zf = inXml->FloatAttribute("zf");
 
-	setLens(fovY, getAspect(), zn, zf);
+	if (isOrthogonal())
+		setLens(_nearWindowHeight, _farWindowHeight, zn, zf);
+	else
+		setLens(inXml->FloatAttribute("fovY"), getAspect(), zn, zf);
+
 	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
 	_zoomSpeed[0] = _zoomSpeed[1] = inXml->FloatAttribute("zoomSpeed");
 	return true;
@@ -807,6 +682,11 @@ EagleEyeCamera::EagleEyeCamera(const wstring& name)
 	: OrbitCamera(name)
 	, _zoomFactor(1.0f)
 {
+	const Dimension2di& size = Root::getSingleton().getDevice()->getScreenSize();
+	_nearWindowHeight = size._width;
+	_farWindowHeight = size._height;
+	_nearZ = -10000.0f;
+	_farZ = 10000.0f;
 	_zoomSpeed[0] = _zoomSpeed[1] = 0.1f;
 	_arcball.updateScale(_zoomFactor, _zoomFactor, _zoomFactor);
 }
@@ -923,71 +803,9 @@ bool EagleEyeCamera::keyClicked(const tagKeyInput& keyInput)
 	return ret;
 }
 
-void EagleEyeCamera::createViewMemento(const wstring& name)
+ViewMementoPtr EagleEyeCamera::createViewMemento()
 {
-	if (name != L"")
-	{
-		ViewMementoEagleEye* viewPtr = new ViewMementoEagleEye();
-		viewPtr->_position = _position;
-		viewPtr->_right = _right;
-		viewPtr->_up = _up;
-		viewPtr->_look = _look;
-		viewPtr->_affector = _affector;
-		viewPtr->_zoomFactor = _zoomFactor;
-		viewPtr->_transform = _arcball._transform;
-
-		SpatialInfo place;
-		Node* pParent = getParentNode();
-		while (pParent)
-		{
-			place._translation = pParent->getPosition();
-			place._rotation = pParent->getRotation();
-			place._scale = pParent->getScale();
-			viewPtr->_placement.push_back(place);
-			pParent = pParent->getParent();
-		}
-
-		_viewMementoPool[name] = viewPtr;
-	}
-}
-
-void EagleEyeCamera::restoreViewMemento(const wstring& name)
-{
-	map<wstring, ViewMemento*>::iterator it = _viewMementoPool.find(name);
-	if (it != _viewMementoPool.end())
-	{
-		ViewMementoEagleEye* viewPtr = dynamic_cast<ViewMementoEagleEye*>(it->second);
-
-		if (viewPtr)
-		{
-			_position = viewPtr->_position;
-			_right = viewPtr->_right;
-			_up = viewPtr->_up;
-			_look = viewPtr->_look;
-			_affector = viewPtr->_affector;
-			_zoomFactor = viewPtr->_zoomFactor;
-			_arcball._transform = viewPtr->_transform;
-
-			Node* pParent = getParentNode();
-			if (pParent)
-			{
-				vector<SpatialInfo>::iterator itor = viewPtr->_placement.begin();
-				for (; itor != viewPtr->_placement.end() && pParent; ++itor)
-				{
-					const SpatialInfo& place = *itor;
-					pParent->setPosition(place._translation);
-					pParent->setRotation(place._rotation);
-					pParent->setScale(place._scale);
-					pParent = pParent->getParent();
-				}
-			}
-
-			_needUpdate = true;
-		}
-
-		SAFE_DELETE(it->second);
-		_viewMementoPool.erase(it);
-	}
+	return ViewMementoPtr(new ViewMementoEagleEye());
 }
 
 void EagleEyeCamera::serialize(XMLElement* outXml)

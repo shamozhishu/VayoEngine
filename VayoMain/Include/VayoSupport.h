@@ -50,6 +50,7 @@ namespace Vayo
 {
 	class App;
 	class Camera;
+	class ViewMemento;
 	class SpriteBox;
 	class MovableObject;
 	class Node;
@@ -88,9 +89,10 @@ namespace Vayo
 	class MaterialRendererServices;
 
 	template<typename T> class SharedPtr;
-	typedef SharedPtr<Mesh>             MeshPtr;
-	typedef SharedPtr<Texture>          TexturePtr;
-	typedef SharedPtr<Material>         MaterialPtr;
+	typedef SharedPtr<ViewMemento> ViewMementoPtr;
+	typedef SharedPtr<Mesh> MeshPtr;
+	typedef SharedPtr<Texture> TexturePtr;
+	typedef SharedPtr<Material> MaterialPtr;
 	typedef SharedPtr<MaterialRenderer> MaterialRendererPtr;
 }
 

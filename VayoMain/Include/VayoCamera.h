@@ -8,9 +8,9 @@
 
 #include "VayoInput.h"
 #include "VayoBitState.h"
-#include "VayoMatrix4x4.h"
 #include "VayoArcball.h"
 #include "VayoFrustum.h"
+#include "VayoViewMemento.h"
 #include "VayoMovableObject.h"
 
 NS_VAYO_BEGIN
@@ -18,6 +18,7 @@ NS_VAYO_BEGIN
 // 摄像机
 class _VayoExport Camera : public TouchDelegate, public KeypadDelegate
 {
+	friend class ViewMemento;
 public:
 	Camera();
 	virtual ~Camera();
@@ -67,24 +68,16 @@ public:
 
 	virtual const Frustum& getViewFrustum() const;
 
-	virtual void createViewMemento(const wstring& name) = 0;
-	virtual void restoreViewMemento(const wstring& name) = 0;
-
-	class ViewMemento
-	{
-	public:
-		Vector3df _position;
-		Vector3df _right;
-		Vector3df _up;
-		Vector3df _look;
-		virtual ~ViewMemento() {}
-	};
+	virtual bool setViewMemento(const wstring& name);
+	virtual bool getViewMemento(const wstring& name);
 
 protected:
-	virtual void updateViewTransform();
-	virtual void rebuildViewArea();
+	virtual void regenerateViewArea();
 	virtual void recalculateViewArea();
-	map<wstring, ViewMemento*> _viewMementoPool;
+	virtual void updateViewTransform();
+	virtual ViewMementoPtr createViewMemento() = 0;
+	map<wstring, ViewMementoPtr> _viewMementoPool;
+
 protected:
 	bool      _needUpdate;
 	Vector3df _position;
@@ -105,6 +98,7 @@ protected:
 // 第一人称摄像机
 class _VayoExport FPSCamera : public MovableObject, public Camera
 {
+	friend class ViewMementoFPS;
 	VAYO_REFLEX_WITHPARA_DECLARE(FPSCamera, const wstring&)
 public:
 	FPSCamera(const wstring& name);
@@ -113,13 +107,13 @@ public:
 	void setMoveSpeed(float speed);
 	void touchMoved(const Touch& touch, EMouseKeys key);
 	bool keyClicked(const tagKeyInput& keyInput);
-	void createViewMemento(const wstring& name);
-	void restoreViewMemento(const wstring& name);
 	void serialize(XMLElement* outXml);
 	bool deserialize(XMLElement* inXml);
 
 protected:
-	void rebuildViewArea();
+	void regenerateViewArea();
+	ViewMementoPtr createViewMemento();
+
 protected:
 	float    _moveSpeed[2];
 	BitState _direction;
@@ -128,6 +122,7 @@ protected:
 // 轨道摄像机
 class _VayoExport OrbitCamera : public MovableObject, public Camera
 {
+	friend class ViewMementoOrbit;
 	VAYO_REFLEX_WITHPARA_DECLARE(OrbitCamera, const wstring&)
 public:
 	OrbitCamera(const wstring& name);
@@ -142,13 +137,13 @@ public:
 	void touchEnded(const Touch& touch, EMouseKeys key);
 	bool touchWheel(const Touch& touch, float wheel);
 	bool keyClicked(const tagKeyInput& keyInput);
-	void createViewMemento(const wstring& name);
-	void restoreViewMemento(const wstring& name);
 	void serialize(XMLElement* outXml);
 	bool deserialize(XMLElement* inXml);
 
 protected:
-	void rebuildViewArea();
+	void regenerateViewArea();
+	ViewMementoPtr createViewMemento();
+
 protected:
 	float   _moveSpeed[2];
 	float   _zoomSpeed[2];
@@ -158,6 +153,7 @@ protected:
 // 鹰眼摄像机
 class _VayoExport EagleEyeCamera : public OrbitCamera
 {
+	friend class ViewMementoEagleEye;
 	VAYO_REFLEX_WITHPARA_DECLARE(EagleEyeCamera, const wstring&)
 public:
 	EagleEyeCamera(const wstring& name);
@@ -176,10 +172,11 @@ public:
 	void  touchEnded(const Touch& touch, EMouseKeys key);
 	bool  touchWheel(const Touch& touch, float wheel);
 	bool  keyClicked(const tagKeyInput& keyInput);
-	void  createViewMemento(const wstring& name);
-	void  restoreViewMemento(const wstring& name);
 	void  serialize(XMLElement* outXml);
 	bool  deserialize(XMLElement* inXml);
+
+protected:
+	ViewMementoPtr createViewMemento();
 
 protected:
 	float    _zoomFactor;

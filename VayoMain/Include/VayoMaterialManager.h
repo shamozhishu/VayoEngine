@@ -9,7 +9,7 @@
 /* ----------begin----------²ÄÖÊ½Å±¾----------
 material examples/test
 {
-	material_type solid
+	type solid
 	ambient_color 104 204 50 255
 	diffuse_color 153 153 153 255
 	specular_color 102 102 102 255

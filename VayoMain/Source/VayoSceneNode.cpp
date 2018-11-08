@@ -182,6 +182,12 @@ void SceneNode::serialize(XMLElement* outXml)
 
 	if (!_canVisit)
 		outXml->SetAttribute("visit", _canVisit);
+
+	if (_showBoundingBox)
+		outXml->SetAttribute("show_boundingbox", _showBoundingBox);
+
+	if (!_isAutomaticCulling)
+		outXml->SetAttribute("auto_culling", _isAutomaticCulling);
 }
 
 bool SceneNode::deserialize(XMLElement* inXml)
@@ -232,6 +238,8 @@ bool SceneNode::deserialize(XMLElement* inXml)
 	}
 
 	inXml->QueryBoolAttribute("visit", &_canVisit);
+	inXml->QueryBoolAttribute("show_boundingbox", &_showBoundingBox);
+	inXml->QueryBoolAttribute("auto_culling", &_isAutomaticCulling);
 	return true;
 }
 

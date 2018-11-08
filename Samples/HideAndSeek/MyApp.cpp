@@ -23,12 +23,8 @@ bool ModelViewer::startup()
 	// 获取摄像机
 	m_cameraFPS = pCurSceneMgr->findObject<FPSCamera>(L"第一人称摄像机");
 	m_cameraOrbit = pCurSceneMgr->findObject<OrbitCamera>(L"轨道摄像机");
+	m_cameraEagleEye = pCurSceneMgr->findObject<EagleEyeCamera>(L"鹰眼摄像机");
 
-#if HAS_TESTING_BOARD
-	{
-		TessGridBuilder gridBuilder(L"板子.tessgrid");
-	}
-#endif
 #if HAS_TESTING_MODEL
 	m_testModel = new TestModel(pCurSceneMgr);
 #endif
@@ -58,7 +54,7 @@ bool ModelViewer::startup()
 		builder.addSingleStret(Vector3df(0, 0, -4), Vector3df(0, 0, 0), Vector3df(1, 1, 1));
 		builder.endAddStretBody();
 		gridder.parseTessgridFile(builder.getStream());
-		builder.save(Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + L"testmodel2", false);
+		builder.save(L"testmodel2", false);
 	}
 
 	// 激活轨道摄像机
@@ -81,25 +77,24 @@ void ModelViewer::cleanup()
 
 bool ModelViewer::keyClicked(const tagKeyInput& keyInput)
 {
-#if HAS_FPS_CAMERA
 	if (keyInput.PressedDown)
 		return false;
 
 	switch (keyInput.Key)
 	{
-	case KEY_SPACE:
-		if (Root::getSingleton().getCurSceneMgr()->getActiveCamera() == m_cameraFPS)
-		{
-			Root::getSingleton().getCurSceneMgr()->setActiveCamera(m_cameraOrbit);
-			Log::wprint(ELL_INFORMATION, L"激活轨道摄像机");
-		}
-		else
-		{
-			Root::getSingleton().getCurSceneMgr()->setActiveCamera(m_cameraFPS);
-			Log::wprint(ELL_INFORMATION, L"激活第一人称摄像机");
-		}
+	case KEY_F1:
+		Root::getSingleton().getCurSceneMgr()->setActiveCamera(m_cameraFPS);
+		Log::wprint(ELL_INFORMATION, L"激活第一人称摄像机");
+		return true;
+	case KEY_F2:
+		Root::getSingleton().getCurSceneMgr()->setActiveCamera(m_cameraOrbit);
+		Log::wprint(ELL_INFORMATION, L"激活轨道摄像机");
+		return true;
+	case KEY_F3:
+		Root::getSingleton().getCurSceneMgr()->setActiveCamera(m_cameraEagleEye);
+		Log::wprint(ELL_INFORMATION, L"激活鹰眼摄像机");
 		return true;
 	}
-#endif
+
 	return false;
 }

@@ -213,7 +213,7 @@ wstringstream& TessGridBuilder::getStream()
 
 void TessGridBuilder::save(const wstring& fileName, bool append/*=true*/)
 {
-	WriteFile fout(fileName + L".tessgrid", append);
+	WriteFile fout(Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + fileName + L".tessgrid", append);
 	wstring strtmp = getStream().str();
 	fout.write(strtmp.data(), strtmp.size() * sizeof(wchar_t));
 }

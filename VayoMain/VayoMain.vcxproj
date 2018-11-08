@@ -96,6 +96,7 @@
     <ClInclude Include="Include\VayoVector2d.h" />
     <ClInclude Include="Include\VayoVector3d.h" />
     <ClInclude Include="Include\VayoVertex.h" />
+    <ClInclude Include="Include\VayoViewMemento.h" />
     <ClInclude Include="Source\VayoFontManager.h" />
     <ClInclude Include="Source\VayoWin32Device.h" />
     <ClInclude Include="Source\VayoWireBoundingBox.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="Source\VayoTimer.cpp" />
     <ClCompile Include="Source\VayoUserDataBind.cpp" />
     <ClCompile Include="Source\VayoUtils.cpp" />
+    <ClCompile Include="Source\VayoViewMemento.cpp" />
     <ClCompile Include="Source\VayoWin32Device.cpp" />
     <ClCompile Include="ThirdParty\rc5\rc5_ecb.cpp" />
     <ClCompile Include="ThirdParty\rc5\rc5_enc.cpp" />

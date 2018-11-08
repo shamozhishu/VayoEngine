@@ -150,7 +150,7 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			}
 		}
 
-		if (0 == strTag.substr(0, 13).compare("material_type"))
+		if (0 == strTag.substr(0, 4).compare("type"))
 		{
 			container.clear();
 			stringtok(container, strTag, " ");
