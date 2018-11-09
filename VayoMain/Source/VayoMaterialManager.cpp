@@ -45,18 +45,24 @@ bool MaterialManager::init()
 MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
 {
 	static unsigned short idx = 0;
-	MaterialPtr materialPtr(new Material());
-
+	wstring materialName;
 	if (name == L"" || name == L"default_material")
 	{
 		std::wstringstream ss;
 		ss << L"Material" << idx;
 		++idx;
-		materialPtr->_materialName = ss.str();
+		materialName = ss.str();
 	}
 	else
-		materialPtr->_materialName = name;
+	{
+		map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
+		if (it != _materialPool.end())
+			return it->second;
+		materialName = name;
+	}
 
+	MaterialPtr materialPtr(new Material());
+	materialPtr->_materialName = materialName;
 	_materialPool[materialPtr->_materialName] = materialPtr;
 	return materialPtr;
 }
@@ -70,6 +76,7 @@ MaterialPtr MaterialManager::findMaterial(const wstring& name)
 	if (it != _materialPool.end())
 		return it->second;
 
+	Log::wprint(ELL_WARNING, L"材质[%s]不存在，使用默认材质！", name.c_str());
 	return _defaultMaterial;
 }
 

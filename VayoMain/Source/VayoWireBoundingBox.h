@@ -17,12 +17,8 @@ class WireBoundingBox : public Renderable
 {
 public:
 	WireBoundingBox() {
-		_material = Root::getSingleton().getMaterialManager()->createMaterial();
+		_material = Root::getSingleton().getMaterialManager()->createMaterial(L"Material_WireBoundingBox");
 		_material->_lighting = false;
-	}
-
-	~WireBoundingBox() {
-		Root::getSingleton().getMaterialManager()->destroyMaterial(_material);
 	}
 
 	void render() {

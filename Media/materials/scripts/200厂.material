@@ -1,28 +1,31 @@
 material 200厂/纤芯
 {
-	ambient_color 255 100 100 255
-	diffuse_color 255 192 192 255
+	ambient_color 0 255 0 255
+	diffuse_color 0 255 0 255
 	specular_color 0 0 0 255
 	emissive_color 0 0 0 0
 	shininess 16
+	zbuffer off
 }
 
 material 200厂/线束
 {
-	ambient_color 100 100 255 255
-	diffuse_color 192 192 255 255
+	ambient_color 0 0 255 255
+	diffuse_color 0 0 255 255
 	specular_color 0 0 0 255
 	emissive_color 0 0 0 0
 	shininess 16
+	zbuffer off
 }
 
 material 200厂/屏蔽层
 {
-	ambient_color 100 255 100 255
-	diffuse_color 192 255 192 255
+	ambient_color 0 255 255 255
+	diffuse_color 0 255 255 255
 	specular_color 0 0 0 255
 	emissive_color 0 0 0 0
 	shininess 16
+	zbuffer off
 }
 
 material 200厂/尾罩
@@ -32,15 +35,18 @@ material 200厂/尾罩
 	specular_color 0 0 0 255
 	emissive_color 0 0 0 0
 	shininess 16
+	zbuffer off
 }
 
 material 200厂/焊杯
 {
-	ambient_color 220 100 10 255
-	diffuse_color 220 192 192 255
+	type solid
+	ambient_color 255 255 0 100
+	diffuse_color 255 255 0 100
 	specular_color 0 0 0 255
 	emissive_color 0 0 0 0
 	shininess 16
+	zbuffer off
 }
 
 material 200厂/二维图端子
@@ -51,6 +57,7 @@ material 200厂/二维图端子
 	emissive_color 0 0 0 0
 	shininess 16
 	anti_aliasing on
+	zbuffer off
 }
 
 material 200厂/二维图节点
@@ -61,6 +68,7 @@ material 200厂/二维图节点
 	emissive_color 0 0 0 0
 	shininess 16
 	anti_aliasing on
+	zbuffer off
 }
 
 material 200厂/二维图导线
@@ -71,4 +79,16 @@ material 200厂/二维图导线
 	emissive_color 0 0 0 0
 	shininess 16
 	anti_aliasing on line_smooth
+	zbuffer off
+}
+
+material 200厂/选中
+{
+	type solid
+	ambient_color 255 0 0 100
+	diffuse_color 255 0 0 100
+	specular_color 0 0 0 255
+	emissive_color 0 0 0 0
+	shininess 16
+	zbuffer off
 }

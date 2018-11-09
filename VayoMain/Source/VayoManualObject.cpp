@@ -41,13 +41,12 @@ void ManualObject::render()
 	{
 		// 设置所有子网格的公共材质,例如启用光照,因为类似glEnable(GL_LIGHTING)这类调用不能装入显示列表中.
 		Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
+		if (_needSubmit)
+		{
+			submitDisplay();
+			_needSubmit = false;
+		}
 		Root::getSingleton().getActiveRenderer()->drawDisplayList(_displayList);
-	}
-
-	if (_needSubmit)
-	{
-		submitDisplay();
-		_needSubmit = false;
 	}
 }
 
