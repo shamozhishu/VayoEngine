@@ -8,21 +8,43 @@
 
 #include "VayoSupport.h"
 #include "VayoInput.h"
+#include "VayoColour.h"
 #include "VayoBitState.h"
 #include "VayoVector2d.h"
-#include "VayoDimension2d.h"
 #include "VayoRectangle.h"
 NS_VAYO_BEGIN
 
-class Device
+class _VayoExport Device
 {
 public:
-	static Device* create();
+	typedef struct tagAttrib
+	{
+		void*         WndHandle;
+		bool          WndQuit;
+		bool          WndPaint;
+		bool          TurnOnUI;
+		bool          FullScreen;
+		Colour        BgClearColor;
+		Dimension2di  ScreenSize;
+		wstring       WndCaption;
+		tagAttrib()
+			: WndHandle(NULL)
+			, WndQuit(true)
+			, WndPaint(false)
+			, TurnOnUI(true)
+			, FullScreen(false)
+			, BgClearColor(0)
+			, ScreenSize(1280, 720)
+			, WndCaption(L"Vayo Engine") {}
+
+	} Attrib;
 
 public:
-	Device();
-	virtual ~Device() {}
+	Device(const Attrib& attrib);
+	virtual ~Device();
 	virtual bool  init() = 0;
+	virtual bool  openUI();
+	virtual void  closeUI();
 	virtual void* getWndHandle() const = 0;
 	virtual float getAspectRatio() const;
 	virtual bool  handleEvents(bool& idle) = 0;
@@ -30,6 +52,8 @@ public:
 	virtual void  sleep(unsigned int milliSeconds, bool pauseTimer) = 0;
 	virtual void  setWndCaption(const wstring& wndCaption);
 	virtual void  setScreenSize(const Dimension2di& screenSize);
+	virtual const wstring& getWndCaption() const;
+	virtual const Dimension2di& getScreenSize() const;
 
 	// ÊÂ¼þ×¢Èë
 	virtual void  injectMouseDown(EMouseKeys mouseKey, int x, int y);
@@ -49,13 +73,15 @@ public:
 	virtual void  injectInputLanguageChange();
 
 protected:
-	PROPERTY_R(bool,             _appPaused,   AppPaused)
-	PROPERTY_R(bool,             _minimized,   Minimized)
-	PROPERTY_R(bool,             _maximized,   Maximized)
-	PROPERTY_R(bool,             _resizing,    Resizing)
-	PROPERTY_R(BitState,         _mouseIsDown, MouseIsDown)
-	PROPERTY_R_REF(wstring,      _wndCaption,  WndCaption)
-	PROPERTY_R_REF(Dimension2di, _screenSize,  ScreenSize)
+	PROPERTY_R(bool,     _appPaused,   AppPaused)
+	PROPERTY_R(bool,     _minimized,   Minimized)
+	PROPERTY_R(bool,     _maximized,   Maximized)
+	PROPERTY_R(bool,     _resizing,    Resizing)
+	PROPERTY_R(BitState, _mouseIsDown, MouseIsDown)
+	PROPERTY_R_REF(Attrib,        _attribute,        Attrib)
+	PROPERTY_R(UIManager*,        _uiManager,        UIManager)
+	PROPERTY_R(TouchDispatcher*,  _touchDispatcher,  TouchDispatcher)
+	PROPERTY_R(KeypadDispatcher*, _keypadDispatcher, KeypadDispatcher)
 };
 
 NS_VAYO_END

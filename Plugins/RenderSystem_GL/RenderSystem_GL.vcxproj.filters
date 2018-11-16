@@ -35,6 +35,9 @@
     <ClCompile Include="Source\VayoGLTexture.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\VayoWin32Device.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GL\glad.h">
@@ -65,6 +68,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Include\VayoGLTexture.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\VayoWin32Device.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

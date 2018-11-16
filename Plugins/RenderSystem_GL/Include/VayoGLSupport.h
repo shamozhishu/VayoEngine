@@ -8,6 +8,7 @@
 
 #include "VayoSupport.h"
 #include <Windows.h>
+#include <WindowsX.h>
 #include <glad.h>
 #include <gl/GLU.h>
 
@@ -24,6 +25,7 @@
 namespace Vayo
 {
 	class GLRenderSystem;
+	class Win32Device;
 }
 
 #endif // __VAYO_GL_SUPPORT_H__

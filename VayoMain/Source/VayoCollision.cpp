@@ -377,7 +377,7 @@ Position2di CollisionDetector::getScreenCoordinatesFrom3DPosition(const Vector3d
 	if (useViewPort)
 		dim.set(renderer->getViewPort().getWidth(), renderer->getViewPort().getHeight());
 	else
-		dim = (renderer->getCurrentRenderTargetSize());
+		dim = (renderer->getCurRenderTargetSize());
 
 	dim._width /= 2;
 	dim._height /= 2;

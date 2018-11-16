@@ -53,7 +53,7 @@ class _VayoExport ConfigManager
 	DISALLOW_COPY_AND_ASSIGN(ConfigManager)
 public:
 	ConfigManager() {}
-	bool                             init();
+	bool                             init(wstring rootDirectory);
 	const tagUIConfig&               getUIConfig() const;
 	const tagSceneConfig&            getSceneConfig() const;
 	const vector<tagFontConfig>&     getFontConfig() const;

@@ -98,7 +98,6 @@
     <ClInclude Include="Include\VayoVertex.h" />
     <ClInclude Include="Include\VayoViewMemento.h" />
     <ClInclude Include="Source\VayoFontManager.h" />
-    <ClInclude Include="Source\VayoWin32Device.h" />
     <ClInclude Include="Source\VayoWireBoundingBox.h" />
     <ClInclude Include="ThirdParty\rc5\rc5.h" />
     <ClInclude Include="ThirdParty\rc5\RC5.hpp" />
@@ -164,7 +163,6 @@
     <ClCompile Include="Source\VayoUserDataBind.cpp" />
     <ClCompile Include="Source\VayoUtils.cpp" />
     <ClCompile Include="Source\VayoViewMemento.cpp" />
-    <ClCompile Include="Source\VayoWin32Device.cpp" />
     <ClCompile Include="ThirdParty\rc5\rc5_ecb.cpp" />
     <ClCompile Include="ThirdParty\rc5\rc5_enc.cpp" />
     <ClCompile Include="ThirdParty\rc5\rc5_skey.cpp" />

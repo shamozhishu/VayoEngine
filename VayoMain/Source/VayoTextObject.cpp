@@ -21,7 +21,9 @@ TextObject::~TextObject()
 
 void TextObject::update(float dt)
 {
-	Root::getSingleton().getCurSceneMgr()->registerForRendering(this, getQueueID());
+	Root& root = Root::getSingleton();
+	if (root.getUIManager())
+		root.getCurSceneMgr()->registerForRendering(this, getQueueID());
 }
 
 void TextObject::render()

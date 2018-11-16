@@ -2280,7 +2280,7 @@ void UIDialog::handleInput()
 
 void UIDialog::center(bool bXPos/*=true*/, bool bYPos/*=true*/)
 {
-	const Dimension2di& screenSize = Root::getSingleton().getDevice()->getScreenSize();
+	const Dimension2di& screenSize = Root::getSingleton().getActiveDevice()->getScreenSize();
 	int dialogW = getRelativeRect().getWidth();
 	int dialogH = getRelativeRect().getHeight();
 	int xpos = bXPos ? ((int)screenSize._width - dialogW) / 2 : getRelativeRect()._upperLeftCorner._x;
@@ -2488,15 +2488,16 @@ bool UIDialog::deserialize(XMLElement* inXml)
 }
 
 //////////////////////////////////////////////////////////////////////////
-UIManager::UIManager()
-	: _curDrawImage(NULL)
+UIManager::UIManager(Device* device)
+	: _relatedDevice(device)
+	, _curDrawImage(NULL)
 	, _currentSkin(NULL)
 	, _clipArea(NULL)
 {
 	memset(_fontArr, 0, sizeof(_fontArr));
 	memset(_imageSetArr, 0, sizeof(_imageSetArr));
-	Root::getSingleton().getTouchDispatcher()->addTouchDelegate(this);
-	Root::getSingleton().getKeypadDispatcher()->addKeypadDelegate(this);
+	_relatedDevice->getTouchDispatcher()->addTouchDelegate(this, 0);
+	_relatedDevice->getKeypadDispatcher()->addKeypadDelegate(this, 0);
 }
 
 UIManager::~UIManager()
@@ -2514,8 +2515,8 @@ UIManager::~UIManager()
 		SAFE_DELETE(_imageSetArr[i]);
 	}
 
-	Root::getSingleton().getTouchDispatcher()->removeTouchDelegate(this);
-	Root::getSingleton().getKeypadDispatcher()->removeKeypadDelegate(this);
+	_relatedDevice->getTouchDispatcher()->removeTouchDelegate(this);
+	_relatedDevice->getKeypadDispatcher()->removeKeypadDelegate(this);
 }
 
 bool UIManager::init()

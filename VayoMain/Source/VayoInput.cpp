@@ -5,6 +5,11 @@ NS_VAYO_BEGIN
 //-------------------------------------------------------------------------
 // KeypadDispatcher class.
 //-------------------------------------------------------------------------
+KeypadDispatcher::~KeypadDispatcher()
+{
+	_keypadDelegates.clear();
+}
+
 void KeypadDispatcher::handleKeyClicked(const tagKeyInput& event)
 {
 	list<KeypadDelegate*>::iterator itor = _keypadDelegates.begin();
@@ -15,10 +20,20 @@ void KeypadDispatcher::handleKeyClicked(const tagKeyInput& event)
 	}
 }
 
-void KeypadDispatcher::addKeypadDelegate(KeypadDelegate* pDelegate)
+void KeypadDispatcher::addKeypadDelegate(KeypadDelegate* pDelegate, int priority /*= -1*/)
 {
 	if (NULL != pDelegate)
-		_keypadDelegates.push_back(pDelegate);
+	{
+		if (priority >= 0 && priority < _keypadDelegates.size())
+		{
+			list<KeypadDelegate*>::iterator it = _keypadDelegates.begin();
+			while (priority--)
+				++it;
+			_keypadDelegates.insert(it, pDelegate);
+		}
+		else
+			_keypadDelegates.push_back(pDelegate);
+	}
 }
 
 void KeypadDispatcher::removeKeypadDelegate(KeypadDelegate* pDelegate)
@@ -35,6 +50,11 @@ void KeypadDispatcher::removeKeypadDelegate(KeypadDelegate* pDelegate)
 //-------------------------------------------------------------------------
 // TouchDispatcher class.
 //-------------------------------------------------------------------------
+TouchDispatcher::~TouchDispatcher()
+{
+	_touchDelegates.clear();
+}
+
 void TouchDispatcher::handleTouchBegan(int x, int y, EMouseKeys key)
 {
 	if (0 == _touchDelegates.size())
@@ -97,10 +117,20 @@ void TouchDispatcher::setTouchCurPos(int x, int y)
 	_curPosition.setTouchPoint(x, y);
 }
 
-void TouchDispatcher::addTouchDelegate(TouchDelegate* pDelegate)
+void TouchDispatcher::addTouchDelegate(TouchDelegate* pDelegate, int priority /*= -1*/)
 {
 	if (NULL != pDelegate)
-		_touchDelegates.push_back(pDelegate);
+	{
+		if (priority >= 0 && priority < _touchDelegates.size())
+		{
+			list<TouchDelegate*>::iterator it = _touchDelegates.begin();
+			while (priority--)
+				++it;
+			_touchDelegates.insert(it, pDelegate);
+		}
+		else
+			_touchDelegates.push_back(pDelegate);
+	}
 }
 
 void TouchDispatcher::removeTouchDelegate(TouchDelegate* pDelegate)

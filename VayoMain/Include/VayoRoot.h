@@ -6,11 +6,9 @@
 #ifndef __VAYO_ROOT_H__
 #define __VAYO_ROOT_H__
 
-#include "VayoSupport.h"
 #include "VayoTimer.h"
-#include "VayoColour.h"
+#include "VayoDevice.h"
 #include "VayoSingleton.h"
-#include "VayoDimension2d.h"
 NS_VAYO_BEGIN
 
 class _VayoExport Root : public Singleton<Root>
@@ -18,36 +16,22 @@ class _VayoExport Root : public Singleton<Root>
 public:
 	typedef struct tagConfig
 	{
-		void*         WndHandle;
-		bool          WndQuit;
-		bool          WndPaint;
-		bool          FullScreen;
-		bool          HandleSRGB;
-		Colour        BgClearColor;
-		Dimension2di  ScreenSize;
-		wstring       WndCaption;
-		wstring       RendererName;
-		wstring       RootDirectory;
-		unsigned char AntiAliasFactor;
+		bool           HandleSRGB;
+		wstring        RendererName;
+		wstring        RootDirectory;
+		unsigned char  AntiAliasFactor;
+		Device::Attrib MainDeviceAttrib;
 		tagConfig()
-			: WndHandle(NULL)
-			, WndQuit(true)
-			, WndPaint(false)
-			, FullScreen(false)
-			, HandleSRGB(false)
-			, BgClearColor(0)
-			, ScreenSize(1280, 720)
-			, WndCaption(L"VayoEngine1.0")
+			: HandleSRGB(false)
 			, RendererName(L"RenderSystem_GL")
 		    , AntiAliasFactor(0) {}
 	} Config;
 
 public:
-	Root(const Config& config);
+	Root();
 	~Root();
-	bool          launch();
-	bool          renderOneFrame();
-	void          setBgClearColor(unsigned int bgColor);
+	bool          launch(const Config& config);
+	bool          renderOneFrame(Device* renderWnd = NULL);
 	Timer&        getTimer() { return _timer; }
 	const Timer&  getTimer() const { return _timer; }
 	int           getFrameCnt() const { return _frameCnt; }
@@ -60,6 +44,18 @@ public:
 	void          destroySceneMgr(const wstring& sceneName);
 	void          destroySceneMgr(SceneManager* pSceneMgr);
 	void          destroyAllSceneMgrs();
+
+	Device*       createDevice(void* wndHandle = NULL, bool wndQuit = true, bool wndPaint = false,
+		wstring wndCaption = L"Vayo Engine", bool turnOnUI = true, bool fullScreen = false,
+		Colour bgClearColor = 0xff000000, Dimension2di screenSize = Dimension2di(1280, 720));
+	Device*       findDevice(unsigned int idx);
+	void          destroyDevice(unsigned int idx);
+	void          destroyAllDevices();
+	static int    getMaxSupportDevCnt();
+
+	UIManager*        getUIManager() const;
+	TouchDispatcher*  getTouchDispatcher() const;
+	KeypadDispatcher* getKeypadDispatcher() const;
 
 	// ²å¼þÏà¹Ø
 	void loadPlugins();
@@ -81,26 +77,25 @@ private:
 	map<wstring, RenderSystem*> _renderers;
 	vector<Plugin*>             _plugins;
 	vector<DynLib*>             _pluginLibs;
+	static const int            _maxSupportDevCnt = 8;
+	Device*                     _multiDevices[_maxSupportDevCnt];
 
 private:
 	void updateFrameStats();
 
 protected:
-	PROPERTY_R_REF(Config,        _configuration,    Config)
-	PROPERTY_RW(SceneManager*,    _curSceneMgr,      CurSceneMgr)
-	PROPERTY_RW(ScriptSystem*,    _scriptSystem,     ScriptSystem)
-	PROPERTY_R(RenderSystem*,     _activeRenderer,   ActiveRenderer)
-	PROPERTY_R(DynLibManager*,    _dynLibManager,    DynLibManager)
-	PROPERTY_R(KeypadDispatcher*, _keypadDispatcher, KeypadDispatcher)
-	PROPERTY_R(TouchDispatcher*,  _touchDispatcher,  TouchDispatcher)
-	PROPERTY_R(Device*,           _device,           Device)
-	PROPERTY_R(ConfigManager*,    _configManager,    ConfigManager)
-	PROPERTY_R(DatabaseCSV*,      _csvDatabase,      DatabaseCSV)
-	PROPERTY_R(Language*,         _language,         Language)
-	PROPERTY_R(UIManager*,        _uiManager,        UIManager)
-	PROPERTY_R(TextureManager*,   _textureManager,   TextureManager)
-	PROPERTY_R(MaterialManager*,  _materialManager,  MaterialManager)
-	PROPERTY_R(MeshManager*,      _meshManager,      MeshManager)
+	PROPERTY_RW(SceneManager*,   _curSceneMgr,     CurSceneMgr)
+	PROPERTY_R(Device*,          _mainDevice,      MainDevice)
+	PROPERTY_RW(Device*,         _activeDevice,    ActiveDevice)
+	PROPERTY_R(RenderSystem*,    _activeRenderer,  ActiveRenderer)
+	PROPERTY_RW(ScriptSystem*,   _scriptSystem,    ScriptSystem)
+	PROPERTY_R(DynLibManager*,   _dynLibManager,   DynLibManager)
+	PROPERTY_R(ConfigManager*,   _configManager,   ConfigManager)
+	PROPERTY_R(DatabaseCSV*,     _csvDatabase,     DatabaseCSV)
+	PROPERTY_R(Language*,        _language,        Language)
+	PROPERTY_R(MeshManager*,     _meshManager,     MeshManager)
+	PROPERTY_R(TextureManager*,  _textureManager,  TextureManager)
+	PROPERTY_R(MaterialManager*, _materialManager, MaterialManager)
 };
 
 NS_VAYO_END

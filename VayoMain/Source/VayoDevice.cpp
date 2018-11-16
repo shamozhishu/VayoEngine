@@ -1,28 +1,57 @@
 #include "VayoDevice.h"
 #include "VayoRoot.h"
 #include "VayoCamera.h"
+#include "VayoCoreGUI.h"
 #include "VayoRenderSystem.h"
 #include "VayoSceneManager.h"
-
-namespace
-{
-	Vayo::TouchDispatcher* gTouchDispatcher = NULL;
-}
 
 NS_VAYO_BEGIN
 
 float Device::getAspectRatio() const
 {
-	return static_cast<float>(_screenSize._width) / _screenSize._height;
+	return static_cast<float>(_attribute.ScreenSize._width) / _attribute.ScreenSize._height;
 }
 
-Device::Device()
-	: _appPaused(false)
+Device::Device(const Attrib& attrib)
+	: _attribute(attrib)
+	, _appPaused(false)
 	, _minimized(false)
 	, _maximized(false)
 	, _resizing(false)
+	, _uiManager(NULL)
 {
-	gTouchDispatcher = Root::getSingleton().getTouchDispatcher();
+	_keypadDispatcher = new KeypadDispatcher();
+	_touchDispatcher = new TouchDispatcher();
+}
+
+Device::~Device()
+{
+	SAFE_DELETE(_uiManager);
+	SAFE_DELETE(_touchDispatcher);
+	SAFE_DELETE(_keypadDispatcher);
+}
+
+bool Device::openUI()
+{
+	_attribute.TurnOnUI = true;
+	if (_uiManager)
+		return true;
+
+	_uiManager = new UIManager(this);
+	if (!_uiManager || !_uiManager->init())
+	{
+		_attribute.TurnOnUI = false;
+		SAFE_DELETE(_uiManager);
+		return false;
+	}
+
+	return true;
+}
+
+void Device::closeUI()
+{
+	_attribute.TurnOnUI = false;
+	SAFE_DELETE(_uiManager);
 }
 
 void Device::onResize()
@@ -30,13 +59,13 @@ void Device::onResize()
 	RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
 	if (pRenderer && pRenderer->isActive())
 	{
-		pRenderer->setViewpot(Recti(0, 0, _screenSize._width, _screenSize._height));
+		pRenderer->setViewpot(Recti(0, 0, _attribute.ScreenSize._width, _attribute.ScreenSize._height));
 		Camera* pActiveCamera = Root::getSingleton().getCurSceneMgr()->getActiveCamera();
 		if (pActiveCamera)
 		{
-			float w = _screenSize._width;
-			float h = _screenSize._height;
-			if (0 == _screenSize._height)
+			float w = _attribute.ScreenSize._width;
+			float h = _attribute.ScreenSize._height;
+			if (0 == _attribute.ScreenSize._height)
 				h = 1.0f;
 
 			if (pActiveCamera->isOrthogonal())
@@ -49,77 +78,93 @@ void Device::onResize()
 
 void Device::setWndCaption(const wstring& wndCaption)
 {
-	_wndCaption = wndCaption;
-	const_cast<wstring&>(Root::getSingleton().getConfig().WndCaption) = _wndCaption;
+	_attribute.WndCaption = wndCaption;
 }
 
 void Device::setScreenSize(const Dimension2di& screenSize)
 {
-	_screenSize = screenSize;
-	const_cast<Dimension2di&>(Root::getSingleton().getConfig().ScreenSize) = _screenSize;
+	_attribute.ScreenSize = screenSize;
+}
+
+const wstring& Device::getWndCaption() const
+{
+	return _attribute.WndCaption;
+}
+
+const Dimension2di& Device::getScreenSize() const
+{
+	return _attribute.ScreenSize;
 }
 
 void Device::injectMouseDown(EMouseKeys mouseKey, int x, int y)
 {
+	Root::getSingleton().setActiveDevice(this);
 	_mouseIsDown.addState(mouseKey);
 	if (_mouseIsDown.checkState(EMK_LEFT))
-		gTouchDispatcher->handleTouchBegan(x, y, EMK_LEFT);
+		_touchDispatcher->handleTouchBegan(x, y, EMK_LEFT);
 	if (_mouseIsDown.checkState(EMK_RIGHT))
-		gTouchDispatcher->handleTouchBegan(x, y, EMK_RIGHT);
+		_touchDispatcher->handleTouchBegan(x, y, EMK_RIGHT);
 	if (_mouseIsDown.checkState(EMK_MIDDLE))
-		gTouchDispatcher->handleTouchBegan(x, y, EMK_MIDDLE);
+		_touchDispatcher->handleTouchBegan(x, y, EMK_MIDDLE);
 }
 
 void Device::injectMouseUp(EMouseKeys mouseKey, int x, int y)
 {
+	Root::getSingleton().setActiveDevice(this);
 	BitState mouseIsUp = mouseKey;
 	if (_mouseIsDown.checkState(EMK_LEFT) && mouseIsUp.checkState(EMK_LEFT))
 	{
 		_mouseIsDown.eraseState(EMK_LEFT);
-		gTouchDispatcher->handleTouchEnded(x, y, EMK_LEFT);
+		_touchDispatcher->handleTouchEnded(x, y, EMK_LEFT);
 	}
 	if (_mouseIsDown.checkState(EMK_RIGHT) && mouseIsUp.checkState(EMK_RIGHT))
 	{
 		_mouseIsDown.eraseState(EMK_RIGHT);
-		gTouchDispatcher->handleTouchEnded(x, y, EMK_RIGHT);
+		_touchDispatcher->handleTouchEnded(x, y, EMK_RIGHT);
 	}
 	if (_mouseIsDown.checkState(EMK_MIDDLE) && mouseIsUp.checkState(EMK_MIDDLE))
 	{
 		_mouseIsDown.eraseState(EMK_MIDDLE);
-		gTouchDispatcher->handleTouchEnded(x, y, EMK_MIDDLE);
+		_touchDispatcher->handleTouchEnded(x, y, EMK_MIDDLE);
 	}
 }
 
 void Device::injectMouseMove(int x, int y)
 {
-	gTouchDispatcher->setTouchCurPos(x, y);
+	Root::getSingleton().setActiveDevice(this);
+	_touchDispatcher->setTouchCurPos(x, y);
 	if (_mouseIsDown.checkState(EMK_LEFT))
-		gTouchDispatcher->handleTouchMoved(x, y, EMK_LEFT);
+		_touchDispatcher->handleTouchMoved(x, y, EMK_LEFT);
 	if (_mouseIsDown.checkState(EMK_RIGHT))
-		gTouchDispatcher->handleTouchMoved(x, y, EMK_RIGHT);
+		_touchDispatcher->handleTouchMoved(x, y, EMK_RIGHT);
 	if (_mouseIsDown.checkState(EMK_MIDDLE))
-		gTouchDispatcher->handleTouchMoved(x, y, EMK_MIDDLE);
+		_touchDispatcher->handleTouchMoved(x, y, EMK_MIDDLE);
 }
 
 void Device::injectMouseWheel(float wheel)
 {
-	gTouchDispatcher->handleTouchWheel(wheel);
+	Root::getSingleton().setActiveDevice(this);
+	_touchDispatcher->handleTouchWheel(wheel);
 }
 
 void Device::injectKeyboard(unsigned int keyCode, unsigned int scanCode, bool keyDown)
 {
+	Root::getSingleton().setActiveDevice(this);
 }
 
 void Device::injectPaint()
 {
+	Root::getSingleton().setActiveDevice(this);
 }
 
 void Device::injectDestroy()
 {
+	Root::getSingleton().setActiveDevice(this);
 }
 
 void Device::injectActivate()
 {
+	Root::getSingleton().setActiveDevice(this);
 	_appPaused = false;
 	Root::getSingleton().getTimer().start();
 	RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
@@ -129,12 +174,14 @@ void Device::injectActivate()
 
 void Device::injectInactive()
 {
+	Root::getSingleton().setActiveDevice(this);
 	_appPaused = true;
 	Root::getSingleton().getTimer().stop();
 }
 
 void Device::injectSizeMinimized(int w, int h)
 {
+	Root::getSingleton().setActiveDevice(this);
 	// Save the new client area dimensions.
 	setScreenSize(Dimension2di(w, h));
 	_appPaused = true;
@@ -144,6 +191,7 @@ void Device::injectSizeMinimized(int w, int h)
 
 void Device::injectSizeMaximized(int w, int h)
 {
+	Root::getSingleton().setActiveDevice(this);
 	// Save the new client area dimensions.
 	setScreenSize(Dimension2di(w, h));
 	_appPaused = false;
@@ -154,6 +202,7 @@ void Device::injectSizeMaximized(int w, int h)
 
 void Device::injectSizeRestored(int w, int h)
 {
+	Root::getSingleton().setActiveDevice(this);
 	// Save the new client area dimensions.
 	setScreenSize(Dimension2di(w, h));
 	// Restoring from minimized state?
@@ -189,6 +238,7 @@ void Device::injectSizeRestored(int w, int h)
 
 void Device::injectEnterSizeMove()
 {
+	Root::getSingleton().setActiveDevice(this);
 	_appPaused = true;
 	_resizing = true;
 	Root::getSingleton().getTimer().stop();
@@ -196,6 +246,7 @@ void Device::injectEnterSizeMove()
 
 void Device::injectExitSizeMove()
 {
+	Root::getSingleton().setActiveDevice(this);
 	_appPaused = false;
 	_resizing = false;
 	Root::getSingleton().getTimer().start();
@@ -204,6 +255,7 @@ void Device::injectExitSizeMove()
 
 void Device::injectInputLanguageChange()
 {
+	Root::getSingleton().setActiveDevice(this);
 }
 
 NS_VAYO_END

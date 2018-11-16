@@ -429,7 +429,7 @@ public:
 class _VayoExport UIManager : public TouchDelegate, public KeypadDelegate
 {
 public:
-	UIManager();
+	UIManager(Device* device);
 	virtual ~UIManager();
 	bool                init();
 	void                render();
@@ -459,16 +459,17 @@ private:
 	void confirmWhichSelected(UIDialog* pDialog, const Touch& touch);
 
 private:
-	deque<UIDialog*>             _popupDlgs;
-	BitState                     _UIStateMark;
-	UIImageSet*                  _curDrawImage;
-	UIImageSet*                  _imageSetArr[VAYO_MAX_IMAGESET_NUM];
-	UIFont*                      _fontArr[EUIFT_COUNT];
-	UISkin*                      _currentSkin;
-	Recti*                       _clipArea;
-	vector<Recti>                _destRects;
-	vector<Recti>                _sourceRects;
-	vector<Colour>               _colors;
+	deque<UIDialog*> _popupDlgs;
+	BitState         _UIStateMark;
+	UIImageSet*      _curDrawImage;
+	UIImageSet*      _imageSetArr[VAYO_MAX_IMAGESET_NUM];
+	UIFont*          _fontArr[EUIFT_COUNT];
+	Device*          _relatedDevice;
+	UISkin*          _currentSkin;
+	Recti*           _clipArea;
+	vector<Recti>    _destRects;
+	vector<Recti>    _sourceRects;
+	vector<Colour>   _colors;
 
 	struct tagAnim
 	{

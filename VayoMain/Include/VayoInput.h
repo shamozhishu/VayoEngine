@@ -260,8 +260,9 @@ class _VayoExport KeypadDispatcher
 	DISALLOW_COPY_AND_ASSIGN(KeypadDispatcher)
 public:
 	KeypadDispatcher() {}
+	~KeypadDispatcher();
 	void handleKeyClicked(const tagKeyInput& event);
-	void addKeypadDelegate(KeypadDelegate* pDelegate);
+	void addKeypadDelegate(KeypadDelegate* pDelegate, int priority = -1);
 	void removeKeypadDelegate(KeypadDelegate* pDelegate);
 
 private:
@@ -273,12 +274,13 @@ class _VayoExport TouchDispatcher
 	DISALLOW_COPY_AND_ASSIGN(TouchDispatcher)
 public:
 	TouchDispatcher() {}
+	~TouchDispatcher();
 	void handleTouchBegan(int x, int y, EMouseKeys key);
 	void handleTouchMoved(int x, int y, EMouseKeys key);
 	void handleTouchEnded(int x, int y, EMouseKeys key);
 	void handleTouchWheel(float wheel);
 	void setTouchCurPos(int x, int y);
-	void addTouchDelegate(TouchDelegate* pDelegate);
+	void addTouchDelegate(TouchDelegate* pDelegate, int priority = -1);
 	void removeTouchDelegate(TouchDelegate* pDelegate);
 
 private:

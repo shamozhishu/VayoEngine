@@ -5,12 +5,33 @@
 #include "VayoRoot.h"
 #include "VayoDevice.h"
 #include "VayoGLTexture.h"
+#include "VayoWin32Device.h"
 #include "VayoGLTesselator.h"
 #include "VayoGLDisplayList.h"
 #include "VayoMaterialManager.h"
 #include "VayoGLMaterialRenderer.h"
 
 NS_VAYO_BEGIN
+
+static PIXELFORMATDESCRIPTOR g_pfd = {
+	sizeof(PIXELFORMATDESCRIPTOR), // Size Of This Pixel Format Descriptor
+	1,                             // Version Number
+	PFD_DRAW_TO_WINDOW |           // Format Must Support Window
+	PFD_SUPPORT_OPENGL |           // Format Must Support OpenGL
+	PFD_DOUBLEBUFFER,              // Must Support Double Buffering
+	PFD_TYPE_RGBA,                 // Request An RGBA Format
+	32,                            // Select Our Color Depth
+	0, 0, 0, 0, 0, 0,              // Color Bits Ignored
+	0,                             // No Alpha Buffer
+	0,                             // Shift Bit Ignored
+	0,                             // No Accumulation Buffer
+	0, 0, 0, 0,                    // Accumulation Bits Ignored
+	24,                            // Z-Buffer (Depth Buffer)
+	8,                             // Stencil Buffer Depth
+	0,                             // No Auxiliary Buffer
+	PFD_MAIN_PLANE,                // Main Drawing Layer
+	0,                             // Reserved
+	0, 0, 0 };                     // Layer Masks Ignored
 
 static inline unsigned char* buffer_offset(const long offset)
 {
@@ -21,6 +42,8 @@ GLRenderSystem::GLRenderSystem(const wstring& name)
 	: RenderSystem(name)
 	, _hCurrentDC(NULL)
 	, _hCurrentRC(NULL)
+	, _hCurrentWnd(NULL)
+	, _pixelFormat(0)
 	, _currentRenderMode(ERM_NONE)
 	, _colorBufferFormat(ECF_BGRA8888)
 	, _resetRenderStates(true)
@@ -59,35 +82,15 @@ GLRenderSystem::~GLRenderSystem()
 	}
 
 	if (_hCurrentDC)
-		ReleaseDC((HWND)Root::getSingleton().getDevice()->getWndHandle(), _hCurrentDC);
+		ReleaseDC(_hCurrentWnd, _hCurrentDC);
 }
 
-bool GLRenderSystem::init()
+bool GLRenderSystem::init(unsigned char antiAliasFactor /*= 0*/, bool handleSRGB /*= false*/)
 {
-	int pixelFormat = 0;
-	static PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR), // Size Of This Pixel Format Descriptor
-		1,                             // Version Number
-		PFD_DRAW_TO_WINDOW |           // Format Must Support Window
-		PFD_SUPPORT_OPENGL |           // Format Must Support OpenGL
-		PFD_DOUBLEBUFFER,              // Must Support Double Buffering
-		PFD_TYPE_RGBA,                 // Request An RGBA Format
-		32,                            // Select Our Color Depth
-		0, 0, 0, 0, 0, 0,              // Color Bits Ignored
-		0,                             // No Alpha Buffer
-		0,                             // Shift Bit Ignored
-		0,                             // No Accumulation Buffer
-		0, 0, 0, 0,                    // Accumulation Bits Ignored
-		24,                            // Z-Buffer (Depth Buffer)
-		8,                             // Stencil Buffer Depth
-		0,                             // No Auxiliary Buffer
-		PFD_MAIN_PLANE,                // Main Drawing Layer
-		0,                             // Reserved
-		0, 0, 0 };                     // Layer Masks Ignored
-
-	const Root::Config& conf = Root::getSingleton().getConfig();
-	_antiAliasFactor = conf.AntiAliasFactor;
-	if (conf.AntiAliasFactor > 1)
+	_pixelFormat = 0;
+	const Device::Attrib& devAttrib = Root::getSingleton().getActiveDevice()->getAttrib();
+	_antiAliasFactor = antiAliasFactor;
+	if (antiAliasFactor > 1)
 	{
 		// Create a window to test antialiasing support.
 		const wchar_t* szClassName = L"GLRenderSystem";
@@ -113,11 +116,11 @@ bool GLRenderSystem::init()
 		RECT clientSize;
 		clientSize.top = 0;
 		clientSize.left = 0;
-		clientSize.right = conf.ScreenSize._width;
-		clientSize.bottom = conf.ScreenSize._height;
+		clientSize.right = devAttrib.ScreenSize._width;
+		clientSize.bottom = devAttrib.ScreenSize._height;
 
 		DWORD style = WS_POPUP;
-		if (!conf.FullScreen)
+		if (!devAttrib.FullScreen)
 			style = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 
 		AdjustWindowRect(&clientSize, style, FALSE);
@@ -139,8 +142,8 @@ bool GLRenderSystem::init()
 		}
 
 		_hCurrentDC = GetDC(temporary_wnd);
-		pixelFormat = ChoosePixelFormat(_hCurrentDC, &pfd);
-		if (!pixelFormat)
+		_pixelFormat = ChoosePixelFormat(_hCurrentDC, &g_pfd);
+		if (!_pixelFormat)
 		{
 			Log::print(ELL_ERROR, "Cannot create a GL device context, No suitable pixel format for temporary window.");
 			ReleaseDC(temporary_wnd, _hCurrentDC);
@@ -149,7 +152,7 @@ bool GLRenderSystem::init()
 			return false;
 		}
 
-		SetPixelFormat(_hCurrentDC, pixelFormat, &pfd);
+		SetPixelFormat(_hCurrentDC, _pixelFormat, &g_pfd);
 		_hCurrentRC = wglCreateContext(_hCurrentDC);
 		if (!_hCurrentRC)
 		{
@@ -203,7 +206,6 @@ bool GLRenderSystem::init()
 			if (_antiAliasFactor > 32)
 			{
 				_antiAliasFactor = 32;
-				const_cast<unsigned char&>(conf.AntiAliasFactor) = _antiAliasFactor;
 			}
 
 			float fAttributes[] = { 0.0f, 0.0f };
@@ -230,9 +232,9 @@ bool GLRenderSystem::init()
 				WGL_SAMPLE_BUFFERS_3DFX, 1,
 #endif
 #ifdef WGL_ARB_framebuffer_sRGB
-				WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB, conf.HandleSRGB ? 1 : 0,
+				WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB, handleSRGB ? 1 : 0,
 #elif defined(WGL_EXT_framebuffer_sRGB)
-				WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT, conf.HandleSRGB ? 1 : 0,
+				WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT, handleSRGB ? 1 : 0,
 #endif
 				0,0,0,0
 			};
@@ -270,16 +272,14 @@ bool GLRenderSystem::init()
 
 			if (rv)
 			{
-				pixelFormat = rv;
+				_pixelFormat = rv;
 				_antiAliasFactor = iAttributes[21];
-				const_cast<unsigned char&>(conf.AntiAliasFactor) = _antiAliasFactor;
 			}
 		}
 		else
 #endif
 		{
 			_antiAliasFactor = 0;
-			const_cast<unsigned char&>(conf.AntiAliasFactor) = _antiAliasFactor;
 		}
 
 		wglMakeCurrent(_hCurrentDC, NULL);
@@ -289,30 +289,8 @@ bool GLRenderSystem::init()
 		UnregisterClass(szClassName, lhInstance);
 	}
 
-	_hCurrentDC = GetDC((HWND)Root::getSingleton().getDevice()->getWndHandle());
-	if (!_hCurrentDC)
-	{
-		Log::print(ELL_ERROR, "Cannot create a GL device context.");
+	if (!setWndPixelFormat((Win32Device*)Root::getSingleton().getActiveDevice()))
 		return false;
-	}
-
-	if (pixelFormat == 0 || !SetPixelFormat(_hCurrentDC, pixelFormat, &pfd))
-	{
-		pixelFormat = ChoosePixelFormat(_hCurrentDC, &pfd);
-		if (!pixelFormat)
-		{
-			Log::print(ELL_ERROR, "Cannot create a GL device context, %s.", "No suitable format");
-			return false;
-		}
-
-		if (!SetPixelFormat(_hCurrentDC, pixelFormat, &pfd))
-		{
-			Log::print(ELL_ERROR, "Cannot set the pixel format.");
-			return false;
-		}
-	}
-
-	Log::print(ELL_DEBUG, "Pixel Format %d.", pixelFormat);
 
 #ifdef WGL_ARB_create_context
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
@@ -347,17 +325,17 @@ bool GLRenderSystem::init()
 	}
 
 	int pf = GetPixelFormat(_hCurrentDC);
-	DescribePixelFormat(_hCurrentDC, pf, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
-	if (pfd.cAlphaBits != 0)
+	DescribePixelFormat(_hCurrentDC, pf, sizeof(PIXELFORMATDESCRIPTOR), &g_pfd);
+	if (g_pfd.cAlphaBits != 0)
 	{
-		if (pfd.cRedBits == 8)
+		if (g_pfd.cRedBits == 8)
 			_colorBufferFormat = ECF_BGRA8888;
 		else
 			_colorBufferFormat = ECF_BGRA5551;
 	}
 	else
 	{
-		if (pfd.cRedBits == 8)
+		if (g_pfd.cRedBits == 8)
 			_colorBufferFormat = ECF_BGR888;
 		else
 			_colorBufferFormat = ECF_BGR565;
@@ -371,7 +349,7 @@ bool GLRenderSystem::init()
 	}
 
 	createMaterialRenderers();
-	const Dimension2di& renderTargetSize = getCurrentRenderTargetSize();
+	const Dimension2di& renderTargetSize = getCurRenderTargetSize();
 	setViewpot(Recti(0, 0, renderTargetSize._width, renderTargetSize._height));
 	setAmbientLight(Colour(0, 0, 0, 0));
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
@@ -390,7 +368,7 @@ bool GLRenderSystem::init()
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_NORMALIZE);
 	glFrontFace(GL_CCW);
-	if (conf.HandleSRGB)
+	if (handleSRGB)
 		glEnable(GL_FRAMEBUFFER_SRGB);
 
 	setRenderMode3D();
@@ -400,7 +378,7 @@ bool GLRenderSystem::init()
 
 bool GLRenderSystem::isActive() const
 {
-	return getCurrentDC() != NULL && getCurrentRC() == wglGetCurrentContext();
+	return _hCurrentDC != NULL && _hCurrentRC == wglGetCurrentContext();
 }
 
 void GLRenderSystem::restoreContext() const
@@ -409,13 +387,16 @@ void GLRenderSystem::restoreContext() const
 		wglMakeCurrent(_hCurrentDC, _hCurrentRC);
 }
 
-bool GLRenderSystem::beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Colour color)
+bool GLRenderSystem::beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Device* renderWnd)
 {
-	RenderSystem::beginScene(backBuffer, zBuffer, stencilBuffer, color);
+	if (!RenderSystem::beginScene(backBuffer, zBuffer, stencilBuffer, renderWnd) || !changeRenderContext((Win32Device*)renderWnd))
+		return false;
+
 	GLbitfield mask = 0;
 	if (backBuffer)
 	{
 		float inv = 1.0f / 255.0f;
+		Colour color = renderWnd->getAttrib().BgClearColor;
 		glClearColor(color.getRed() * inv, color.getGreen() * inv, color.getBlue() * inv, color.getAlpha() * inv);
 		mask |= GL_COLOR_BUFFER_BIT;
 	}
@@ -503,7 +484,7 @@ void GLRenderSystem::setTransform(ETransformationState state, const Matrix4x4& m
 
 void GLRenderSystem::setViewpot(const Recti& area)
 {
-	const Dimension2di& renderTargetSize = getCurrentRenderTargetSize();
+	const Dimension2di& renderTargetSize = getCurRenderTargetSize();
 	Recti vp = area;
 	Recti rendert(0, 0, renderTargetSize._width, renderTargetSize._height);
 	vp.clipAgainst(rendert);
@@ -715,7 +696,7 @@ void GLRenderSystem::setRenderMode2D(bool alpha, bool texture, bool alphaChannel
 	if (_transformation3DChanged)
 	{
 		glMatrixMode(GL_PROJECTION);
-		const Dimension2di& renderTargetSize = getCurrentRenderTargetSize();
+		const Dimension2di& renderTargetSize = getCurRenderTargetSize();
 		Matrix4x4 m;
 		m.buildProjectionMatrixOrthoRH(float(renderTargetSize._width), float(-(renderTargetSize._height)), -1.0f, 1.0f);
 		m.setTranslation(Vector3df(-1, 1, 0));
@@ -795,6 +776,57 @@ void GLRenderSystem::setWrapMode(const Material& material)
 	}
 }
 
+bool GLRenderSystem::setWndPixelFormat(Win32Device* renderWnd)
+{
+	_hCurrentDC = GetDC(renderWnd->getWin32WndHandle());
+	if (!_hCurrentDC)
+	{
+		Log::print(ELL_ERROR, "Cannot create a GL device context.");
+		return false;
+	}
+
+	if (_pixelFormat == 0 || !SetPixelFormat(_hCurrentDC, _pixelFormat, &g_pfd))
+	{
+		_pixelFormat = ChoosePixelFormat(_hCurrentDC, &g_pfd);
+		if (!_pixelFormat)
+		{
+			Log::print(ELL_ERROR, "Cannot create a GL device context, %s.", "No suitable format");
+			return false;
+		}
+
+		if (!SetPixelFormat(_hCurrentDC, _pixelFormat, &g_pfd))
+		{
+			Log::print(ELL_ERROR, "Cannot set the pixel format.");
+			return false;
+		}
+	}
+
+	Log::print(ELL_DEBUG, "Pixel Format %d.", _pixelFormat);
+	return true;
+}
+
+bool GLRenderSystem::changeRenderContext(Win32Device* renderWnd)
+{
+	if (_hCurrentWnd != renderWnd->getWin32WndHandle())
+	{
+		if (_hCurrentWnd && _hCurrentDC)
+		{
+			ReleaseDC(_hCurrentWnd, _hCurrentDC);
+		}
+
+		_hCurrentWnd = renderWnd->getWin32WndHandle();
+		if (_hCurrentWnd)
+		{
+			_hCurrentDC = GetDC(_hCurrentWnd);
+			if (!wglMakeCurrent(_hCurrentDC, _hCurrentRC))
+				return false;
+			Dimension2di screenSize = renderWnd->getScreenSize();
+			setViewpot(Recti(0, 0, screenSize._width, screenSize._height));
+		}
+	}
+	return true;
+}
+
 GLint GLRenderSystem::getTextureWrapMode(unsigned char clamp)
 {
 	GLint mode = GL_REPEAT;
@@ -835,24 +867,24 @@ inline void GLRenderSystem::getGLTextureMatrix(GLfloat gl_matrix[16], const Matr
 	gl_matrix[15] = 1.0f;
 }
 
-void GLRenderSystem::gainColorBuffer(const void* vertices, unsigned int vertexCount)
+void GLRenderSystem::gainVertexColorBuffer(const void* vertices, unsigned int vertexCount)
 {
 	vertexCount *= 4;
-	_colorBuffer.clear();
-	_colorBuffer.resize(vertexCount);
+	_vertexColorBuffer.clear();
+	_vertexColorBuffer.resize(vertexCount);
 
 	const Vertex* p = static_cast<const Vertex*>(vertices);
 	for (unsigned int i = 0; i < vertexCount; i += 4)
 	{
-		p->_color.toOpenGLColor(&_colorBuffer[i]);
+		p->_color.toOpenGLColor(&_vertexColorBuffer[i]);
 		++p;
 	}
 }
 
-const Dimension2di& GLRenderSystem::getCurrentRenderTargetSize() const
+const Dimension2di& GLRenderSystem::getCurRenderTargetSize() const
 {
 	if (_currentRenderTargetSize._width == 0)
-		return Root::getSingleton().getDevice()->getScreenSize();
+		return Root::getSingleton().getActiveDevice()->getScreenSize();
 	return _currentRenderTargetSize;
 }
 
@@ -1011,7 +1043,7 @@ bool GLRenderSystem::updateIndexHardwareBuffer(HardwareBufferLink_OpenGL* hwBuff
 
 void GLRenderSystem::drawPixel(int x, int y, const Colour& color)
 {
-	const Dimension2di& renderTargetSize = getCurrentRenderTargetSize();
+	const Dimension2di& renderTargetSize = getCurRenderTargetSize();
 	if (x > renderTargetSize._width || x < 0 || y > renderTargetSize._height || y < 0)
 		return;
 	disableTextures();
@@ -1140,7 +1172,7 @@ void GLRenderSystem::draw2DImage(TexturePtr texture, const Position2di& destPos,
 		targetPos._x = 0;
 	}
 
-	const Dimension2di& renderTargetSize = getCurrentRenderTargetSize();
+	const Dimension2di& renderTargetSize = getCurRenderTargetSize();
 
 	if (targetPos._x + sourceSize._width > renderTargetSize._width)
 	{
@@ -1232,7 +1264,7 @@ void GLRenderSystem::draw2DImage(TexturePtr texture, const Recti& destRect, cons
 			return;
 
 		glEnable(GL_SCISSOR_TEST);
-		const Dimension2di& renderTargetSize = getCurrentRenderTargetSize();
+		const Dimension2di& renderTargetSize = getCurRenderTargetSize();
 		glScissor(clipRect->_upperLeftCorner._x, renderTargetSize._height - clipRect->_lowerRightCorner._y,
 			clipRect->getWidth(), clipRect->getHeight());
 	}
@@ -1273,7 +1305,7 @@ void GLRenderSystem::draw2DImageBatch(TexturePtr texture, const vector<Position2
 	const Dimension2di& ss = texture->getImgSize();
 	const float invW = 1.f / static_cast<float>(ss._width);
 	const float invH = 1.f / static_cast<float>(ss._height);
-	const Dimension2di& renderTargetSize = getCurrentRenderTargetSize();
+	const Dimension2di& renderTargetSize = getCurRenderTargetSize();
 
 	disableTextures(1);
 	if (!setActiveTexture(0, texture.get()))
@@ -1410,7 +1442,7 @@ void GLRenderSystem::draw2DImageBatch(TexturePtr texture, const vector<Recti>& d
 			return;
 
 		glEnable(GL_SCISSOR_TEST);
-		glScissor(clipRect->_upperLeftCorner._x, getCurrentRenderTargetSize()._height - clipRect->_lowerRightCorner._y,
+		glScissor(clipRect->_upperLeftCorner._x, getCurRenderTargetSize()._height - clipRect->_lowerRightCorner._y,
 			clipRect->getWidth(), clipRect->getHeight());
 	}
 
@@ -1502,10 +1534,10 @@ void GLRenderSystem::drawVertexPrimitiveList(const void* vertices, unsigned int 
 
 		if (vertices)
 		{
-			gainColorBuffer(vertices, vertexCount);
+			gainVertexColorBuffer(vertices, vertexCount);
 			glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &(static_cast<const Vertex*>(vertices))[0]._position);
 			glNormalPointer(GL_FLOAT, sizeof(Vertex), &(static_cast<const Vertex*>(vertices))[0]._normal);
-			glColorPointer(4, GL_UNSIGNED_BYTE, 0, &_colorBuffer[0]);
+			glColorPointer(4, GL_UNSIGNED_BYTE, 0, &_vertexColorBuffer[0]);
 			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &(static_cast<const Vertex*>(vertices))[0]._texCoord);
 		}
 		else
@@ -1646,6 +1678,30 @@ GLRenderSystem::HardwareBufferLinkItor GLRenderSystem::deleteHardwareBuffer(Hard
 	}
 
 	return RenderSystem::deleteHardwareBuffer(hwBuffer);
+}
+
+Device* GLRenderSystem::createDevice(const Device::Attrib& attrib)
+{
+	Win32Device* dev = new Win32Device(attrib);
+	if (NULL == dev || !dev->init())
+	{
+		SAFE_DELETE(dev);
+		return NULL;
+	}
+
+	if (Root::getSingleton().IsLaunched())
+	{
+		if (!setWndPixelFormat(dev))
+		{
+			SAFE_DELETE(dev);
+			return NULL;
+		}
+
+		if (attrib.TurnOnUI)
+			dev->openUI();
+	}
+
+	return dev;
 }
 
 TexturePtr GLRenderSystem::createTexture(const wstring& name, Image* image, bool generateMipLevels)

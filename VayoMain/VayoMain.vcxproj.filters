@@ -251,9 +251,6 @@
     <ClInclude Include="Source\VayoFontManager.h">
       <Filter>Source\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Source\VayoWin32Device.h">
-      <Filter>Source\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Source\VayoWireBoundingBox.h">
       <Filter>Source\Headers</Filter>
     </ClInclude>
@@ -452,9 +449,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\VayoUtils.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\VayoWin32Device.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="ThirdParty\rc5\rc5_ecb.cpp">

@@ -684,9 +684,7 @@ bool TessGridHandler::parseTessgridFile(wstringstream& filestream)
 		}
 	}
 
-	if (succParse)
-		Log::wprint(ELL_DEBUG, L"文件流解析成功");
-	else
+	if (!succParse)
 		Log::wprint(ELL_WARNING, L"文件流解析失败");
 
 	return succParse;

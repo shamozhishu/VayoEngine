@@ -19,7 +19,7 @@ Camera::Camera()
 	, _look(0.0f, 0.0f, -1.0f)
 	, _needUpdate(true)
 {
-	const Dimension2di& size = Root::getSingleton().getDevice()->getScreenSize();
+	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_aspect = (float)size._width / size._height;
 	_nearZ = 1.0f;
 	_farZ = 1000.0f;
@@ -481,7 +481,7 @@ OrbitCamera::OrbitCamera(const wstring& name)
 	, _arcball(0, 0)
 {
 	_moveSpeed[0] = _moveSpeed[1] = _zoomSpeed[0] = _zoomSpeed[1] = 5.0f;
-	const Dimension2di& size = Root::getSingleton().getDevice()->getScreenSize();
+	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_arcball.setBounds(size._width, size._height);
 	_position.set(0, 0, 100);
 }
@@ -510,7 +510,7 @@ void OrbitCamera::setZoomSpeed(float speed)
 void OrbitCamera::setLens(float fovY, float aspect, float zn, float zf)
 {
 	Camera::setLens(fovY, aspect, zn, zf);
-	Dimension2di size = Root::getSingleton().getDevice()->getScreenSize();
+	Dimension2di size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_arcball.setBounds(size._width, size._height);
 }
 
@@ -682,7 +682,7 @@ EagleEyeCamera::EagleEyeCamera(const wstring& name)
 	: OrbitCamera(name)
 	, _zoomFactor(1.0f)
 {
-	const Dimension2di& size = Root::getSingleton().getDevice()->getScreenSize();
+	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_nearWindowHeight = size._width;
 	_farWindowHeight = size._height;
 	_nearZ = -10000.0f;

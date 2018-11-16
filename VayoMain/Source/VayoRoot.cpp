@@ -1,17 +1,15 @@
 #include "VayoRoot.h"
-#include "VayoInput.h"
-#include "VayoDevice.h"
 #include "VayoRenderSystem.h"
 #include "VayoScriptSystem.h"
 #include "VayoConfigManager.h"
 #include "VayoDatabaseCSV.h"
 #include "VayoLanguage.h"
-#include "VayoCoreGUI.h"
 #include "VayoSceneManager.h"
 #include "VayoLog.h"
 #include "VayoApp.h"
 #include "VayoSceneNode.h"
 #include "VayoCamera.h"
+#include "VayoCoreGUI.h"
 #include "VayoTextureManager.h"
 #include "VayoMaterialManager.h"
 #include "VayoMeshManager.h"
@@ -26,23 +24,21 @@ typedef void(*DLL_STOP_PLUGIN)(void);
 //-------------------------------------------------------------------------
 // Root class.
 //-------------------------------------------------------------------------
-Root::Root(const Config& config)
-	: _configuration(config)
-	, _isLaunched(false)
+Root::Root()
+	: _isLaunched(false)
 	, _curSceneMgr(NULL)
 	, _scriptSystem(NULL)
+	, _mainDevice(NULL)
+	, _activeDevice(NULL)
 	, _activeRenderer(NULL)
-	, _device(NULL)
 	, _frameCnt(0)
 	, _msOneFrame(0.0f)
 {
+	memset(_multiDevices, 0, sizeof(_multiDevices));
 	_dynLibManager = new DynLibManager();
-	_keypadDispatcher = new KeypadDispatcher();
-	_touchDispatcher = new TouchDispatcher();
 	_configManager = new ConfigManager();
 	_csvDatabase = new DatabaseCSV();
 	_language = new Language();
-	_uiManager = new UIManager();
 	_textureManager = new TextureManager();
 	_materialManager = new MaterialManager();
 	_meshManager = new MeshManager();
@@ -54,35 +50,35 @@ Root::~Root()
 	SAFE_DELETE(_meshManager);
 	SAFE_DELETE(_materialManager);
 	SAFE_DELETE(_textureManager);
-	SAFE_DELETE(_uiManager);
 	SAFE_DELETE(_language);
 	SAFE_DELETE(_csvDatabase);
 	SAFE_DELETE(_configManager);
+	destroyAllDevices();
+	SAFE_DELETE(_mainDevice);
 	unloadPlugins();
 	SAFE_DELETE(_dynLibManager);
-	SAFE_DELETE(_device);
-	SAFE_DELETE(_touchDispatcher);
-	SAFE_DELETE(_keypadDispatcher);
 }
 
-bool Root::launch()
+bool Root::launch(const Config& config)
 {
 	do
 	{
-		IF_FALSE_BREAK(_configManager && _configManager->init());
+		IF_FALSE_BREAK(_configManager && _configManager->init(config.RootDirectory));
 		IF_FALSE_BREAK(_csvDatabase && _csvDatabase->init());
 		IF_FALSE_BREAK(_language && _language->init());
 		loadPlugins();
-		_device = Device::create();
-		IF_FALSE_BREAK(_device && _device->init());
-		map<wstring, RenderSystem*>::iterator it = _renderers.find(_configuration.RendererName);
+		map<wstring, RenderSystem*>::iterator it = _renderers.find(config.RendererName);
 		if (it != _renderers.end())
 			_activeRenderer = it->second;
-		IF_FALSE_BREAK(_activeRenderer && _activeRenderer->init());
-		IF_FALSE_BREAK(_uiManager && _uiManager->init());
+		IF_FALSE_BREAK(_activeRenderer);
+		_activeDevice = _mainDevice = _activeRenderer->createDevice(config.MainDeviceAttrib);
+		IF_FALSE_BREAK(_activeDevice);
+		IF_FALSE_BREAK(_activeRenderer->init(config.AntiAliasFactor, config.HandleSRGB));
 		IF_FALSE_BREAK(_textureManager && _textureManager->init());
 		IF_FALSE_BREAK(_materialManager && _materialManager->init());
 		IF_FALSE_BREAK(_meshManager && _meshManager->init());
+		if (config.MainDeviceAttrib.TurnOnUI)
+			_mainDevice->openUI();
 		_isLaunched = true;
 		return true;
 
@@ -91,12 +87,15 @@ bool Root::launch()
 	return false;
 }
 
-bool Root::renderOneFrame()
+bool Root::renderOneFrame(Device* renderWnd /*= NULL*/)
 {
 	_timer.tick();
 	updateFrameStats();
 
-	if (!_activeRenderer->beginScene(true, true, true, _configuration.BgClearColor))
+	if (!renderWnd)
+		renderWnd = _activeDevice;
+
+	if (!_activeRenderer->beginScene(true, true, true, renderWnd))
 		return false;
 
 	if (_curSceneMgr && _curSceneMgr->getActiveCamera())
@@ -107,13 +106,11 @@ bool Root::renderOneFrame()
 		_curSceneMgr->updateRenderQueue();
 	}
 
-	_uiManager->render();
-	return _activeRenderer->endScene();
-}
+	UIManager* uiMgr = renderWnd->getUIManager();
+	if (uiMgr)
+		uiMgr->render();
 
-void Root::setBgClearColor(unsigned int bgColor)
-{
-	_configuration.BgClearColor = bgColor;
+	return _activeRenderer->endScene();
 }
 
 void Root::addRenderSystem(RenderSystem* newRenderer)
@@ -166,6 +163,87 @@ void Root::destroyAllSceneMgrs()
 	for (; it != _sceneMgrPool.end(); ++it)
 		delete it->second;
 	_sceneMgrPool.clear();
+}
+
+Device* Root::createDevice(void* wndHandle /*= NULL*/, bool wndQuit /*= true*/, bool wndPaint /*= false*/,
+	wstring wndCaption /*= L"Vayo Engine"*/, bool turnOnUI /*= true*/, bool fullScreen /*= false*/,
+	Colour bgClearColor /*= 0xff000000*/, Dimension2di screenSize /*= Dimension2di(1280, 720)*/)
+{
+	if (_activeRenderer)
+	{
+		Device::Attrib devAttrib;
+		devAttrib.WndHandle = wndHandle;
+		devAttrib.WndQuit = wndQuit;
+		devAttrib.WndPaint = wndPaint;
+		devAttrib.WndCaption = wndCaption;
+		devAttrib.TurnOnUI = turnOnUI;
+		devAttrib.FullScreen = fullScreen;
+		devAttrib.BgClearColor = bgClearColor;
+		devAttrib.ScreenSize = screenSize;
+
+		Device* dev = _activeRenderer->createDevice(devAttrib);
+		for (int i = 0; i < _maxSupportDevCnt; ++i)
+		{
+			if (NULL == _multiDevices[i])
+			{
+				_multiDevices[i] = dev;
+				return dev;
+			}
+		}
+
+		Log::wprint(ELL_WARNING, L"达到支持设备数量的最大上限值[%d]，无法创建新的窗口设备！", _maxSupportDevCnt);
+		SAFE_DELETE(dev);
+	}
+
+	return NULL;
+}
+
+Device* Root::findDevice(unsigned int idx)
+{
+	if (idx >= _maxSupportDevCnt)
+		return _mainDevice;
+	return _multiDevices[idx];
+}
+
+void Root::destroyDevice(unsigned int idx)
+{
+	if (idx >= _maxSupportDevCnt)
+		return;
+	SAFE_DELETE(_multiDevices[idx]);
+}
+
+void Root::destroyAllDevices()
+{
+	for (int i = 0; i < _maxSupportDevCnt; ++i)
+	{
+		SAFE_DELETE(_multiDevices[i]);
+	}
+}
+
+int Root::getMaxSupportDevCnt()
+{
+	return _maxSupportDevCnt;
+}
+
+UIManager* Root::getUIManager() const
+{
+	if (_activeDevice)
+		return _activeDevice->getUIManager();
+	return _mainDevice->getUIManager();
+}
+
+TouchDispatcher* Root::getTouchDispatcher() const
+{
+	if (_activeDevice)
+		return _activeDevice->getTouchDispatcher();
+	return _mainDevice->getTouchDispatcher();
+}
+
+KeypadDispatcher* Root::getKeypadDispatcher() const
+{
+	if (_activeDevice)
+		return _activeDevice->getKeypadDispatcher();
+	return _mainDevice->getKeypadDispatcher();
 }
 
 void Root::loadPlugins()

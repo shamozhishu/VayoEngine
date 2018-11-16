@@ -7,6 +7,7 @@
 #define __VAYO_RENDER_SYSTEM_H__
 
 #include "VayoSupport.h"
+#include "VayoDevice.h"
 #include "VayoColour.h"
 #include "VayoVertex.h"
 #include "VayoVector2d.h"
@@ -50,24 +51,27 @@ public:
 	RenderSystem(const wstring& name);
 	virtual ~RenderSystem();
 
+	virtual Device*      createDevice(const Device::Attrib& attrib) = 0;
 	virtual TexturePtr   createTexture(const wstring& name, Image* image, bool generateMipLevels) = 0;
+
 	virtual DisplayList* createDisplayList(const wstring& name = L"") = 0;
 	virtual DisplayList* findDisplayList(const wstring& name);
 	virtual void         destroyDisplayList(const wstring& name);
 	virtual void         destroyAllDisplayList();
+
 	virtual Tesselator*  createTesselator(const wstring& name = L"") = 0;
 	virtual Tesselator*  findTesselator(const wstring& name);
 	virtual void         destroyTesselator(const wstring& name);
 	virtual void         destroyAllTesselators();
 
-	virtual bool init() = 0;
+	virtual bool init(unsigned char antiAliasFactor = 0, bool handleSRGB = false) = 0;
 	virtual bool isActive() const = 0;
 	virtual void restoreContext() const = 0;
-	virtual bool beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Colour color);
+	virtual bool beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Device* renderWnd);
 	virtual bool endScene();
 	virtual const Matrix4x4& getTransform(ETransformationState state) const = 0;
 	virtual void setTransform(ETransformationState state, const Matrix4x4& mat) = 0;
-	virtual const Dimension2di& getCurrentRenderTargetSize() const = 0;
+	virtual const Dimension2di& getCurRenderTargetSize() const = 0;
 	virtual void setViewpot(const Recti& area) = 0;
 	virtual void setAmbientLight(const Colour& color) = 0;
 	virtual void setMaterial(const Material& material) = 0;
@@ -164,7 +168,7 @@ protected:
 protected:
 	unsigned int                       _primitivesDrawn;
 	unsigned int                       _minVertCntForHwbuffer;
-	vector<LightData>                  _lights;
+	vector<LightData>                  _lightDataset;
 	vector<MaterialRendererPtr>        _materialRenderers;
 	map<wstring, DisplayList*>         _displayListSet;
 	map<wstring, Tesselator*>          _tesselators;

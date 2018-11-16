@@ -8,37 +8,36 @@ using tinyxml2::XMLElement;
 
 NS_VAYO_BEGIN
 
-bool ConfigManager::init()
+bool ConfigManager::init(wstring rootDirectory)
 {
 	tinyxml2::XMLDocument doc;
-	string rootDirectory = w2a_(Root::getSingleton().getConfig().RootDirectory);
 
-	if (rootDirectory == "")
+	if (rootDirectory == L"")
 	{
-		rootDirectory = w2a_(getWorkingDirectory());
+		rootDirectory = getWorkingDirectory();
 	}
 
-	if (rootDirectory.substr(rootDirectory.length() - 1) == "\\"
-		|| rootDirectory.substr(rootDirectory.length() - 1) == "/")
+	if (rootDirectory.substr(rootDirectory.length() - 1) == L"\\"
+		|| rootDirectory.substr(rootDirectory.length() - 1) == L"/")
 	{
-		rootDirectory.erase(rootDirectory.find_last_not_of("/\\") + 1);
+		rootDirectory.erase(rootDirectory.find_last_not_of(L"/\\") + 1);
 	}
 
-	if (doc.LoadFile((rootDirectory + "\\engine_config.xml").c_str()) != tinyxml2::XML_SUCCESS)
+	if (doc.LoadFile((w2a_(rootDirectory) + "\\engine_config.xml").c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		Log::wprint(ELL_ERROR, L"引擎配置文件[%s\\engine_config.xml]加载失败", a2w_(rootDirectory).c_str());
+		Log::wprint(ELL_ERROR, L"引擎配置文件[%s\\engine_config.xml]加载失败", rootDirectory.c_str());
 		return false;
 	}
 
 	XMLElement* pRoot = doc.RootElement();
 	if (NULL == pRoot)
 	{
-		Log::wprint(ELL_ERROR, L"引擎配置文件[%s\\engine_config.xml]解析失败", a2w_(rootDirectory).c_str());
+		Log::wprint(ELL_ERROR, L"引擎配置文件[%s\\engine_config.xml]解析失败", rootDirectory.c_str());
 		return false;
 	}
 
 	string curTag;
-	_rootResourcePath = a2w_(rootDirectory) + L"\\" + utf8ToUnicode(pRoot->Attribute("rootpath"));
+	_rootResourcePath = rootDirectory + L"\\" + utf8ToUnicode(pRoot->Attribute("rootpath"));
 	XMLElement* pElem = pRoot->FirstChildElement();
 	while (pElem)
 	{
@@ -142,8 +141,7 @@ bool ConfigManager::init()
 		pElem = pElem->NextSiblingElement();
 	}
 
-	const_cast<wstring&>(Root::getSingleton().getConfig().RootDirectory) = a2w_(rootDirectory);
-	Log::wprint(ELL_INFORMATION, L"引擎配置文件[%s\\engine_config.xml]加载成功", a2w_(rootDirectory).c_str());
+	Log::wprint(ELL_INFORMATION, L"引擎配置文件[%s\\engine_config.xml]加载成功", rootDirectory.c_str());
 	return true;
 }
 

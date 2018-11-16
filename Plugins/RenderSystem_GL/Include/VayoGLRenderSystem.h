@@ -17,18 +17,19 @@ public:
 	GLRenderSystem(const wstring& name);
 	~GLRenderSystem();
 
+	Device*      createDevice(const Device::Attrib& attrib);
 	TexturePtr   createTexture(const wstring& name, Image* image, bool generateMipLevels);
 	DisplayList* createDisplayList(const wstring& name = L"");
 	Tesselator*  createTesselator(const wstring& name = L"");
 
-	bool init();
+	bool init(unsigned char antiAliasFactor = 0, bool handleSRGB = false);
 	bool isActive() const;
 	void restoreContext() const;
-	bool beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Colour color);
+	bool beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Device* renderWnd);
 	bool endScene();
 	const Matrix4x4& getTransform(ETransformationState state) const;
 	void setTransform(ETransformationState state, const Matrix4x4& mat);
-	const Dimension2di& getCurrentRenderTargetSize() const;
+	const Dimension2di& getCurRenderTargetSize() const;
 	void setViewpot(const Recti& area);
 	void setAmbientLight(const Colour& color);
 	void setMaterial(const Material& material);
@@ -107,14 +108,22 @@ private:
 	void  setRenderMode3D();
 	void  setRenderMode2D(bool alpha, bool texture, bool alphaChannel);
 	void  setWrapMode(const Material& material);
+	bool  setWndPixelFormat(Win32Device* renderWnd);
+	bool  changeRenderContext(Win32Device* renderWnd);
 	GLint getTextureWrapMode(unsigned char clamp);
 	void  getGLTextureMatrix(GLfloat gl_matrix[16], const Matrix4x4& mat);
-	void  gainColorBuffer(const void* vertices, unsigned int vertexCount);
+	void  gainVertexColorBuffer(const void* vertices, unsigned int vertexCount);
 	void  renderArray(const void* indexList, unsigned int primitiveCount, EPrimitiveType primType);
 	void  createMaterialRenderers();
 	bool  updateVertexHardwareBuffer(HardwareBufferLink_OpenGL* hwBuffer);
 	bool  updateIndexHardwareBuffer(HardwareBufferLink_OpenGL* hwBuffer);
 
+private:
+	HDC   _hCurrentDC;
+	HGLRC _hCurrentRC;
+	HWND  _hCurrentWnd;
+	int   _pixelFormat;
+	PROPERTY_R(GLint, _maxTextureSize, MaxTextureSize)
 private:
 	enum ERenderMode
 	{
@@ -125,7 +134,7 @@ private:
 	ERenderMode           _currentRenderMode;
 	EColorFormat          _colorBufferFormat;
 	Matrix4x4             _matrizes[ETS_COUNT];
-	vector<unsigned char> _colorBuffer;
+	vector<unsigned char> _vertexColorBuffer;
 	Material              _curMaterial;
 	Material              _lastMaterial;
 	int                   _lastSetLight;
@@ -141,11 +150,6 @@ private:
 	GLfloat               _dimSmoothedLine[2];
 	GLfloat               _dimSmoothedPoint[2];
 	Texture*              _texturesUnitSet[MATERIAL_MAX_TEXTURES];
-
-protected:
-	PROPERTY_R(HDC,   _hCurrentDC,     CurrentDC)
-	PROPERTY_R(HGLRC, _hCurrentRC,     CurrentRC)
-	PROPERTY_R(GLint, _maxTextureSize, MaxTextureSize)
 };
 
 NS_VAYO_END

@@ -12,12 +12,12 @@ NS_VAYO_BEGIN
 
 void RenderSystem::addDynamicLight(const LightData& light)
 {
-	_lights.push_back(light);
+	_lightDataset.push_back(light);
 }
 
 void RenderSystem::removeAllDynamicLights()
 {
-	_lights.clear();
+	_lightDataset.clear();
 }
 
 RenderSystem::RenderSystem(const wstring& name)
@@ -31,8 +31,10 @@ RenderSystem::~RenderSystem()
 {
 }
 
-bool RenderSystem::beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Colour color)
+bool RenderSystem::beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Device* renderWnd)
 {
+	if (NULL == renderWnd)
+		return false;
 	_primitivesDrawn = 0;
 	return true;
 }

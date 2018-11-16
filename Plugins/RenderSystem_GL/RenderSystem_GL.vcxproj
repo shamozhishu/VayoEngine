@@ -26,6 +26,7 @@
     <ClCompile Include="Source\VayoGLRenderSystem.cpp" />
     <ClCompile Include="Source\VayoGLTesselator.cpp" />
     <ClCompile Include="Source\VayoGLTexture.cpp" />
+    <ClCompile Include="Source\VayoWin32Device.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GL\glad.h" />
@@ -38,6 +39,7 @@
     <ClInclude Include="Include\VayoGLSupport.h" />
     <ClInclude Include="Include\VayoGLTesselator.h" />
     <ClInclude Include="Include\VayoGLTexture.h" />
+    <ClInclude Include="Include\VayoWin32Device.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\VayoMain\VayoMain.vcxproj">

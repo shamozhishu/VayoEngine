@@ -8,16 +8,15 @@
 
 #ifdef _WIN32
 
+#include "VayoGLSupport.h"
 #include "VayoDevice.h"
-#include <Windows.h>
-#include <WindowsX.h>
 NS_VAYO_BEGIN
 
 class Win32Device : public Device
 {
 	DISALLOW_COPY_AND_ASSIGN(Win32Device)
 public:
-	Win32Device();
+	Win32Device(const Attrib& attrib);
 	~Win32Device();
 	bool    init();
 	void*   getWndHandle() const;
@@ -40,8 +39,8 @@ public:
 	LRESULT windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
-	HWND _wndHandle;
 	bool _externalWindow;
+	PROPERTY_R(HWND, _wndHandle, Win32WndHandle)
 };
 
 NS_VAYO_END

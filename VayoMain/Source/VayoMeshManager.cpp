@@ -30,6 +30,9 @@ MeshPtr MeshManager::findMesh(const wstring& name)
 
 MeshPtr MeshManager::createEmptyMesh(const wstring& name /*= L""*/)
 {
+	unordered_map<wstring, MeshPtr>::iterator it = _meshPool.find(name);
+	if (it != _meshPool.end())
+		return it->second;
 	MeshPtr pMesh(new Mesh(name));
 	_meshPool[pMesh->getName()] = pMesh;
 	return pMesh;
