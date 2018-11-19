@@ -50,6 +50,7 @@ public:
 		Colour bgClearColor = 0xff000000, Dimension2di screenSize = Dimension2di(1280, 720));
 	Device*       findDevice(unsigned int idx);
 	void          destroyDevice(unsigned int idx);
+	void          destroyDevice(Device* dev);
 	void          destroyAllDevices();
 	static int    getMaxSupportDevCnt();
 

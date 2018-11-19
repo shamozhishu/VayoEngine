@@ -212,6 +212,20 @@ void Root::destroyDevice(unsigned int idx)
 	SAFE_DELETE(_multiDevices[idx]);
 }
 
+void Root::destroyDevice(Device* dev)
+{
+	if (dev)
+	{
+		for (int i = 0; i < _maxSupportDevCnt; ++i)
+		{
+			if (_multiDevices[i] == dev)
+			{
+				SAFE_DELETE(_multiDevices[i]);
+			}
+		}
+	}
+}
+
 void Root::destroyAllDevices()
 {
 	for (int i = 0; i < _maxSupportDevCnt; ++i)

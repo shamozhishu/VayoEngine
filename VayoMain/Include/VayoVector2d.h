@@ -130,14 +130,17 @@ public:
 
 	T _x, _y;
 
-	static const Vector2d<float> XAxis;
-	static const Vector2d<float> YAxis;
-	static const Vector2d<float> Origin;
+	static const Vector2d<T> XAxis;
+	static const Vector2d<T> YAxis;
+	static const Vector2d<T> Origin;
 };
 
-const Vector2d<float> Vector2d<float>::XAxis(1, 0);
-const Vector2d<float> Vector2d<float>::YAxis(0, 1);
-const Vector2d<float> Vector2d<float>::Origin(0, 0);
+template<typename T>
+const Vector2d<T> Vector2d<T>::XAxis(1, 0);
+template<typename T>
+const Vector2d<T> Vector2d<T>::YAxis(0, 1);
+template<typename T>
+const Vector2d<T> Vector2d<T>::Origin(0, 0);
 
 #define Position2d        Vector2d
 typedef Vector2d<float>   Vector2df;

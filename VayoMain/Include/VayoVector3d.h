@@ -149,16 +149,20 @@ public:
 
 	T _x, _y, _z;
 
-	static const Vector3d<float> XAxis;
-	static const Vector3d<float> YAxis;
-	static const Vector3d<float> ZAxis;
-	static const Vector3d<float> Origin;
+	static const Vector3d<T> XAxis;
+	static const Vector3d<T> YAxis;
+	static const Vector3d<T> ZAxis;
+	static const Vector3d<T> Origin;
 };
 
-const Vector3d<float> Vector3d<float>::XAxis(1, 0, 0);
-const Vector3d<float> Vector3d<float>::YAxis(0, 1, 0);
-const Vector3d<float> Vector3d<float>::ZAxis(0, 0, 1);
-const Vector3d<float> Vector3d<float>::Origin(0, 0, 0);
+template<typename T>
+const Vector3d<T> Vector3d<T>::XAxis(1, 0, 0);
+template<typename T>
+const Vector3d<T> Vector3d<T>::YAxis(0, 1, 0);
+template<typename T>
+const Vector3d<T> Vector3d<T>::ZAxis(0, 0, 1);
+template<typename T>
+const Vector3d<T> Vector3d<T>::Origin(0, 0, 0);
 
 #define Position3d        Vector3d
 typedef Vector3d<float>   Vector3df;

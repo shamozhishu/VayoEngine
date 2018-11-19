@@ -1,5 +1,5 @@
-索引,代号1,代号2,X轴坐标,Y轴坐标,压线筒内经,压线筒外经,焊杯高度（压线筒深度）,纤芯直径,线束直径,屏蔽层直径,焊杯类型
-index,mark1,mark2,coordx,coordy,insideDiameter,outsideDiameter,cupHeight,coreDiameter,lineDiameter,shieldDiameter,cupType
+索引,代号1,代号2,X轴坐标,Y轴坐标,压线筒内经,压线筒外经,焊杯高度（压线筒深度）,纤芯面积,线束直径,屏蔽层直径,焊杯类型
+index,mark1,mark2,coordx,coordy,insideDiameter,outsideDiameter,cupHeight,coreArea,lineOuterDiameter,shieldDiameter,cupType
 1,1,A,4.98,12.7,1.17,1.78,3.5,,,,
 2,2,B,7.98,11.05,1.17,1.78,3.5,,,,
 3,3,C,10.49,8.81,1.17,1.78,3.5,,,,

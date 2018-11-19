@@ -819,7 +819,10 @@ bool GLRenderSystem::changeRenderContext(Win32Device* renderWnd)
 		{
 			_hCurrentDC = GetDC(_hCurrentWnd);
 			if (!wglMakeCurrent(_hCurrentDC, _hCurrentRC))
+			{
+				Log::wprint(ELL_ERROR, L"wglMakeCurrent() call failed![error code: %d]", GetLastError());
 				return false;
+			}
 			Dimension2di screenSize = renderWnd->getScreenSize();
 			setViewpot(Recti(0, 0, screenSize._width, screenSize._height));
 		}
