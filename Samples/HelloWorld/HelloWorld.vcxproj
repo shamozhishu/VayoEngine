@@ -38,6 +38,7 @@
     <ProjectGuid>{43869856-A805-479E-ACE7-B646884A3647}</ProjectGuid>
     <RootNamespace>HideAndSeek</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>HelloWorld</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

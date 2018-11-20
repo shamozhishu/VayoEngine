@@ -72,7 +72,7 @@ xcopy /y %source_path%Plugins\ScriptSystem_Lua\Lua-5.2.4\*.* %target_path%Plugin
 
 echo ----------------------------------------SamplesĿ¼
 
-xcopy /y %source_path%Samples\HideAndSeek\*.* %target_path%Samples\HideAndSeek\*.*
+xcopy /y %source_path%Samples\HelloWorld\*.* %target_path%Samples\HelloWorld\*.*
 
 echo ----------------------------------------ToolsĿ¼
 xcopy /y /s /e %source_path%Tools\*.* %target_path%Tools\
