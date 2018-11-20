@@ -12,6 +12,11 @@ NS_VAYO_BEGIN
 //-------------------------------------------------------------------------
 // TableCSV class.
 //-------------------------------------------------------------------------
+TableCSV::TableCSV(DatabaseCSV* csvdb)
+	: _associatedDB(csvdb)
+{
+}
+
 int TableCSV::getItemCount() const
 {
 	return (int)_tableData.size();
@@ -29,12 +34,12 @@ const wchar_t* TableCSV::item2str(const wchar_t* rowIdx, const wchar_t* colIdx)
 	if (findVal == _fieldName.end())
 		return L"";
 	indexField = findVal->second;
-	unordered_map<wstring, vector<const wchar_t*>>::iterator findData = _tableData.find(rowIdx);
+	unordered_map<wstring, vector<ptrdiff_t>>::iterator findData = _tableData.find(rowIdx);
 	if (findData != _tableData.end())
 	{
-		const vector<const wchar_t*>& arrRowText = findData->second;
-		if (indexField >= 0 && indexField < (int)arrRowText.size())
-			return arrRowText[indexField];
+		const vector<ptrdiff_t>& arrRowText = findData->second;
+		if (indexField >= 0 && indexField < (int)arrRowText.size() && arrRowText[indexField] != -1)
+			return _associatedDB->_buffer + arrRowText[indexField];
 	}
 	return L"";
 }
@@ -42,7 +47,7 @@ const wchar_t* TableCSV::item2str(const wchar_t* rowIdx, const wchar_t* colIdx)
 const wchar_t* TableCSV::item2str(int rowIdx, const wchar_t* colIdx)
 {
 	wchar_t szRowIdx[BUFFER_SIZE] = {};
-	_snwprintf(szRowIdx, sizeof(szRowIdx), L"%d", rowIdx);
+	_snwprintf(szRowIdx, BUFFER_SIZE, L"%d", rowIdx);
 	return item2str(szRowIdx, colIdx);
 }
 
@@ -57,7 +62,7 @@ int TableCSV::item2int(const wchar_t* rowIdx, const wchar_t* colIdx)
 int TableCSV::item2int(int rowIdx, const wchar_t* colIdx)
 {
 	wchar_t szRowIdx[BUFFER_SIZE] = {};
-	_snwprintf(szRowIdx, sizeof(szRowIdx), L"%d", rowIdx);
+	_snwprintf(szRowIdx, BUFFER_SIZE, L"%d", rowIdx);
 	return item2int(szRowIdx, colIdx);
 }
 
@@ -72,7 +77,7 @@ unsigned int TableCSV::item2uint(const wchar_t* rowIdx, const wchar_t* colIdx)
 unsigned int TableCSV::item2uint(int rowIdx, const wchar_t* colIdx)
 {
 	wchar_t szRowIdx[BUFFER_SIZE] = {};
-	_snwprintf(szRowIdx, sizeof(szRowIdx), L"%d", rowIdx);
+	_snwprintf(szRowIdx, BUFFER_SIZE, L"%d", rowIdx);
 	return item2uint(szRowIdx, colIdx);
 }
 
@@ -87,17 +92,17 @@ float TableCSV::item2float(const wchar_t* rowIdx, const wchar_t* colIdx)
 float TableCSV::item2float(int rowIdx, const wchar_t* colIdx)
 {
 	wchar_t szRowIdx[BUFFER_SIZE] = {};
-	_snwprintf(szRowIdx, sizeof(szRowIdx), L"%d", rowIdx);
+	_snwprintf(szRowIdx, BUFFER_SIZE, L"%d", rowIdx);
 	return item2float(szRowIdx, colIdx);
 }
 
 //-------------------------------------------------------------------------
 // DatabaseCSV class.
 //-------------------------------------------------------------------------
-DatabaseCSV::DatabaseCSV()
-	: _maxBufferSize(BUFFER_MAX_SIZE * BUFFER_MAX_SIZE * 3)
-	, _buffer(NULL)
+DatabaseCSV::DatabaseCSV() 
+	: _buffer(NULL)
 	, _curCharOffset(0)
+	, _maxBufferSize(BUFFER_MAX_SIZE * BUFFER_MAX_SIZE * 3)
 	, _startValidLine(2)
 {
 }
@@ -139,6 +144,13 @@ bool DatabaseCSV::loadTable(const wstring& filePath, wstring& tableDataBuff)
 	fin.seekg(0, std::ios_base::end);
 	int sizeToRead = (int)fin.tellg();
 	fin.seekg(0, std::ios_base::beg);
+
+	if (tableDataBuff.size() < sizeToRead)
+	{
+		tableDataBuff.clear();
+		tableDataBuff.resize(sizeToRead);
+	}
+
 	fin.read(&tableDataBuff[0], sizeToRead);
 	sizeToRead = (int)fin.gcount();
 	if (sizeToRead == 0)
@@ -149,11 +161,25 @@ bool DatabaseCSV::loadTable(const wstring& filePath, wstring& tableDataBuff)
 
 	wchar_t* p = &tableDataBuff[0];
 	int readCharOffset = 0;
-	TableCSV* pTable = new TableCSV();
 	wstring strFileName = filePath;
 	size_t idx = strFileName.rfind(L'\\');
-	pTable->_tableName = strFileName.substr(++idx);
-	_tables[pTable->_tableName] = pTable;
+	strFileName = strFileName.substr(++idx);
+	TableCSV* pTable = NULL;
+
+	unordered_map<wstring, TableCSV*>::iterator it = _tables.find(strFileName);
+	if (it != _tables.end())
+	{
+		pTable = it->second;
+		pTable->_tableName.clear();
+		pTable->_fieldName.clear();
+		pTable->_tableData.clear();
+	}
+	else
+	{
+		pTable = new TableCSV(this);
+		pTable->_tableName = strFileName;
+		_tables[pTable->_tableName] = pTable;
+	}
 
 	for (; sizeToRead > 0; p++, sizeToRead--)
 	{
@@ -194,9 +220,12 @@ void DatabaseCSV::destroy()
 	for (; itor != _tables.end(); ++itor)
 		SAFE_DELETE(itor->second);
 	_tables.clear();
-	SAFE_DELETE_ARRAY(_buffer);
-	_buffer = NULL;
 	_curCharOffset = 0;
+	if (_buffer)
+	{
+		free(_buffer);
+		_buffer = NULL;
+	}
 }
 
 TableCSV* DatabaseCSV::getTable(const wstring& strTableName)
@@ -212,7 +241,7 @@ void DatabaseCSV::lazyInit()
 	if (NULL != _buffer)
 		return;
 
-	_buffer = new wchar_t[_maxBufferSize];
+	_buffer = (wchar_t*)malloc(_maxBufferSize * sizeof(wchar_t));
 	_curCharOffset = 0;
 }
 
@@ -284,7 +313,7 @@ void DatabaseCSV::parseTextLine(TableCSV* pTable, const wchar_t* pszLine, int li
 		return; // ·µ»Ø
 	}
 
-	vector<const wchar_t*> tmp;
+	vector<ptrdiff_t> tableDataOffset;
 
 	for (int i = 0; i < len; i++)
 	{
@@ -304,13 +333,13 @@ void DatabaseCSV::parseTextLine(TableCSV* pTable, const wchar_t* pszLine, int li
 						memmove(pDst, buff, sizeof(wchar_t)*curByteOffset);
 
 					pDst[curByteOffset] = 0;
+					tableDataOffset.push_back(pDst - _buffer);
 				}
 				else
 				{
-					pDst = L"";
+					tableDataOffset.push_back(-1);
 				}
 
-				tmp.push_back(pDst);
 				curByteOffset = 0;
 				continue;
 			}
@@ -335,13 +364,13 @@ void DatabaseCSV::parseTextLine(TableCSV* pTable, const wchar_t* pszLine, int li
 						memmove(pDst, buff, sizeof(wchar_t)*curByteOffset);
 
 					pDst[curByteOffset] = 0;
+					tableDataOffset.push_back(pDst - _buffer);
 				}
 				else
 				{
-					pDst = L"";
+					tableDataOffset.push_back(-1);
 				}
 
-				tmp.push_back(pDst);
 				curByteOffset = 0;
 				semicolonNum = 0;
 				continue;
@@ -365,37 +394,47 @@ void DatabaseCSV::parseTextLine(TableCSV* pTable, const wchar_t* pszLine, int li
 		{
 			memmove(pDst, buff, sizeof(wchar_t)*curByteOffset);
 			pDst[curByteOffset] = 0;
+			tableDataOffset.push_back(pDst - _buffer);
 		}
 		else
 		{
-			pDst = L"";
+			tableDataOffset.push_back(-1);
 		}
-
-		tmp.push_back(pDst);
 	}
 
-	if (tmp.size() <= 0)
+	if (tableDataOffset.size() <= 0)
 	{
 		return;
 	}
 
-	wstring idx = tmp[0];
-	pTable->_tableData[idx] = tmp;
+	wstring idx = _buffer + tableDataOffset[0];
+	pTable->_tableData[idx] = tableDataOffset;
 
-	int restNum = pTable->_fieldName.size() - tmp.size();
+	int restNum = pTable->_fieldName.size() - tableDataOffset.size();
 
 	for (int i = 0; i < restNum + 1; i++)
 	{
-		pTable->_tableData[idx].push_back(L"");
+		pTable->_tableData[idx].push_back(-1);
 	}
-
-	tmp.clear();
 }
 
 wchar_t* DatabaseCSV::getCurCharBuff(int len)
 {
-	if (NULL == _buffer || (_curCharOffset + len) >= _maxBufferSize)
+	if (NULL == _buffer)
 		return NULL;
+
+	if ((_curCharOffset + len) >= _maxBufferSize)
+	{
+		int bufferSize = (BUFFER_MAX_SIZE * BUFFER_MAX_SIZE + _maxBufferSize) * sizeof(wchar_t);
+		void* pNewBuffer = realloc(_buffer, bufferSize);
+		if (pNewBuffer)
+		{
+			_buffer = (wchar_t*)pNewBuffer;
+			_maxBufferSize = bufferSize;
+		}
+		else
+			return NULL;
+	}
 
 	wchar_t* pRet = _buffer + _curCharOffset;
 	_curCharOffset += len;

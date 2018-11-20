@@ -1,10 +1,10 @@
 /*************************************************************************\
 * 望友引擎1.0
-* Copyright (c) 2018-2018 author by 朱加浩
+* Copyright (c) 2018-2018 authored by 朱加浩
 * 以逗号分隔的文本文件解析器
 \*************************************************************************/
-#ifndef __VAYO_CSV_DATABASE_H__
-#define __VAYO_CSV_DATABASE_H__
+#ifndef __VAYO_DATABASE_CSV_H__
+#define __VAYO_DATABASE_CSV_H__
 
 #include "VayoSupport.h"
 NS_VAYO_BEGIN
@@ -12,6 +12,7 @@ NS_VAYO_BEGIN
 class _VayoExport TableCSV
 {
 	friend class DatabaseCSV;
+	TableCSV(DatabaseCSV* csvdb);
 public:
 	int            getItemCount() const;
 	const wstring& getTableName() const;
@@ -29,13 +30,15 @@ public:
 	float          item2float(int rowIdx, const wchar_t* colIdx);
 
 private:
-	wstring                                        _tableName;
-	unordered_map<wstring, int>                    _fieldName;
-	unordered_map<wstring, vector<const wchar_t*>> _tableData;
+	wstring                                   _tableName;
+	unordered_map<wstring, int>               _fieldName;
+	unordered_map<wstring, vector<ptrdiff_t>> _tableData;
+	DatabaseCSV*                              _associatedDB;
 };
 
 class _VayoExport DatabaseCSV
 {
+	friend class TableCSV;
 	DISALLOW_COPY_AND_ASSIGN(DatabaseCSV)
 public:
 	DatabaseCSV();
@@ -44,7 +47,6 @@ public:
 	bool loadTable(const wstring& filePath, wstring& tableDataBuff);
 	void destroy();
 	TableCSV* getTable(const wstring& strTableName);
-	PROPERTY_RW(int, _startValidLine, StartValidLine)
 
 private:
 	void     lazyInit();
@@ -52,12 +54,13 @@ private:
 	wchar_t* getCurCharBuff(int len);
 
 private:
-	const int                         _maxBufferSize;
 	wchar_t*                          _buffer;
-	int                               _curCharOffset;
 	unordered_map<wstring, TableCSV*> _tables;
+	int                               _curCharOffset;
+	int                               _maxBufferSize;
+	const int                         _startValidLine;
 };
 
 NS_VAYO_END
 
-#endif // __VAYO_CSV_DATABASE_H__
+#endif // __VAYO_DATABASE_CSV_H__
