@@ -25,11 +25,20 @@ protected:
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	virtual void OnCancel();
 	void InitPropGridCtrl();
+	BOOL InitToolBar();
+	void InitStatusBar();
+	void Resize();
 
 // 实现
 protected:
 	HICON m_hIcon;
 	CModelView* m_modelView;
+	CMenu m_mainMenu;
+	CToolBar m_toolbar;
+	CStatusBar m_statusbar;
+	CStatic m_groupStatic;
+	CImageList m_img;
+	HDITEM m_gridCtrlItem;
 	CMFCPropertyGridCtrl m_wndPropList;
 
 	// 生成的消息映射函数
@@ -37,5 +46,7 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg BOOL OnToolTipText(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
 };

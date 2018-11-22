@@ -70,6 +70,21 @@
     <Image Include="res\ModelBuilder.ico">
       <Filter>Resource</Filter>
     </Image>
+    <Image Include="res\toolbar1.bmp">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\icon1.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\open.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\icon2.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\save.ico">
+      <Filter>Resource</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt">
