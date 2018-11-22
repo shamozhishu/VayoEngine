@@ -132,11 +132,11 @@ bool DatabaseCSV::init()
 	return true;
 }
 
-bool DatabaseCSV::loadTable(const wstring& filePath, wstring& tableDataBuff)
+bool DatabaseCSV::loadTable(const wstring& fileFullName, wstring& tableDataBuff)
 {
 	lazyInit();
 
-	wifstream fin(filePath);
+	wifstream fin(fileFullName);
 	if (!fin)
 		return false;
 
@@ -161,9 +161,8 @@ bool DatabaseCSV::loadTable(const wstring& filePath, wstring& tableDataBuff)
 
 	wchar_t* p = &tableDataBuff[0];
 	int readCharOffset = 0;
-	wstring strFileName = filePath;
-	size_t idx = strFileName.rfind(L'\\');
-	strFileName = strFileName.substr(++idx);
+	wstring strFileName = fileFullName;
+	strFileName = wstrReplaceAll(strFileName, Root::getSingleton().getConfigManager()->getUIConfig().TableCSVPath, L"");
 	TableCSV* pTable = NULL;
 
 	unordered_map<wstring, TableCSV*>::iterator it = _tables.find(strFileName);
@@ -228,8 +227,10 @@ void DatabaseCSV::destroy()
 	}
 }
 
-TableCSV* DatabaseCSV::getTable(const wstring& strTableName)
+TableCSV* DatabaseCSV::getTable(const wstring& tableName)
 {
+	wstring strTableName = tableName;
+	strTableName = wstrReplaceAll(strTableName, L"/", L"\\");
 	unordered_map<wstring, TableCSV*>::iterator findVal = _tables.find(strTableName);
 	if (findVal != _tables.end())
 		return findVal->second;

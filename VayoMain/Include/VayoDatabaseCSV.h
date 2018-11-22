@@ -44,9 +44,9 @@ public:
 	DatabaseCSV();
 	~DatabaseCSV();
 	bool init();
-	bool loadTable(const wstring& filePath, wstring& tableDataBuff);
+	bool loadTable(const wstring& fileFullName, wstring& tableDataBuff);
 	void destroy();
-	TableCSV* getTable(const wstring& strTableName);
+	TableCSV* getTable(const wstring& tableName);
 
 private:
 	void     lazyInit();

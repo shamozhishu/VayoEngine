@@ -73,6 +73,14 @@ xcopy /y %source_path%Plugins\ScriptSystem_Lua\Lua-5.2.4\*.* %target_path%Plugin
 echo ----------------------------------------SamplesĿ¼
 
 xcopy /y %source_path%Samples\HelloWorld\*.* %target_path%Samples\HelloWorld\*.*
+xcopy /y %source_path%Samples\ModelBuilder\*.h %target_path%Samples\ModelBuilder\*.h
+xcopy /y %source_path%Samples\ModelBuilder\*.cpp %target_path%Samples\ModelBuilder\*.cpp
+xcopy /y %source_path%Samples\ModelBuilder\*.rc %target_path%Samples\ModelBuilder\*.rc
+xcopy /y %source_path%Samples\ModelBuilder\res\*.* %target_path%Samples\ModelBuilder\res\*.*
+copy %source_path%Samples\ModelBuilder\ReadMe.txt %target_path%Samples\ModelBuilder\ReadMe.txt
+copy %source_path%Samples\ModelBuilder\ModelBuilder.vcxproj %target_path%Samples\ModelBuilder\ModelBuilder.vcxproj
+copy %source_path%Samples\ModelBuilder\ModelBuilder.vcxproj.filters %target_path%Samples\ModelBuilder\ModelBuilder.vcxproj.filters
+copy %source_path%Samples\ModelBuilder\ModelBuilder.vcxproj.user %target_path%Samples\ModelBuilder\ModelBuilder.vcxproj.user
 
 echo ----------------------------------------ToolsĿ¼
 xcopy /y /s /e %source_path%Tools\*.* %target_path%Tools\
