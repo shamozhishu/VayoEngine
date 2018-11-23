@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "ModelApp.h"
+#include "TessgridApp.h"
 
-ModelApp::ModelApp(const Root::Config& config)
+TessgridApp::TessgridApp(const Root::Config& config)
 	: App(config)
 	, m_cam(NULL)
 {
 }
 
-bool ModelApp::startup()
+bool TessgridApp::startup()
 {
 	Log::print(ELL_INFORMATION, "Model Builder ≥Ã–Ú∆Ù∂Ø");
 
@@ -25,11 +25,11 @@ bool ModelApp::startup()
 	return true;
 }
 
-void ModelApp::cleanup()
+void TessgridApp::cleanup()
 {
 }
 
-bool ModelApp::keyClicked(const tagKeyInput& keyInput)
+bool TessgridApp::keyClicked(const tagKeyInput& keyInput)
 {
 	return false;
 }

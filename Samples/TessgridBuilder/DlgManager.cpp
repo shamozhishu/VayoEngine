@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "DlgManager.h"
-#include "ModelBuilderDlg.h"
+#include "TessgridBuilderDlg.h"
 
 CDlgManager* CDlgManager::ms_dlgMgr = NULL;
 CDlgManager* CDlgManager::GetIns()
@@ -20,19 +20,19 @@ void CDlgManager::Destroy()
 }
 
 CDlgManager::CDlgManager()
-	: m_pModelBuilderDlg(NULL)
+	: m_pTessgridBuilderDlg(NULL)
 {
 }
 
 CDlgManager::~CDlgManager()
 {
-	CModelBuilderDlg::FinishDlg(m_pModelBuilderDlg);
+	CTessgridBuilderDlg::FinishDlg(m_pTessgridBuilderDlg);
 }
 
 void CDlgManager::Init()
 {
-	CModelBuilderDlg::FinishDlg(m_pModelBuilderDlg);
-	m_pModelBuilderDlg = CModelBuilderDlg::StartDlg(NULL);
+	CTessgridBuilderDlg::FinishDlg(m_pTessgridBuilderDlg);
+	m_pTessgridBuilderDlg = CTessgridBuilderDlg::StartDlg(NULL);
 }
 
 void CDlgManager::AutoWidthList(CListCtrl& opList)

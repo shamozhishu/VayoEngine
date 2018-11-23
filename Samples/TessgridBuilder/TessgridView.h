@@ -1,10 +1,10 @@
 #pragma once
 
-class CModelView : public CView
+class CTessgridView : public CView
 {
 public:
-	CModelView();
-	~CModelView();
+	CTessgridView();
+	~CTessgridView();
 	bool Init();
 	bool IsOK() const;
 
@@ -13,7 +13,7 @@ protected:
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	void PostNcDestroy();
 	DECLARE_MESSAGE_MAP()
-	DECLARE_DYNCREATE(CModelView)
+	DECLARE_DYNCREATE(CTessgridView)
 
 private:
 	bool m_bInitOK;

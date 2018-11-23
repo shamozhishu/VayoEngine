@@ -1,9 +1,9 @@
 #pragma once
 
-class ModelApp : public App, public Singleton<ModelApp>
+class TessgridApp : public App, public Singleton<TessgridApp>
 {
 public:
-	ModelApp(const Root::Config& config);
+	TessgridApp(const Root::Config& config);
 	bool startup();
 	void cleanup();
 	bool keyClicked(const tagKeyInput& keyInput);

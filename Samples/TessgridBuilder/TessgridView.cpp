@@ -1,23 +1,23 @@
 #include "stdafx.h"
-#include "ModelView.h"
-#include "ModelApp.h"
+#include "TessgridView.h"
+#include "TessgridApp.h"
 
-static ModelApp* g_app = NULL;
-IMPLEMENT_DYNCREATE(CModelView, CView)
-BEGIN_MESSAGE_MAP(CModelView, CView)
+static TessgridApp* g_app = NULL;
+IMPLEMENT_DYNCREATE(CTessgridView, CView)
+BEGIN_MESSAGE_MAP(CTessgridView, CView)
 END_MESSAGE_MAP()
-CModelView::CModelView()
+CTessgridView::CTessgridView()
 	: m_bInitOK(false)
 {
 }
 
-CModelView::~CModelView()
+CTessgridView::~CTessgridView()
 {
 	g_app->cleanup();
 	SAFE_DELETE(g_app);
 }
 
-bool CModelView::Init()
+bool CTessgridView::Init()
 {
 	if (!g_app)
 	{
@@ -25,22 +25,22 @@ bool CModelView::Init()
 		configInfo.MainDeviceAttrib.BgClearColor = 0xff080808;
 		configInfo.MainDeviceAttrib.WndHandle = GetSafeHwnd();
 		configInfo.MainDeviceAttrib.WndQuit = false;
-		g_app = new ModelApp(configInfo);
+		g_app = new TessgridApp(configInfo);
 		m_bInitOK = Root::getSingleton().IsLaunched() && g_app->startup();
 	}
 	return m_bInitOK;
 }
 
-bool CModelView::IsOK() const
+bool CTessgridView::IsOK() const
 {
 	return m_bInitOK;
 }
 
-void CModelView::OnDraw(CDC* pDC)
+void CTessgridView::OnDraw(CDC* pDC)
 {
 }
 
-BOOL CModelView::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+BOOL CTessgridView::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	if (m_bInitOK)
 	{
@@ -57,10 +57,6 @@ BOOL CModelView::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* p
 			return 0;
 		case WM_MENUCHAR:
 			return MAKELRESULT(0, MNC_CLOSE);
-		case WM_GETMINMAXINFO:
-			((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
-			((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
-			return 0;
 		case WM_LBUTTONDOWN:
 			dev->injectMouseDown(EMK_LEFT, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			return 0;
@@ -91,7 +87,7 @@ BOOL CModelView::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* p
 	return CView::OnWndMsg(message, wParam, lParam, pResult);
 }
 
-void CModelView::PostNcDestroy()
+void CTessgridView::PostNcDestroy()
 {
 	CView::PostNcDestroy();
 }

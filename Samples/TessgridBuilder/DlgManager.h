@@ -1,6 +1,6 @@
 #pragma once
 
-class CModelBuilderDlg;
+class CTessgridBuilderDlg;
 class CDlgManager
 {
 public:
@@ -14,5 +14,5 @@ public:
 private:
 	static CDlgManager* ms_dlgMgr;
 private:
-	PROPERTY_R(CModelBuilderDlg*, m_pModelBuilderDlg, ModelBuilderDlg)
+	PROPERTY_R(CTessgridBuilderDlg*, m_pTessgridBuilderDlg, TessgridBuilderDlg)
 };

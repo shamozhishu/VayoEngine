@@ -1,12 +1,12 @@
 
-// ModelBuilderDlg.cpp : 实现文件
+// TessgridBuilderDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"
-#include "ModelBuilder.h"
-#include "ModelBuilderDlg.h"
+#include "TessgridBuilder.h"
+#include "TessgridBuilderDlg.h"
 #include "afxdialogex.h"
-#include "ModelView.h"
+#include "TessgridView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -46,25 +46,25 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CModelBuilderDlg 对话框
+// CTessgridBuilderDlg 对话框
 
 
 
-CModelBuilderDlg::CModelBuilderDlg(CWnd* pParent /*=NULL*/)
+CTessgridBuilderDlg::CTessgridBuilderDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_MODELBUILDER_DIALOG, pParent)
 	, m_modelView(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-CModelBuilderDlg* CModelBuilderDlg::StartDlg(CWnd* pParent /*= NULL*/)
+CTessgridBuilderDlg* CTessgridBuilderDlg::StartDlg(CWnd* pParent /*= NULL*/)
 {
-	CModelBuilderDlg* pDlg = new CModelBuilderDlg();
+	CTessgridBuilderDlg* pDlg = new CTessgridBuilderDlg();
 	pDlg->Create(IDD_MODELBUILDER_DIALOG, pParent);
 	return pDlg;
 }
 
-void CModelBuilderDlg::FinishDlg(CModelBuilderDlg* &pDlg)
+void CTessgridBuilderDlg::FinishDlg(CTessgridBuilderDlg* &pDlg)
 {
 	if (pDlg)
 	{
@@ -75,7 +75,7 @@ void CModelBuilderDlg::FinishDlg(CModelBuilderDlg* &pDlg)
 	}
 }
 
-bool CModelBuilderDlg::isInitOK() const
+bool CTessgridBuilderDlg::isInitOK() const
 {
 	if (m_modelView)
 	{
@@ -84,14 +84,15 @@ bool CModelBuilderDlg::isInitOK() const
 	return false;
 }
 
-void CModelBuilderDlg::DoDataExchange(CDataExchange* pDX)
+void CTessgridBuilderDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_MFCPROPERTYGRID1, m_wndPropList);
-	DDX_Control(pDX, IDC_BG, m_groupStatic);
+	DDX_Control(pDX, IDC_LIST_CONTOUR_IDX, m_listCtrl);
+	DDX_Control(pDX, IDC_TREE_CONTOUR_IDX, m_treeCtrl);
 }
 
-BOOL CModelBuilderDlg::PreTranslateMessage(MSG* pMsg)
+BOOL CTessgridBuilderDlg::PreTranslateMessage(MSG* pMsg)
 {
 	if (isInitOK())
 	{
@@ -132,7 +133,7 @@ BOOL CModelBuilderDlg::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-BOOL CModelBuilderDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+BOOL CTessgridBuilderDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	if (isInitOK())
 	{
@@ -151,19 +152,23 @@ BOOL CModelBuilderDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRES
 		case WM_EXITSIZEMOVE:
 			pDevice->injectExitSizeMove();
 			return 0;
+		case WM_GETMINMAXINFO:
+			((MINMAXINFO*)lParam)->ptMinTrackSize.x = 800;
+			((MINMAXINFO*)lParam)->ptMinTrackSize.y = 600;
+			return 0;
 		}
 	}
 
 	return CDialogEx::OnWndMsg(message, wParam, lParam, pResult);
 }
 
-void CModelBuilderDlg::OnCancel()
+void CTessgridBuilderDlg::OnCancel()
 {
 	CDialogEx::OnCancel();
 	PostQuitMessage(0);
 }
 
-void CModelBuilderDlg::InitPropGridCtrl()
+void CTessgridBuilderDlg::InitPropGridCtrl()
 {
 	m_gridCtrlItem.cxy = 120;
 	m_gridCtrlItem.mask = HDI_WIDTH;
@@ -226,9 +231,46 @@ void CModelBuilderDlg::InitPropGridCtrl()
 	oleVarUint.uintVal = 1u;
 	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("采样点"), oleVarUint, _T("组成一条边的顶点数量")));
 	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("顺时针"), oleVarBool, _T("多边形的顶点环绕方式")));
+
+	pGroupProp = new CMFCPropertyGridProperty(_T("盖子"));
+	m_wndPropList.AddProperty(pGroupProp);
+	pChildGroupProp = new CMFCPropertyGridProperty(_T("盖顶"));
+	pGroupProp->AddSubItem(pChildGroupProp);
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("法线坐标X"), oleVarFlt, _T("顶部平面网格的法线X坐标")));
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("法线坐标Y"), oleVarFlt, _T("顶部平面网格的法线Y坐标")));
+	oleVarFlt.fltVal = 1.0f;
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("法线坐标Z"), oleVarFlt, _T("顶部平面网格的法线Z坐标")));
+	oleVarStr.SetString(_T(""), VT_BSTR);
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("盖顶材质"), oleVarStr, _T("顶部平面网格的材质")));
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("顺时针"), oleVarBool, _T("组成顶部平面网格的轮廓顶点环绕方式")));
+	pChildGroupProp = new CMFCPropertyGridProperty(_T("盖底"));
+	pGroupProp->AddSubItem(pChildGroupProp);
+	oleVarFlt.fltVal = 0.0f;
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("法线坐标X"), oleVarFlt, _T("底部平面网格的法线X坐标")));
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("法线坐标Y"), oleVarFlt, _T("底部平面网格的法线Y坐标")));
+	oleVarFlt.fltVal = -1.0f;
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("法线坐标Z"), oleVarFlt, _T("底部平面网格的法线Z坐标")));
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("盖底材质"), oleVarStr, _T("底部平面网格的材质")));
+	pChildGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("顺时针"), oleVarBool, _T("组成底部平面网格的轮廓顶点环绕方式")));
+
+	pGroupProp = new CMFCPropertyGridProperty(_T("形体拉伸"));
+	m_wndPropList.AddProperty(pGroupProp);
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("拉伸侧面材质"), oleVarStr, _T("拉伸形体侧面网格的材质")));
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("顺时针"), oleVarBool, _T("组成拉伸形体侧面网格的轮廓顶点环绕方式")));
+	oleVarFlt.fltVal = 0.0f;
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("X轴平移"), oleVarFlt, _T("相应轮廓几何体在X轴的平移量")));
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("Y轴平移"), oleVarFlt, _T("相应轮廓几何体在Y轴的平移量")));
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("Z轴平移"), oleVarFlt, _T("相应轮廓几何体在Z轴的平移量")));
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("X轴旋转"), oleVarFlt, _T("相应轮廓几何体在X轴的旋转量")));
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("Y轴旋转"), oleVarFlt, _T("相应轮廓几何体在Y轴的旋转量")));
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("Z轴旋转"), oleVarFlt, _T("相应轮廓几何体在Z轴的旋转量")));
+	oleVarFlt.fltVal = 1.0f;
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("X轴缩放"), oleVarFlt, _T("相应轮廓几何体在X轴的缩放量")));
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("Y轴缩放"), oleVarFlt, _T("相应轮廓几何体在Y轴的缩放量")));
+	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("Z轴缩放"), oleVarFlt, _T("相应轮廓几何体在Z轴的缩放量")));
 }
 
-BOOL CModelBuilderDlg::InitToolBar()
+BOOL CTessgridBuilderDlg::InitToolBar()
 {
 	if (!m_toolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_ALIGN_TOP |
 		CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC))
@@ -246,32 +288,39 @@ BOOL CModelBuilderDlg::InitToolBar()
 	m_toolbar.MoveWindow(0, rc.top, rc.Width(), 40);
 
 	// 创建位图
-	BOOL isSucc = m_img.Create(32, 32, ILC_COLOR32 | ILC_MASK, 2, 2); // 加载图片大小,图片格式,图片数量
+	BOOL isSucc = m_toolbarImg.Create(32, 32, ILC_COLOR32 | ILC_MASK, 2, 2); // 加载图片大小,图片格式,图片数量
 	if (isSucc)
 	{
 		COLORREF co = GetSysColor(COLOR_WINDOW);
-		m_img.SetBkColor(co);
+		m_toolbarImg.SetBkColor(co);
 
-		HICON hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_OPEN), IMAGE_ICON, 32, 32, 0);
-		m_img.Add(hIcon);
+		HICON hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_NEW), IMAGE_ICON, 32, 32, 0);
+		m_toolbarImg.Add(hIcon);
+		hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_OPEN), IMAGE_ICON, 32, 32, 0);
+		m_toolbarImg.Add(hIcon);
 		hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_SAVE), IMAGE_ICON, 32, 32, 0);
-		m_img.Add(hIcon);
+		m_toolbarImg.Add(hIcon);
+		hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_SAVEAS), IMAGE_ICON, 32, 32, 0);
+		m_toolbarImg.Add(hIcon);
 
 		//添加按钮信息
-		m_toolbar.GetToolBarCtrl().SetImageList(&m_img);
-		m_toolbar.SetButtons(NULL, 4);
+		m_toolbar.GetToolBarCtrl().SetImageList(&m_toolbarImg);
+		m_toolbar.SetButtons(NULL, 5);
 
-		m_toolbar.SetButtonInfo(0, IDC_TOOLBAR_OPEN, TBSTYLE_BUTTON, 0);
+		m_toolbar.SetButtonInfo(0, IDC_TOOLBAR_NEW, TBSTYLE_BUTTON, 0);
 		m_toolbar.SetButtonText(0, _T(""));
 
-		m_toolbar.SetButtonInfo(1, -1, TBSTYLE_SEP, -1);
+		m_toolbar.SetButtonInfo(1, IDC_TOOLBAR_OPEN, TBSTYLE_BUTTON, 1);
 		m_toolbar.SetButtonText(1, _T(""));
 
-		m_toolbar.SetButtonInfo(2, IDC_TOOLBAR_SAVE, TBSTYLE_BUTTON, 1);
+		m_toolbar.SetButtonInfo(2, IDC_TOOLBAR_SAVE, TBSTYLE_BUTTON, 2);
 		m_toolbar.SetButtonText(2, _T(""));
 
-		m_toolbar.SetButtonInfo(3, -1, TBSTYLE_SEP, -1);
+		m_toolbar.SetButtonInfo(3, IDC_TOOLBAR_SAVEAS, TBSTYLE_BUTTON, 3);
 		m_toolbar.SetButtonText(3, _T(""));
+
+		m_toolbar.SetButtonInfo(4, -1, TBSTYLE_SEP, -1);
+		m_toolbar.SetButtonText(4, _T(""));
 
 		CRect rectToolBar;
 		m_toolbar.GetItemRect(0, &rectToolBar);
@@ -283,7 +332,7 @@ BOOL CModelBuilderDlg::InitToolBar()
 	return isSucc;
 }
 
-void CModelBuilderDlg::InitStatusBar()
+void CTessgridBuilderDlg::InitStatusBar()
 {
 	// 添加状态栏
 	UINT array[2] = {12301, 12302};
@@ -297,7 +346,32 @@ void CModelBuilderDlg::InitStatusBar()
 	m_statusbar.SetPaneText(1, _T("状态栏"));
 }
 
-void CModelBuilderDlg::Resize()
+BOOL CTessgridBuilderDlg::InitTreeCtrl()
+{
+	m_treeCtrl.ModifyStyle(TVS_CHECKBOXES, 0);
+	m_treeCtrl.ModifyStyle(0, TVS_CHECKBOXES);
+	BOOL isSucc = m_treeImg.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2); // 加载图片大小,图片格式,图片数量
+	if (isSucc)
+	{
+		COLORREF co = GetSysColor(COLOR_WINDOW);
+		m_treeImg.SetBkColor(co);
+		m_treeCtrl.SetImageList(&m_treeImg, 0);
+
+		HICON hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_CIRCLE), IMAGE_ICON, 16, 16, 0);
+		m_treeImg.Add(hIcon);
+		hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_POLYGON), IMAGE_ICON, 16, 16, 0);
+		m_treeImg.Add(hIcon);
+
+		m_treeItem = m_treeCtrl.InsertItem(TEXT("圆形轮廓"), 0, 0, NULL);
+		m_treeCtrl.SetItemState(m_treeItem, INDEXTOSTATEIMAGEMASK(0), TVIS_STATEIMAGEMASK);
+		m_treeItem = m_treeCtrl.InsertItem(TEXT("多边形轮廓"), 1, 1, NULL);
+		m_treeCtrl.SetItemState(m_treeItem, INDEXTOSTATEIMAGEMASK(0), TVIS_STATEIMAGEMASK);
+	}
+
+	return isSucc;
+}
+
+void CTessgridBuilderDlg::Resize()
 {
 	if (!m_modelView)
 	{
@@ -310,52 +384,47 @@ void CModelBuilderDlg::Resize()
 
 	CRect rcClientOld;
 	GetClientRect(rcClientOld);
-	CRect rc = CRect(rcClientOld.Width() - 260, 40, rcClientOld.Width(), rcClientOld.Height() - 19);
+
+	CRect rc = CRect(0, rcClientOld.Height() - 219, 200, rcClientOld.Height() - 20);
+	m_listCtrl.MoveWindow(rc);
+
+	rc = CRect(0, 42, 200, rcClientOld.Height() - 220);
+	m_treeCtrl.MoveWindow(rc);
+
+	rc = CRect(rcClientOld.Width() - 260, 40, rcClientOld.Width(), rcClientOld.Height() - 20);
 	m_wndPropList.MoveWindow(rc);
 
-	rc.left = 0;
+	rc.left = 200;
 	rc.right = rcClientOld.Width() - 260;
 	rc.top = 40;
-	rc.bottom = rcClientOld.Height() - 19;
-	rc.TopLeft() += CPoint(2, 2);
-	rc.BottomRight() -= CPoint(0, 2);
+	rc.bottom = rcClientOld.Height() - 20;
+	rc.TopLeft() += CPoint(0, 2);
 	m_modelView->MoveWindow(rc);
 }
 
-BEGIN_MESSAGE_MAP(CModelBuilderDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CTessgridBuilderDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_SIZE()
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, &OnToolTipText)
+	ON_COMMAND(ID_32775, &CTessgridBuilderDlg::OnAboutMe)
+	ON_COMMAND(ID_32776, &CTessgridBuilderDlg::OnNewBuild)
+	ON_COMMAND(IDC_TOOLBAR_NEW, &CTessgridBuilderDlg::OnNewBuild)
+	ON_COMMAND(ID_32771, &CTessgridBuilderDlg::OnOpenFile)
+	ON_COMMAND(IDC_TOOLBAR_OPEN, &CTessgridBuilderDlg::OnOpenFile)
+	ON_COMMAND(ID_32772, &CTessgridBuilderDlg::OnSaveFile)
+	ON_COMMAND(IDC_TOOLBAR_SAVE, &CTessgridBuilderDlg::OnSaveFile)
+	ON_COMMAND(ID_32779, &CTessgridBuilderDlg::OnSaveAs)
+	ON_COMMAND(IDC_TOOLBAR_SAVEAS, &CTessgridBuilderDlg::OnSaveAs)
 END_MESSAGE_MAP()
 
 
-// CModelBuilderDlg 消息处理程序
+// CTessgridBuilderDlg 消息处理程序
 
-BOOL CModelBuilderDlg::OnInitDialog()
+BOOL CTessgridBuilderDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
-	// 将“关于...”菜单项添加到系统菜单中。
-
-	// IDM_ABOUTBOX 必须在系统命令范围内。
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
-
-	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL)
-	{
-		BOOL bNameValid;
-		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
-		{
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
-		}
-	}
 
 	// 设置此对话框的图标。  当应用程序主窗口不是对话框时，框架将自动
 	//  执行此操作
@@ -363,40 +432,34 @@ BOOL CModelBuilderDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	ShowWindow(SW_SHOWMAXIMIZED);
-	m_groupStatic.ShowWindow(SW_HIDE);
 	m_mainMenu.LoadMenu(IDR_MENU1);
 	SetMenu(&m_mainMenu);
 	InitToolBar();
 	InitStatusBar();
+	InitTreeCtrl();
 	// TODO: 在此添加额外的初始化代码
-	m_modelView = new CModelView();
+	m_modelView = new CTessgridView();
 	m_modelView->Create(NULL, NULL, AFX_WS_DEFAULT_VIEW, CRect(0, 0, 200, 200), this, 999);
 	if (!m_modelView->Init())
 		return FALSE;
 
 	InitPropGridCtrl();
 	Resize();
+	UpdateData(FALSE);
+	UpdateWindow();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
-void CModelBuilderDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CTessgridBuilderDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
-	}
-	else
-	{
-		CDialogEx::OnSysCommand(nID, lParam);
-	}
+	CDialogEx::OnSysCommand(nID, lParam);
 }
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。  对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
 
-void CModelBuilderDlg::OnPaint()
+void CTessgridBuilderDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -423,17 +486,17 @@ void CModelBuilderDlg::OnPaint()
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
 //显示。
-HCURSOR CModelBuilderDlg::OnQueryDragIcon()
+HCURSOR CTessgridBuilderDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CModelBuilderDlg::OnSize(UINT nType, int cx, int cy)
+void CTessgridBuilderDlg::OnSize(UINT nType, int cx, int cy)
 {
 	Resize();
 }
 
-BOOL CModelBuilderDlg::OnToolTipText(UINT nID, NMHDR* pNMHDR, LRESULT* pResult)
+BOOL CTessgridBuilderDlg::OnToolTipText(UINT nID, NMHDR* pNMHDR, LRESULT* pResult)
 {
 	if (pNMHDR->code == TTN_NEEDTEXTA || pNMHDR->code == TTN_NEEDTEXTW)
 	{
@@ -476,4 +539,35 @@ BOOL CModelBuilderDlg::OnToolTipText(UINT nID, NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	return TRUE;
+}
+
+void CTessgridBuilderDlg::OnAboutMe()
+{
+	// TODO: 在此添加命令处理程序代码
+	CAboutDlg dlgAbout;
+	dlgAbout.DoModal();
+}
+
+
+void CTessgridBuilderDlg::OnNewBuild()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CTessgridBuilderDlg::OnOpenFile()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CTessgridBuilderDlg::OnSaveFile()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CTessgridBuilderDlg::OnSaveAs()
+{
+	// TODO: 在此添加命令处理程序代码
 }

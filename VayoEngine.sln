@@ -19,7 +19,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VayoMain", "VayoMain\VayoMa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloWorld", "Samples\HelloWorld\HelloWorld.vcxproj", "{43869856-A805-479E-ACE7-B646884A3647}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModelBuilder", "Samples\ModelBuilder\ModelBuilder.vcxproj", "{0CF7649B-781A-4FB6-B962-2866C11C7842}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TessgridBuilder", "Samples\TessgridBuilder\TessgridBuilder.vcxproj", "{0CF7649B-781A-4FB6-B962-2866C11C7842}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

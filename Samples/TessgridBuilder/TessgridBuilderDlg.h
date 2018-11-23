@@ -1,18 +1,18 @@
 
-// ModelBuilderDlg.h : 头文件
+// TessgridBuilderDlg.h : 头文件
 //
 
 #pragma once
 
-class CModelView;
-// CModelBuilderDlg 对话框
-class CModelBuilderDlg : public CDialogEx
+class CTessgridView;
+// CTessgridBuilderDlg 对话框
+class CTessgridBuilderDlg : public CDialogEx
 {
 // 构造
 public:
-	CModelBuilderDlg(CWnd* pParent = NULL);	// 标准构造函数
-	static CModelBuilderDlg* StartDlg(CWnd* pParent = NULL);
-	static void FinishDlg(CModelBuilderDlg* &pDlg);
+	CTessgridBuilderDlg(CWnd* pParent = NULL);	// 标准构造函数
+	static CTessgridBuilderDlg* StartDlg(CWnd* pParent = NULL);
+	static void FinishDlg(CTessgridBuilderDlg* &pDlg);
 	bool isInitOK() const;
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -27,19 +27,24 @@ protected:
 	void InitPropGridCtrl();
 	BOOL InitToolBar();
 	void InitStatusBar();
+	BOOL InitTreeCtrl();
 	void Resize();
 
 // 实现
 protected:
 	HICON m_hIcon;
-	CModelView* m_modelView;
+	CTessgridView* m_modelView;
 	CMenu m_mainMenu;
 	CToolBar m_toolbar;
 	CStatusBar m_statusbar;
-	CStatic m_groupStatic;
-	CImageList m_img;
+	CImageList m_toolbarImg;
 	HDITEM m_gridCtrlItem;
 	CMFCPropertyGridCtrl m_wndPropList;
+	CListCtrl m_listCtrl;
+	HTREEITEM m_treeItem;
+	TVINSERTSTRUCT m_treeStruct;
+	CImageList m_treeImg;
+	CTreeCtrl m_treeCtrl;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
@@ -49,4 +54,10 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg BOOL OnToolTipText(UINT nID, NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnAboutMe();
+	afx_msg void OnNewBuild();
+	afx_msg void OnOpenFile();
+	afx_msg void OnSaveFile();
+	afx_msg void OnSaveAs();
 };

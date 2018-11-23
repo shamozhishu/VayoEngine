@@ -23,6 +23,7 @@
     <RootNamespace>ModelBuilder</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <Keyword>MFCProj</Keyword>
+    <ProjectName>TessgridBuilder</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -190,24 +191,21 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="DlgManager.h" />
-    <ClInclude Include="ModelApp.h" />
-    <ClInclude Include="ModelView.h" />
-    <ClInclude Include="ModelBuilder.h" />
-    <ClInclude Include="ModelBuilderDlg.h" />
+    <ClInclude Include="TessgridApp.h" />
+    <ClInclude Include="TessgridView.h" />
+    <ClInclude Include="TessgridBuilder.h" />
+    <ClInclude Include="TessgridBuilderDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DlgManager.cpp" />
-    <ClCompile Include="ModelApp.cpp" />
-    <ClCompile Include="ModelView.cpp" />
-    <ClCompile Include="ModelBuilder.cpp" />
-    <ClCompile Include="ModelBuilderDlg.cpp" />
+    <ClCompile Include="TessgridApp.cpp" />
+    <ClCompile Include="TessgridView.cpp" />
+    <ClCompile Include="TessgridBuilder.cpp" />
+    <ClCompile Include="TessgridBuilderDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -216,18 +214,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ModelBuilder.rc" />
+    <ResourceCompile Include="TessgridBuilder.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\ModelBuilder.rc2" />
+    <None Include="res\TessgridBuilder.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\icon1.ico" />
-    <Image Include="res\icon2.ico" />
-    <Image Include="res\ModelBuilder.ico" />
+    <Image Include="res\circle.ico" />
+    <Image Include="res\circular.ico" />
+    <Image Include="res\new.ico" />
+    <Image Include="res\polygon.ico" />
+    <Image Include="res\saveas.ico" />
+    <Image Include="res\TessgridBuilder.ico" />
     <Image Include="res\open.ico" />
     <Image Include="res\save.ico" />
-    <Image Include="res\toolbar1.bmp" />
+    <Image Include="res\toolbar.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\VayoMain\VayoMain.vcxproj">
@@ -237,4 +238,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

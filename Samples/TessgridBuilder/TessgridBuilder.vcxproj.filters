@@ -11,12 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ModelBuilder.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelBuilderDlg.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Classes</Filter>
     </ClInclude>
@@ -26,69 +20,79 @@
     <ClInclude Include="targetver.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="ModelView.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelApp.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
     <ClInclude Include="DlgManager.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="TessgridApp.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="TessgridBuilder.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="TessgridBuilderDlg.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="TessgridView.h">
       <Filter>Classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ModelBuilder.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelBuilderDlg.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelView.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelApp.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
     <ClCompile Include="DlgManager.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
+    <ClCompile Include="TessgridApp.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="TessgridBuilder.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="TessgridBuilderDlg.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="TessgridView.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ModelBuilder.rc">
-      <Filter>Resource</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\ModelBuilder.rc2">
-      <Filter>Resource</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\ModelBuilder.ico">
-      <Filter>Resource</Filter>
-    </Image>
-    <Image Include="res\toolbar1.bmp">
-      <Filter>Resource</Filter>
-    </Image>
-    <Image Include="res\icon1.ico">
-      <Filter>Resource</Filter>
-    </Image>
     <Image Include="res\open.ico">
-      <Filter>Resource</Filter>
-    </Image>
-    <Image Include="res\icon2.ico">
       <Filter>Resource</Filter>
     </Image>
     <Image Include="res\save.ico">
       <Filter>Resource</Filter>
     </Image>
+    <Image Include="res\TessgridBuilder.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\new.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\toolbar.bmp">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\saveas.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\circular.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\polygon.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\circle.ico">
+      <Filter>Resource</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt">
+    <ResourceCompile Include="TessgridBuilder.rc">
       <Filter>Resource</Filter>
-    </Text>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\TessgridBuilder.rc2">
+      <Filter>Resource</Filter>
+    </None>
   </ItemGroup>
 </Project>

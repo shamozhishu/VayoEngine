@@ -1,10 +1,10 @@
 
-// ModelBuilder.cpp : 定义应用程序的类行为。
+// TessgridBuilder.cpp : 定义应用程序的类行为。
 //
 
 #include "stdafx.h"
-#include "ModelBuilder.h"
-#include "ModelBuilderDlg.h"
+#include "TessgridBuilder.h"
+#include "TessgridBuilderDlg.h"
 #include "DlgManager.h"
 
 #ifdef _DEBUG
@@ -12,16 +12,16 @@
 #endif
 
 
-// CModelBuilderApp
+// CTessgridBuilderApp
 
-BEGIN_MESSAGE_MAP(CModelBuilderApp, CWinApp)
+BEGIN_MESSAGE_MAP(CTessgridBuilderApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CModelBuilderApp 构造
+// CTessgridBuilderApp 构造
 
-CModelBuilderApp::CModelBuilderApp()
+CTessgridBuilderApp::CTessgridBuilderApp()
 	: m_pShellManager(NULL)
 {
 	// 支持重新启动管理器
@@ -32,14 +32,14 @@ CModelBuilderApp::CModelBuilderApp()
 }
 
 
-// 唯一的一个 CModelBuilderApp 对象
+// 唯一的一个 CTessgridBuilderApp 对象
 
-CModelBuilderApp theApp;
+CTessgridBuilderApp theApp;
 
 
-// CModelBuilderApp 初始化
+// CTessgridBuilderApp 初始化
 
-BOOL CModelBuilderApp::InitInstance()
+BOOL CTessgridBuilderApp::InitInstance()
 {
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
@@ -71,11 +71,11 @@ BOOL CModelBuilderApp::InitInstance()
 	// TODO: 应适当修改该字符串，
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
-	m_pMainWnd = CDlgManager::GetIns()->getModelBuilderDlg();
+	m_pMainWnd = CDlgManager::GetIns()->getTessgridBuilderDlg();
 	return TRUE;
 }
 
-int CModelBuilderApp::ExitInstance()
+int CTessgridBuilderApp::ExitInstance()
 {
 	CDlgManager::Destroy();
 	// 删除上面创建的 shell 管理器。
@@ -94,7 +94,7 @@ int CModelBuilderApp::ExitInstance()
 	return 0;
 }
 
-BOOL CModelBuilderApp::OnIdle(LONG lCount)
+BOOL CTessgridBuilderApp::OnIdle(LONG lCount)
 {
 	if (Root::getSingletonPtr() && Root::getSingletonPtr()->IsLaunched())
 	{
