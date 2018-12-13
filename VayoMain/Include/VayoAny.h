@@ -46,6 +46,20 @@ public:
 
 	const std::type_info& type() const { return _content ? _content->getType() : typeid(void); }
 
+	inline friend wstringstream& operator<<(wstringstream& ss, const Any& in)
+	{
+		if (in._content)
+			in._content->writeToStream(ss);
+		return ss;
+	}
+
+	inline friend wstringstream& operator>>(wstringstream& ss, Any& out)
+	{
+		if (out._content)
+			out._content->readFromStream(ss);
+		return ss;
+	}
+
 	void reset()
 	{
 		delete _content;
@@ -59,6 +73,8 @@ protected:
 		virtual ~placeholder() {}
 		virtual const std::type_info& getType() const = 0;
 		virtual placeholder* clone() const = 0;
+		virtual void writeToStream(wstringstream& ss) = 0;
+		virtual void readFromStream(wstringstream& ss) = 0;
 	};
 
 	template<typename ValueType>
@@ -67,7 +83,7 @@ protected:
 	public:
 		holder(const ValueType& value) : held(value) {}
 
-		virtual const std::type_info & getType() const
+		virtual const std::type_info& getType() const
 		{
 			return typeid(ValueType);
 		}
@@ -75,6 +91,16 @@ protected:
 		virtual placeholder* clone() const
 		{
 			return new holder(held);
+		}
+
+		virtual void writeToStream(wstringstream& ss)
+		{
+			ss << held << L" ";
+		}
+
+		virtual void readFromStream(wstringstream& ss)
+		{
+			ss >> held;
 		}
 
 		ValueType held;
@@ -145,7 +171,14 @@ protected:
 		{
 			return new numholder(held / static_cast<numholder*>(rhs)->held);
 		}
-
+		virtual void writeToStream(wstringstream& ss)
+		{
+			ss << held << L" ";
+		}
+		virtual void readFromStream(wstringstream& ss)
+		{
+			ss >> held;
+		}
 	public:
 		ValueType held;
 	};

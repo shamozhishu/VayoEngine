@@ -10,8 +10,8 @@
 NS_VAYO_BEGIN
 
 Reflex<SceneNode, const wstring&, Node*, SceneManager*> SceneNode::_dynReflex;
-SceneNode::SceneNode(const wstring& name, Node* parent, SceneManager* mgr)
-	: Node(name, parent, mgr)
+SceneNode::SceneNode(const wstring& name, Node* parent, SceneManager* originSceneMgr)
+	: Node(name, parent, originSceneMgr)
 	, _wireBoundingBox(NULL)
 	, _showBoundingBox(false)
 	, _isAutomaticCulling(true)
@@ -40,10 +40,10 @@ void SceneNode::visit(float dt)
 		updateLocalAABB();
 		animating(dt);
 		updateWorldAABB();
-		if (!_sceneMgr->isCulled(this))
+		if (!_originSceneMgr->isCulled(this))
 		{
 			if (_showBoundingBox)
-				_sceneMgr->registerForRendering(_wireBoundingBox, ERQ_WIRE_BOUNDING_BOX);
+				_originSceneMgr->registerForRendering(_wireBoundingBox, ERQ_WIRE_BOUNDING_BOX);
 
 			MovableObject* pObj;
 			map<wstring, MovableObject*>::iterator it = _objects.begin();
@@ -97,7 +97,9 @@ void SceneNode::updateLocalAABB()
 
 void SceneNode::attachObject(MovableObject* obj)
 {
-	if (obj && NULL == getAttacheObject(obj->getName()))
+	if (!obj || obj->getOriginSceneMgr() != getOriginSceneMgr())
+		return;
+	if (NULL == getAttacheObject(obj->getName()))
 	{
 		_objects.insert(make_pair(obj->getName(), obj));
 		if (obj->_parentNode)
@@ -152,8 +154,8 @@ void SceneNode::detachAllObjects()
 SceneNode* SceneNode::createChildSceneNode(const wstring& name /*= L""*/)
 {
 	SceneNode* pRet = NULL;
-	if (_sceneMgr)
-		pRet = _sceneMgr->createSceneNode<SceneNode>(this, name);
+	if (_originSceneMgr)
+		pRet = _originSceneMgr->createSceneNode<SceneNode>(this, name);
 	return pRet;
 }
 
@@ -188,6 +190,14 @@ void SceneNode::serialize(XMLElement* outXml)
 
 	if (!_isAutomaticCulling)
 		outXml->SetAttribute("auto_culling", _isAutomaticCulling);
+
+	wstringstream ss;
+	ss << _userDataBind;
+	string strUserData = unicodeToUtf8(ss.str());
+	if (!strUserData.empty())
+	{
+		outXml->LinkEndChild(outXml->GetDocument()->NewText(strUserData.c_str()));
+	}
 }
 
 bool SceneNode::deserialize(XMLElement* inXml)
@@ -240,6 +250,15 @@ bool SceneNode::deserialize(XMLElement* inXml)
 	inXml->QueryBoolAttribute("visit", &_canVisit);
 	inXml->QueryBoolAttribute("show_boundingbox", &_showBoundingBox);
 	inXml->QueryBoolAttribute("auto_culling", &_isAutomaticCulling);
+
+	const char* szUserData = inXml->GetText();
+	if (szUserData)
+	{
+		wstringstream ss;
+		ss << utf8ToUnicode(szUserData);
+		ss >> _userDataBind;
+	}
+
 	return true;
 }
 

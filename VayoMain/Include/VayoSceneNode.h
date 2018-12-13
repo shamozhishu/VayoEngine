@@ -14,7 +14,7 @@ class _VayoExport SceneNode : public Node
 {
 	static Reflex<SceneNode, const wstring&, Node*, SceneManager*> _dynReflex;
 public:
-	SceneNode(const wstring& name, Node* parent, SceneManager* mgr);
+	SceneNode(const wstring& name, Node* parent, SceneManager* originSceneMgr);
 	virtual ~SceneNode();
 	virtual void             visit(float dt);
 	virtual void             showWireBoundingBox(bool bShow);

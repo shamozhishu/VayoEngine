@@ -19,7 +19,7 @@ class _VayoExport MovableObject : public AttribSerializer
 {
 	friend class SceneNode;
 public:
-	MovableObject(const wstring& name);
+	MovableObject(const wstring& name, SceneManager* originSceneMgr);
 	virtual ~MovableObject();
 	virtual void             update(float dt) = 0;
 	virtual const wstring&   getName() const;
@@ -38,8 +38,9 @@ public:
 
 protected:
 	DISALLOW_COPY_AND_ASSIGN(MovableObject)
-	PROPERTY_RW(unsigned int,  _queueID,      QueueID)
+	PROPERTY_RW(unsigned int, _queueID, QueueID)
 	PROPERTY_RW(TriContainer*, _triContainer, TriContainer)
+	PROPERTY_R(SceneManager*, _originSceneMgr, OriginSceneMgr)
 
 protected:
 	wstring       _name;

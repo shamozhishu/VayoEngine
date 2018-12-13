@@ -9,9 +9,6 @@
 #define VAYO_REFLEX_DECLARE(CLASS_TYPE) private: static Vayo::Reflex<CLASS_TYPE> _dynReflex;
 #define VAYO_REFLEX_IMPLEMENT(CLASS_TYPE) Vayo::Reflex<CLASS_TYPE> CLASS_TYPE::_dynReflex;
 
-#define VAYO_REFLEX_WITHPARA_DECLARE(CLASS_TYPE, PARA_TYPE) private: static Vayo::Reflex<CLASS_TYPE, PARA_TYPE> _dynReflex;
-#define VAYO_REFLEX_WITHPARA_IMPLEMENT(CLASS_TYPE, PARA_TYPE) Vayo::Reflex<CLASS_TYPE, PARA_TYPE> CLASS_TYPE::_dynReflex;
-
 #include "VayoSupport.h"
 NS_VAYO_BEGIN
 
@@ -29,7 +26,12 @@ public:
 
 	static string makeTypeName(const char* name)
 	{
-#ifndef __GNUC__
+#ifdef __GNUC__
+		char* real_name = abi::__cxa_demangle(name, nullptr, nullptr, nullptr);
+		std::string real_name_string(real_name);
+		free(real_name);
+		return real_name_string;
+#else
 		const char* p = strstr(name, " ");
 		if (p)
 		{
@@ -44,11 +46,6 @@ public:
 			}
 		}
 		return std::string(name);
-#else
-		char* real_name = abi::__cxa_demangle(name, nullptr, nullptr, nullptr);
-		std::string real_name_string(real_name);
-		free(real_name);
-		return real_name_string;
 #endif
 	}
 

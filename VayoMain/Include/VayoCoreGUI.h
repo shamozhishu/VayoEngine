@@ -395,7 +395,7 @@ private:
 /** 对话框: 它包含各种类型的控件 */
 class _VayoExport UIDialog : public UIWidget
 {
-	VAYO_REFLEX_WITHPARA_DECLARE(UIDialog, const wstring&)
+	static Reflex<UIDialog, const wstring&> _dynReflex;
 public:
 	UIDialog(const wstring& fileName);
 	virtual ~UIDialog();
@@ -429,7 +429,7 @@ public:
 class _VayoExport UIManager : public TouchDelegate, public KeypadDelegate
 {
 public:
-	UIManager(Device* device);
+	UIManager(Device* dev);
 	virtual ~UIManager();
 	bool                init();
 	void                render();
@@ -464,7 +464,6 @@ private:
 	UIImageSet*      _curDrawImage;
 	UIImageSet*      _imageSetArr[VAYO_MAX_IMAGESET_NUM];
 	UIFont*          _fontArr[EUIFT_COUNT];
-	Device*          _relatedDevice;
 	UISkin*          _currentSkin;
 	Recti*           _clipArea;
 	vector<Recti>    _destRects;

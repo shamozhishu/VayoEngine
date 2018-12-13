@@ -1,15 +1,19 @@
 #include "VayoNodeAnimator.h"
+#include "VayoSceneManager.h"
 #include "VayoUtils.h"
 
 NS_VAYO_BEGIN
 
-bool NodeAnimator::hasFinished(void) const
+bool NodeAnimator::hasFinished() const
 {
 	return false;
 }
 
-NodeAnimator::NodeAnimator(const wstring& name)
-	: _name(name)
+NodeAnimator::NodeAnimator(const wstring& name, SceneManager* originSceneMgr)
+	: TouchDelegate(originSceneMgr->getName())
+	, KeypadDelegate(originSceneMgr->getName())
+	, _originSceneMgr(originSceneMgr)
+	, _name(name)
 {
 	static unsigned short idx = 0;
 	if (0 == _name.compare(L""))
@@ -23,11 +27,6 @@ NodeAnimator::NodeAnimator(const wstring& name)
 
 NodeAnimator::~NodeAnimator()
 {
-}
-
-bool NodeAnimator::isInputEnabled() const
-{
-	return false;
 }
 
 void NodeAnimator::serialize(XMLElement* outXml)

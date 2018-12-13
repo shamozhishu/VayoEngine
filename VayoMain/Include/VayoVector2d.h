@@ -40,6 +40,18 @@ public:
 	bool operator==(const Vector2d<T>& other) const { return equals(_x, other._x) && equals(_y, other._y); }
 	bool operator!=(const Vector2d<T>& other) const { return !equals(_x, other._x) || !equals(_y, other._y); }
 
+	inline friend wstringstream& operator<<(wstringstream& ss, const Vector2d<T>& in)
+	{
+		ss << in._x << L" " << in._y << L" ";
+		return ss;
+	}
+
+	inline friend wstringstream& operator>>(wstringstream& ss, Vector2d<T>& out)
+	{
+		ss >> out._x >> out._y;
+		return ss;
+	}
+
 	// functions
 
 	void set(const T& x, const T& y) {_x=x; _y=y; }

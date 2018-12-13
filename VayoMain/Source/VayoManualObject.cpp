@@ -11,9 +11,9 @@
 
 NS_VAYO_BEGIN
 
-VAYO_REFLEX_WITHPARA_IMPLEMENT(ManualObject, const wstring&)
-ManualObject::ManualObject(const wstring& name)
-	: MovableObject(name)
+Reflex<ManualObject, const wstring&, SceneManager*> ManualObject::_dynReflex;
+ManualObject::ManualObject(const wstring& name, SceneManager* originSceneMgr)
+	: MovableObject(name, originSceneMgr)
 	, _needSubmit(true)
 	, _opSubMesh(NULL)
 	, _displayList(NULL)

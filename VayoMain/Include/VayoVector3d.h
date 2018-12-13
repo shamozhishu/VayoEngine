@@ -43,6 +43,18 @@ public:
 	bool operator==(const Vector3d<T>& other) const { return equals(_x, other._x) && equals(_y, other._y) && equals(_z, other._z); }
 	bool operator!=(const Vector3d<T>& other) const { return !equals(_x, other._x) || !equals(_y, other._y) || !equals(_z, other._z); }
 
+	inline friend wstringstream& operator<<(wstringstream& ss, const Vector3d<T>& in)
+	{
+		ss << in._x << L" " << in._y << L" " << in._z << L" ";
+		return ss;
+	}
+
+	inline friend wstringstream& operator>>(wstringstream& ss, Vector3d<T>& out)
+	{
+		ss >> out._x >> out._y >> out._z;
+		return ss;
+	}
+
 	// functions
 
 	void set(const T x, const T y, const T z) {_x=x; _y=y; _z=z; }

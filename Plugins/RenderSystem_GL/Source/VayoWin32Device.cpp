@@ -23,6 +23,8 @@ namespace
 
 NS_VAYO_BEGIN
 
+static KeypadDispatcher* s_keypadDispatcher = NULL;
+
 static SEnvMapper* getEnvMapperFromHWnd(HWND hWnd)
 {
 	list<SEnvMapper>::iterator it = g_envMapper.begin();
@@ -314,11 +316,12 @@ LRESULT Win32Device::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 }
 
 //////////////////////////////////////////////////////////////////////////
-Win32Device::Win32Device(const Attrib& attrib)
-	: Device(attrib)
+Win32Device::Win32Device(int deviceID, const Attrib& attrib)
+	: Device(deviceID, attrib)
 	, _wndHandle(NULL)
 	, _externalWindow(false)
 {
+	s_keypadDispatcher = &Root::getSingleton().getKeypadDispatcher();
 }
 
 Win32Device::~Win32Device()
@@ -554,7 +557,7 @@ void Win32Device::injectKeyboard(unsigned int keyCode, unsigned int scanCode, bo
 	if ((allKeys[VK_MENU] & 0x80) != 0)
 		evt.Control = 0;
 
-	_keypadDispatcher->handleKeyClicked(evt);
+	s_keypadDispatcher->handleKeyClicked(evt);
 	if (_attribute.WndPaint)
 		InvalidateRect(_wndHandle, NULL, FALSE);
 }

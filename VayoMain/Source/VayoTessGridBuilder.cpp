@@ -1,6 +1,7 @@
 #include "VayoTessGridBuilder.h"
 #include "VayoConfigManager.h"
 #include "VayoRoot.h"
+#include "VayoUtils.h"
 #include "VayoFileIO.h"
 
 NS_VAYO_BEGIN
@@ -214,8 +215,8 @@ wstringstream& TessGridBuilder::getStream()
 void TessGridBuilder::save(const wstring& fileName, bool append/*=true*/)
 {
 	WriteFile fout(Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + fileName + L".tessgrid", append);
-	wstring strtmp = getStream().str();
-	fout.write(strtmp.data(), strtmp.size() * sizeof(wchar_t));
+	string strtmp = w2a_(getStream().str());
+	fout.write(strtmp.data(), strtmp.size() * sizeof(char));
 }
 
 void TessGridBuilder::rebuild()

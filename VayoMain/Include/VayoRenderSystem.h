@@ -51,7 +51,7 @@ public:
 	RenderSystem(const wstring& name);
 	virtual ~RenderSystem();
 
-	virtual Device*      createDevice(const Device::Attrib& attrib) = 0;
+	virtual Device*      createDevice(int deviceID, const Device::Attrib& attrib) = 0;
 	virtual TexturePtr   createTexture(const wstring& name, Image* image, bool generateMipLevels) = 0;
 
 	virtual DisplayList* createDisplayList(const wstring& name = L"") = 0;

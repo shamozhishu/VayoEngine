@@ -41,8 +41,8 @@ App::App(const Root::Config& config)
 	{
 		if (!pRoot->launch(config))
 			return;
-		pRoot->getTouchDispatcher()->addTouchDelegate(this);
-		pRoot->getKeypadDispatcher()->addKeypadDelegate(this);
+		enableTouch(true);
+		enableKeypad(true);
 	}
 }
 
@@ -51,8 +51,8 @@ App::~App()
 	Root* pRoot = Root::getSingletonPtr();
 	if (pRoot)
 	{
-		pRoot->getTouchDispatcher()->removeTouchDelegate(this);
-		pRoot->getKeypadDispatcher()->removeKeypadDelegate(this);
+		enableTouch(false);
+		enableKeypad(false);
 		delete pRoot;
 	}
 }

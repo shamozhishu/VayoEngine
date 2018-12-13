@@ -101,6 +101,7 @@ float TableCSV::item2float(int rowIdx, const wchar_t* colIdx)
 //-------------------------------------------------------------------------
 DatabaseCSV::DatabaseCSV() 
 	: _buffer(NULL)
+	, _canInit(true)
 	, _curCharOffset(0)
 	, _maxBufferSize(BUFFER_MAX_SIZE * BUFFER_MAX_SIZE * 3)
 	, _startValidLine(2)
@@ -114,36 +115,56 @@ DatabaseCSV::~DatabaseCSV()
 
 bool DatabaseCSV::init()
 {
-	wstring csvTablePath = Root::getSingleton().getConfigManager()->getUIConfig().TableCSVPath;
-	vector<wstring> allFilePath;
-	findFileDir(allFilePath, csvTablePath, L"csv");
-
-	wstring tableDataBuff;
-	unsigned len = allFilePath.size();
-	if (len > 0)
-		tableDataBuff.resize(_maxBufferSize);
-
-	for (unsigned i = 0; i < len; i++)
+	if (_canInit)
 	{
-		if (!loadTable(allFilePath[i], tableDataBuff))
-			Log::wprint(ELL_ERROR, L"表数据文件[%s]加载失败", allFilePath[i].c_str());
+		destroy();
+		wstring csvTablePath = Root::getSingleton().getConfigManager()->getUIConfig().TableCSVPath;
+		vector<wstring> allFilePath;
+		findFileDir(allFilePath, csvTablePath, L"csv");
+
+		wstring tableDataBuff;
+		unsigned len = allFilePath.size();
+		if (len > 0)
+			tableDataBuff.resize(_maxBufferSize);
+
+		for (unsigned i = 0; i < len; i++)
+			loadTable(wstrReplaceAll(allFilePath[i], csvTablePath, L""), tableDataBuff);
+
+		_canInit = false;
 	}
 
 	return true;
 }
 
-bool DatabaseCSV::loadTable(const wstring& fileFullName, wstring& tableDataBuff)
+bool DatabaseCSV::loadTable(const wstring& fileName, wstring& tableDataBuff)
 {
+	wstring csvTablePath = Root::getSingleton().getConfigManager()->getUIConfig().TableCSVPath;
+	wstring fileFullName = csvTablePath + fileName;
+	fileFullName = wstrReplaceAll(fileFullName, L"/", L"\\");
+	if (fileName.rfind(L".csv") == wstring::npos)
+	{
+		Log::wprint(ELL_WARNING, L"CSV表[%s]文件格式错误", fileFullName.c_str());
+		return false;
+	}
+
 	lazyInit();
 
 	wifstream fin(fileFullName);
 	if (!fin)
+	{
+		Log::wprint(ELL_ERROR, L"CSV表[%s]打开失败", fileFullName.c_str());
 		return false;
+	}
 
 	fin.imbue(locale("chs"));
 	fin.seekg(0, std::ios_base::end);
 	int sizeToRead = (int)fin.tellg();
 	fin.seekg(0, std::ios_base::beg);
+	if (sizeToRead == 0)
+	{
+		Log::wprint(ELL_ERROR, L"CSV表[%s]为空", fileFullName.c_str());
+		return false;
+	}
 
 	if (tableDataBuff.size() < sizeToRead)
 	{
@@ -154,18 +175,20 @@ bool DatabaseCSV::loadTable(const wstring& fileFullName, wstring& tableDataBuff)
 	fin.read(&tableDataBuff[0], sizeToRead);
 	sizeToRead = (int)fin.gcount();
 	if (sizeToRead == 0)
+	{
+		Log::wprint(ELL_ERROR, L"CSV表[%s]读取失败", fileFullName.c_str());
 		return false;
+	}
 
 	wchar_t buff[BUFFER_MAX_SIZE * 4];
 	int lineNum = 0;
 
 	wchar_t* p = &tableDataBuff[0];
 	int readCharOffset = 0;
-	wstring strFileName = fileFullName;
-	strFileName = wstrReplaceAll(strFileName, Root::getSingleton().getConfigManager()->getUIConfig().TableCSVPath, L"");
 	TableCSV* pTable = NULL;
 
-	unordered_map<wstring, TableCSV*>::iterator it = _tables.find(strFileName);
+	csvTablePath = wstrReplaceAll(fileFullName, csvTablePath, L"");
+	unordered_map<wstring, TableCSV*>::iterator it = _tables.find(csvTablePath);
 	if (it != _tables.end())
 	{
 		pTable = it->second;
@@ -176,7 +199,7 @@ bool DatabaseCSV::loadTable(const wstring& fileFullName, wstring& tableDataBuff)
 	else
 	{
 		pTable = new TableCSV(this);
-		pTable->_tableName = strFileName;
+		pTable->_tableName = csvTablePath;
 		_tables[pTable->_tableName] = pTable;
 	}
 
@@ -220,11 +243,17 @@ void DatabaseCSV::destroy()
 		SAFE_DELETE(itor->second);
 	_tables.clear();
 	_curCharOffset = 0;
+	_canInit = true;
 	if (_buffer)
 	{
 		free(_buffer);
 		_buffer = NULL;
 	}
+}
+
+int DatabaseCSV::getTableCount() const
+{
+	return (int)_tables.size();
 }
 
 TableCSV* DatabaseCSV::getTable(const wstring& tableName)
@@ -423,6 +452,9 @@ wchar_t* DatabaseCSV::getCurCharBuff(int len)
 {
 	if (NULL == _buffer)
 		return NULL;
+
+	if ((_curCharOffset + len) >= _maxBufferSize - BUFFER_MAX_SIZE * BUFFER_MAX_SIZE)
+		_canInit = true;
 
 	if ((_curCharOffset + len) >= _maxBufferSize)
 	{

@@ -44,8 +44,9 @@ public:
 	DatabaseCSV();
 	~DatabaseCSV();
 	bool init();
-	bool loadTable(const wstring& fileFullName, wstring& tableDataBuff);
+	bool loadTable(const wstring& fileName, wstring& tableDataBuff);
 	void destroy();
+	int  getTableCount() const;
 	TableCSV* getTable(const wstring& tableName);
 
 private:
@@ -56,6 +57,7 @@ private:
 private:
 	wchar_t*                          _buffer;
 	unordered_map<wstring, TableCSV*> _tables;
+	bool                              _canInit;
 	int                               _curCharOffset;
 	int                               _maxBufferSize;
 	const int                         _startValidLine;

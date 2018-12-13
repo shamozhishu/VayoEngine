@@ -1683,9 +1683,9 @@ GLRenderSystem::HardwareBufferLinkItor GLRenderSystem::deleteHardwareBuffer(Hard
 	return RenderSystem::deleteHardwareBuffer(hwBuffer);
 }
 
-Device* GLRenderSystem::createDevice(const Device::Attrib& attrib)
+Device* GLRenderSystem::createDevice(int deviceID, const Device::Attrib& attrib)
 {
-	Win32Device* dev = new Win32Device(attrib);
+	Win32Device* dev = new Win32Device(deviceID, attrib);
 	if (NULL == dev || !dev->init())
 	{
 		SAFE_DELETE(dev);

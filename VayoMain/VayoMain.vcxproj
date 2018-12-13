@@ -98,6 +98,7 @@
     <ClInclude Include="Include\VayoVertex.h" />
     <ClInclude Include="Include\VayoViewMemento.h" />
     <ClInclude Include="Source\VayoFontManager.h" />
+    <ClInclude Include="Source\VayoTessGridParser.h" />
     <ClInclude Include="Source\VayoWireBoundingBox.h" />
     <ClInclude Include="ThirdParty\rc5\rc5.h" />
     <ClInclude Include="ThirdParty\rc5\RC5.hpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="Source\VayoSpriteBox.cpp" />
     <ClCompile Include="Source\VayoTessGridBuilder.cpp" />
     <ClCompile Include="Source\VayoTessGridHandler.cpp" />
+    <ClCompile Include="Source\VayoTessGridParser.cpp" />
     <ClCompile Include="Source\VayoTextObject.cpp" />
     <ClCompile Include="Source\VayoTextureManager.cpp" />
     <ClCompile Include="Source\VayoTiledMap.cpp" />

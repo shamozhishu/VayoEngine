@@ -47,18 +47,18 @@ SceneManager::~SceneManager()
 
 void SceneManager::setActiveCamera(Camera* pActiveCamera)
 {
-	if (pActiveCamera == _activeCamera)
+	if ((pActiveCamera && pActiveCamera->getOriginSceneMgr() != this) || pActiveCamera == _activeCamera)
 		return;
 	if (_activeCamera)
 	{
-		Root::getSingleton().getTouchDispatcher()->removeTouchDelegate(_activeCamera);
-		Root::getSingleton().getKeypadDispatcher()->removeKeypadDelegate(_activeCamera);
+		_activeCamera->enableTouch(false);
+		_activeCamera->enableKeypad(false);
 	}
 	_activeCamera = pActiveCamera;
 	if (_activeCamera)
 	{
-		Root::getSingleton().getTouchDispatcher()->addTouchDelegate(_activeCamera);
-		Root::getSingleton().getKeypadDispatcher()->addKeypadDelegate(_activeCamera);
+		_activeCamera->enableTouch(true);
+		_activeCamera->enableKeypad(true);
 		_activeCamera->setNeedUpdate(true);
 	}
 }
@@ -142,13 +142,13 @@ bool SceneManager::loadScene(const wstring& sceneFile)
 	destroyAllAnimators();
 	destroyAllObjects();
 	destroyAllSceneNodes();
-	Root::getSingleton().setCurSceneMgr(this);
+	Root::getSingleton().bootFrame(this);
 	XMLElement* element = root->FirstChildElement();
 	while (element)
 	{
 		if (!recursionLoading(element, _rootSceneNode))
 		{
-			Root::getSingleton().setCurSceneMgr(NULL);
+			Root::getSingleton().setNullCurSceneMgr();
 			destroyAllAnimators();
 			destroyAllObjects();
 			destroyAllSceneNodes();
@@ -233,7 +233,7 @@ bool SceneManager::loadScene(const wstring& sceneFile)
 
 		if (!parseOK)
 		{
-			Root::getSingleton().setCurSceneMgr(NULL);
+			Root::getSingleton().setNullCurSceneMgr();
 			destroyAllAnimators();
 			destroyAllObjects();
 			destroyAllSceneNodes();
@@ -267,22 +267,43 @@ bool SceneManager::saveScene(const wstring& sceneFile)
 	return true;
 }
 
-void SceneManager::destroySceneNode(const wstring& name)
+void SceneManager::destroySceneNode(const wstring& name, bool cleanUpChildren /*= false*/)
 {
 	SceneNode* node = NULL;
 	map<wstring, SceneNode*>::iterator it = _sceneNodesPool.find(name);
 	if (it != _sceneNodesPool.end())
 	{
 		node = it->second;
-		delete node;
 		_sceneNodesPool.erase(it);
+
+		if (cleanUpChildren)
+		{
+			list<Node*> nodes = node->getChildren();
+			list<Node*>::const_iterator cit = nodes.cbegin();
+			for (; cit != nodes.cend(); ++cit)
+			{
+				SceneNode* pChild = dynamic_cast<SceneNode*>(*cit);
+				if (pChild)
+					destroySceneNode(pChild->getName(), cleanUpChildren);
+			}
+
+			map<wstring, MovableObject*> objs = node->getObjects();
+			map<wstring, MovableObject*>::const_iterator itmap = objs.cbegin();
+			for (; itmap != objs.cend(); ++itmap)
+			{
+				MovableObject* pObj = itmap->second;
+				destroyObject(pObj->getName());
+			}
+		}
+
+		delete node;
 	}
 }
 
-void SceneManager::destroySceneNode(SceneNode* sn)
+void SceneManager::destroySceneNode(SceneNode* sn, bool cleanUpChildren /*= false*/)
 {
 	if (sn)
-		destroySceneNode(sn->getName());
+		destroySceneNode(sn->getName(), cleanUpChildren);
 }
 
 void SceneManager::destroyAllSceneNodes()
@@ -383,7 +404,7 @@ bool SceneManager::recursionLoading(XMLElement* element, SceneNode* parent)
 				return false;
 			}
 
-			pObj = ReflexFactory<const wstring&>::getInstance().create<MovableObject>(w2a_(typeTag), objName);
+			pObj = ReflexFactory<const wstring&, SceneManager*>::getInstance().create<MovableObject>(w2a_(typeTag), objName, this);
 			if (!pObj)
 			{
 				Log::wprint(ELL_WARNING, L"非法标签[%s]", typeTag.c_str());
@@ -420,7 +441,7 @@ bool SceneManager::recursionLoading(XMLElement* element, SceneNode* parent)
 			pAnim = findAnimator<NodeAnimator>(animName);
 			if (!pAnim)
 			{
-				pAnim = ReflexFactory<const wstring&>::getInstance().create<NodeAnimator>(w2a_(typeTag), animName);
+				pAnim = ReflexFactory<const wstring&, SceneManager*>::getInstance().create<NodeAnimator>(w2a_(typeTag), animName, this);
 				if (!pAnim)
 				{
 					Log::wprint(ELL_WARNING, L"非法标签[%s]", typeTag.c_str());

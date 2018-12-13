@@ -317,6 +317,9 @@
     <ClInclude Include="Include\VayoViewMemento.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Source\VayoTessGridParser.h">
+      <Filter>Source\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\VayoApp.cpp">
@@ -518,6 +521,9 @@
       <Filter>ThirdParty\tinyxml2</Filter>
     </ClCompile>
     <ClCompile Include="Source\VayoViewMemento.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VayoTessGridParser.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -185,9 +185,17 @@ struct tagKeyInput
 
 class _VayoExport KeypadDelegate
 {
+	friend class KeypadDispatcher;
 public:
-	virtual ~KeypadDelegate() {}
+	KeypadDelegate(const wstring& bindEvtID = L"");
+	virtual ~KeypadDelegate();
+	virtual bool isKeypadEnabled() const;
+	virtual void enableKeypad(bool enable, int priority = -1);
 	virtual bool keyClicked(const tagKeyInput& keyInput) {(void)keyInput;return false;}
+
+private:
+	bool _keypadEnabled;
+	wstring _bindKeypadEvtID;
 };
 
 enum EMouseKeys
@@ -234,18 +242,20 @@ public:
 	}
 
 private:
-	bool        _startPointMark;
-	Position2di _startPoint;
 	Position2di _curPoint;
 	Position2di _prePoint;
+	Position2di _startPoint;
+	bool        _startPointMark;
 };
 
 class _VayoExport TouchDelegate
 {
 	friend class TouchDispatcher;
 public:
-	TouchDelegate() : _captured(false) {}
-	virtual ~TouchDelegate() {}
+	TouchDelegate(const wstring& bindEvtID = L"");
+	virtual ~TouchDelegate();
+	virtual bool isTouchEnabled() const;
+	virtual void enableTouch(bool enable, int priority = -1);
 	virtual bool touchBegan(const Touch& touch, EMouseKeys key) {(void)touch;(void)key;return false;}
 	virtual void touchMoved(const Touch& touch, EMouseKeys key) {(void)touch;(void)key;}
 	virtual void touchEnded(const Touch& touch, EMouseKeys key) {(void)touch;(void)key;}
@@ -253,40 +263,52 @@ public:
 
 private:
 	bool _captured;
+	bool _touchEnabled;
+	wstring _bindTouchEvtID;
 };
 
 class _VayoExport KeypadDispatcher
 {
 	DISALLOW_COPY_AND_ASSIGN(KeypadDispatcher)
 public:
-	KeypadDispatcher() {}
+	KeypadDispatcher();
 	~KeypadDispatcher();
 	void handleKeyClicked(const tagKeyInput& event);
+	void dispatchKeypadEvts(const vector<wstring>& evtIds);
 	void addKeypadDelegate(KeypadDelegate* pDelegate, int priority = -1);
 	void removeKeypadDelegate(KeypadDelegate* pDelegate);
 
 private:
-	list<KeypadDelegate*> _keypadDelegates;
+	void regActivateEvents(const wstring& evtId = L"");
+private:
+	vector<wstring> _keypadEvtIds;
+	vector<list<KeypadDelegate*>*> _keypadActivateEvents;
+	map<wstring, list<KeypadDelegate*>>* _pKeypadDelegates;
 };
 
 class _VayoExport TouchDispatcher
 {
 	DISALLOW_COPY_AND_ASSIGN(TouchDispatcher)
 public:
-	TouchDispatcher() {}
+	TouchDispatcher();
 	~TouchDispatcher();
 	void handleTouchBegan(int x, int y, EMouseKeys key);
 	void handleTouchMoved(int x, int y, EMouseKeys key);
 	void handleTouchEnded(int x, int y, EMouseKeys key);
 	void handleTouchWheel(float wheel);
 	void setTouchCurPos(int x, int y);
+	void dispatchTouchEvts(const vector<wstring>& evtIds);
 	void addTouchDelegate(TouchDelegate* pDelegate, int priority = -1);
 	void removeTouchDelegate(TouchDelegate* pDelegate);
 
 private:
-	list<TouchDelegate*> _touchDelegates;
+	void regActivateEvents(const wstring& evtId = L"");
+private:
 	Touch                _curPosition;
 	Touch                _curTouch[EMK_COUNT];
+	vector<wstring>      _touchEvtIds;
+	vector<list<TouchDelegate*>*> _touchActivateEvents;
+	map<wstring, list<TouchDelegate*>>* _pTouchDelegates;
 };
 
 NS_VAYO_END

@@ -78,21 +78,25 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
     <IncludePath>..\..\VayoMain\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\Lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>..\..\VayoMain\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
     <IncludePath>..\..\VayoMain\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\Lib\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Bin\$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>..\..\VayoMain\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\Lib\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -191,6 +195,10 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CmdManager.h" />
+    <ClInclude Include="CommonDef.h" />
+    <ClInclude Include="GridData.h" />
+    <ClInclude Include="GridDataManager.h" />
     <ClInclude Include="DlgManager.h" />
     <ClInclude Include="TessgridApp.h" />
     <ClInclude Include="TessgridView.h" />
@@ -199,8 +207,12 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="WzdSplash.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CmdManager.cpp" />
+    <ClCompile Include="GridData.cpp" />
+    <ClCompile Include="GridDataManager.cpp" />
     <ClCompile Include="DlgManager.cpp" />
     <ClCompile Include="TessgridApp.cpp" />
     <ClCompile Include="TessgridView.cpp" />
@@ -212,6 +224,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WzdSplash.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TessgridBuilder.rc" />
@@ -221,7 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\circle.ico" />
-    <Image Include="res\circular.ico" />
+    <Image Include="res\logo.bmp" />
     <Image Include="res\new.ico" />
     <Image Include="res\polygon.ico" />
     <Image Include="res\saveas.ico" />
@@ -229,11 +242,6 @@
     <Image Include="res\open.ico" />
     <Image Include="res\save.ico" />
     <Image Include="res\toolbar.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\VayoMain\VayoMain.vcxproj">
-      <Project>{e8605e2e-db10-4ca2-a234-0a895eafdda2}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

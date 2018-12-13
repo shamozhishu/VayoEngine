@@ -608,11 +608,11 @@ void CollisionDetector::getPickedObjectAABB(SceneNode* root, Line3df& ray, int b
 						}
 					}
 				}
-
-				// Only check the children if this node is visible.
-				getPickedObjectAABB(pNode, ray, bits, outBestDistance, outBestObj);
 			}
 		}
+
+		// Only check the children if this node is visible.
+		getPickedObjectAABB(pNode, ray, bits, outBestDistance, outBestObj);
 	}
 }
 

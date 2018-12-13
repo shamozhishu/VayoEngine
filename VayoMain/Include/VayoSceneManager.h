@@ -26,8 +26,8 @@ public:
 
 	template<typename T> T* createSceneNode(SceneNode* parent, const wstring& name = L"");
 	template<typename T> T* findSceneNode(const wstring& name);
-	void                    destroySceneNode(const wstring& name);
-	void                    destroySceneNode(SceneNode* sn);
+	void                    destroySceneNode(const wstring& name, bool cleanUpChildren = false);
+	void                    destroySceneNode(SceneNode* sn, bool cleanUpChildren = false);
 	void                    destroyAllSceneNodes();
 
 	template<typename T> T* createObject(const wstring& name = L"");
@@ -92,7 +92,7 @@ T* SceneManager::findSceneNode(const wstring& name)
 template<typename T>
 T* SceneManager::createObject(const wstring& name /*= L""*/)
 {
-	T* ret = new T(name);
+	T* ret = new T(name, this);
 	MovableObject* pObj = dynamic_cast<MovableObject*>(ret);
 	if (NULL == pObj)
 	{
@@ -123,7 +123,7 @@ T* SceneManager::findObject(const wstring& name)
 template<typename T>
 T* SceneManager::createAnimator(const wstring& name /*= L""*/)
 {
-	T* ret = new T(name);
+	T* ret = new T(name, this);
 	NodeAnimator* pAnim = dynamic_cast<NodeAnimator*>(ret);
 	if (NULL == pAnim)
 	{

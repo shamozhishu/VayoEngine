@@ -71,7 +71,7 @@ bool Root::launch(const Config& config)
 		if (it != _renderers.end())
 			_activeRenderer = it->second;
 		IF_FALSE_BREAK(_activeRenderer);
-		_activeDevice = _mainDevice = _activeRenderer->createDevice(config.MainDeviceAttrib);
+		_activeDevice = _mainDevice = _activeRenderer->createDevice(-1, config.MainDeviceAttrib);
 		IF_FALSE_BREAK(_activeDevice);
 		IF_FALSE_BREAK(_activeRenderer->init(config.AntiAliasFactor, config.HandleSRGB));
 		IF_FALSE_BREAK(_textureManager && _textureManager->init());
@@ -95,6 +95,9 @@ bool Root::renderOneFrame(Device* renderWnd /*= NULL*/)
 	if (!renderWnd)
 		renderWnd = _activeDevice;
 
+	if (!renderWnd)
+		return false;
+
 	if (!_activeRenderer->beginScene(true, true, true, renderWnd))
 		return false;
 
@@ -111,6 +114,45 @@ bool Root::renderOneFrame(Device* renderWnd /*= NULL*/)
 		uiMgr->render();
 
 	return _activeRenderer->endScene();
+}
+
+void Root::bootFrame(SceneManager* scene, Device* dev /*= NULL*/, const wstring& userEvtID /*= L""*/)
+{
+	bool isDispatchEvts = false;
+	if (scene && _curSceneMgr != scene)
+	{
+		isDispatchEvts = true;
+		_curSceneMgr = scene;
+	}
+
+	if (dev && _activeDevice != dev)
+	{
+		isDispatchEvts = true;
+		_activeDevice = dev;
+	}
+
+	if (!userEvtID.empty())
+		isDispatchEvts = true;
+
+	if (isDispatchEvts)
+	{
+		vector<wstring> evtIds;
+		if (_activeDevice)
+			evtIds.push_back(_activeDevice->getDeviceCode());
+		if (_curSceneMgr)
+			evtIds.push_back(_curSceneMgr->getName());
+		if (!userEvtID.empty())
+			evtIds.push_back(userEvtID);
+		_touchDispatcher.dispatchTouchEvts(evtIds);
+		_keypadDispatcher.dispatchKeypadEvts(evtIds);
+	}
+}
+
+UIManager* Root::getUIManager() const
+{
+	if (_activeDevice)
+		return _activeDevice->getUIManager();
+	return _mainDevice->getUIManager();
 }
 
 void Root::addRenderSystem(RenderSystem* newRenderer)
@@ -143,10 +185,14 @@ SceneManager* Root::findSceneMgr(const wstring& sceneName)
 
 void Root::destroySceneMgr(const wstring& sceneName)
 {
+	SceneManager* pSceneMgr;
 	map<wstring, SceneManager*>::iterator it = _sceneMgrPool.find(sceneName);
 	if (it != _sceneMgrPool.end())
 	{
-		delete it->second;
+		pSceneMgr = it->second;
+		if (pSceneMgr == _curSceneMgr)
+			_curSceneMgr = NULL;
+		delete pSceneMgr;
 		_sceneMgrPool.erase(it);
 	}
 }
@@ -162,7 +208,13 @@ void Root::destroyAllSceneMgrs()
 	map<wstring, SceneManager*>::iterator it = _sceneMgrPool.begin();
 	for (; it != _sceneMgrPool.end(); ++it)
 		delete it->second;
+	_curSceneMgr = NULL;
 	_sceneMgrPool.clear();
+}
+
+void Root::setNullCurSceneMgr()
+{
+	_curSceneMgr = NULL;
 }
 
 Device* Root::createDevice(void* wndHandle /*= NULL*/, bool wndQuit /*= true*/, bool wndPaint /*= false*/,
@@ -171,28 +223,25 @@ Device* Root::createDevice(void* wndHandle /*= NULL*/, bool wndQuit /*= true*/, 
 {
 	if (_activeRenderer)
 	{
-		Device::Attrib devAttrib;
-		devAttrib.WndHandle = wndHandle;
-		devAttrib.WndQuit = wndQuit;
-		devAttrib.WndPaint = wndPaint;
-		devAttrib.WndCaption = wndCaption;
-		devAttrib.TurnOnUI = turnOnUI;
-		devAttrib.FullScreen = fullScreen;
-		devAttrib.BgClearColor = bgClearColor;
-		devAttrib.ScreenSize = screenSize;
-
-		Device* dev = _activeRenderer->createDevice(devAttrib);
 		for (int i = 0; i < _maxSupportDevCnt; ++i)
 		{
 			if (NULL == _multiDevices[i])
 			{
-				_multiDevices[i] = dev;
-				return dev;
+				Device::Attrib devAttrib;
+				devAttrib.WndHandle = wndHandle;
+				devAttrib.WndQuit = wndQuit;
+				devAttrib.WndPaint = wndPaint;
+				devAttrib.WndCaption = wndCaption;
+				devAttrib.TurnOnUI = turnOnUI;
+				devAttrib.FullScreen = fullScreen;
+				devAttrib.BgClearColor = bgClearColor;
+				devAttrib.ScreenSize = screenSize;
+				_multiDevices[i] = _activeRenderer->createDevice(i, devAttrib);
+				return _multiDevices[i];
 			}
 		}
 
 		Log::wprint(ELL_WARNING, L"达到支持设备数量的最大上限值[%d]，无法创建新的窗口设备！", _maxSupportDevCnt);
-		SAFE_DELETE(dev);
 	}
 
 	return NULL;
@@ -209,6 +258,8 @@ void Root::destroyDevice(unsigned int idx)
 {
 	if (idx >= _maxSupportDevCnt)
 		return;
+	if (_multiDevices[idx] == _activeDevice)
+		_activeDevice = NULL;
 	SAFE_DELETE(_multiDevices[idx]);
 }
 
@@ -221,8 +272,12 @@ void Root::destroyDevice(Device* dev)
 			if (_multiDevices[i] == dev)
 			{
 				SAFE_DELETE(_multiDevices[i]);
+				break;
 			}
 		}
+
+		if (dev == _activeDevice)
+			_activeDevice = NULL;
 	}
 }
 
@@ -232,32 +287,14 @@ void Root::destroyAllDevices()
 	{
 		SAFE_DELETE(_multiDevices[i]);
 	}
+
+	if (_mainDevice != _activeDevice)
+		_activeDevice = NULL;
 }
 
 int Root::getMaxSupportDevCnt()
 {
 	return _maxSupportDevCnt;
-}
-
-UIManager* Root::getUIManager() const
-{
-	if (_activeDevice)
-		return _activeDevice->getUIManager();
-	return _mainDevice->getUIManager();
-}
-
-TouchDispatcher* Root::getTouchDispatcher() const
-{
-	if (_activeDevice)
-		return _activeDevice->getTouchDispatcher();
-	return _mainDevice->getTouchDispatcher();
-}
-
-KeypadDispatcher* Root::getKeypadDispatcher() const
-{
-	if (_activeDevice)
-		return _activeDevice->getKeypadDispatcher();
-	return _mainDevice->getKeypadDispatcher();
 }
 
 void Root::loadPlugins()

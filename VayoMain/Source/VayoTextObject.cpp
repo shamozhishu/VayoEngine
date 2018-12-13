@@ -8,9 +8,9 @@
 
 NS_VAYO_BEGIN
 
-VAYO_REFLEX_WITHPARA_IMPLEMENT(TextObject, const wstring&)
-TextObject::TextObject(const wstring& name)
-	: MovableObject(name)
+Reflex<TextObject, const wstring&, SceneManager*> TextObject::_dynReflex;
+TextObject::TextObject(const wstring& name, SceneManager* originSceneMgr)
+	: MovableObject(name, originSceneMgr)
 	, _fontid(0)
 {
 }

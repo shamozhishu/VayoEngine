@@ -18,12 +18,13 @@ typedef struct tagSpatialInfo
 	Vector3df _translation;
 	Vector3df _rotation;
 	Vector3df _scale;
+	tagSpatialInfo() : _scale(1,1,1) {}
 } SpatialInfo;
 
 class _VayoExport Node : public AttribSerializer
 {
 public:
-	Node(const wstring& name, Node* parent, SceneManager* mgr);
+	Node(const wstring& name, Node* parent, SceneManager* originSceneMgr);
 	virtual ~Node();
 	virtual void                visit(float dt);
 	virtual Matrix4x4           getRelTransformation() const;
@@ -58,6 +59,7 @@ public:
 protected:
 	virtual void updateAbsPosition();
 	DISALLOW_COPY_AND_ASSIGN(Node)
+	PROPERTY_R(SceneManager*, _originSceneMgr, OriginSceneMgr)
 protected:
 	wstring               _name;
 	bool                  _canVisit;
@@ -67,7 +69,6 @@ protected:
 	list<Node*>           _children;
 	list<NodeAnimator*>   _animators;
 	UserDataBind          _userDataBind;
-	SceneManager*         _sceneMgr;
 };
 
 NS_VAYO_END

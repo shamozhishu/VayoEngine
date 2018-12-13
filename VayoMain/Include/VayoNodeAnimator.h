@@ -13,16 +13,16 @@ NS_VAYO_BEGIN
 class _VayoExport NodeAnimator : public AttribSerializer, public TouchDelegate, public KeypadDelegate
 {
 public:
-	NodeAnimator(const wstring& name);
+	NodeAnimator(const wstring& name, SceneManager* originSceneMgr);
 	virtual ~NodeAnimator();
 	virtual void animateNode(Node* node, float dt) = 0;
-	virtual bool hasFinished(void) const;
-	virtual bool isInputEnabled() const;
+	virtual bool hasFinished() const;
 	virtual void serialize(XMLElement* outXml);
 	virtual bool deserialize(XMLElement* inXml);
 
-private:
+protected:
 	PROPERTY_R_REF(wstring, _name, Name)
+	PROPERTY_R(SceneManager*, _originSceneMgr, OriginSceneMgr)
 };
 
 NS_VAYO_END

@@ -68,6 +68,36 @@ inline void wstringtok(Container& container, const std::wstring& in,
 	}
 }
 
+/* 清理vector容器里的重复元素 */
+template<typename T>
+void clearDupElements(vector<T>& elems)
+{
+	vector<T>::iterator it, dupit;
+	for (it = ++elems.begin(); it != elems.end();)
+	{
+		dupit = find(elems.begin(), it, *it);
+		if (dupit != it)
+			it = elems.erase(it);
+		else
+			it++;
+	}
+}
+
+/* 清理list容器里的重复元素 */
+template<typename T>
+void clearDupElements(list<T>& elems)
+{
+	list<T>::iterator it, dupit;
+	for (it = ++elems.begin(); it != elems.end();)
+	{
+		dupit = find(elems.begin(), it, *it);
+		if (dupit != it)
+			it = elems.erase(it);
+		else
+			it++;
+	}
+}
+
 /* 修剪掉多字节字符串里前后的空白符 */
 static inline string& trim(string& str)
 {

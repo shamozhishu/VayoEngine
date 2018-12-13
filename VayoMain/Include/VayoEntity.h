@@ -33,9 +33,9 @@ private:
 
 class _VayoExport Entity : public MovableObject
 {
-	VAYO_REFLEX_WITHPARA_DECLARE(Entity, const wstring&)
+	static Reflex<Entity, const wstring&, SceneManager*> _dynReflex;
 public:
-	Entity(const wstring& name);
+	Entity(const wstring& name, SceneManager* originSceneMgr);
 	~Entity();
 	void         update(float dt);
 	void         setMesh(MeshPtr pMesh);

@@ -16,11 +16,11 @@
 NS_VAYO_BEGIN
 
 // 摄像机
-class _VayoExport Camera : public TouchDelegate, public KeypadDelegate
+class _VayoExport Camera : public MovableObject, public TouchDelegate, public KeypadDelegate
 {
 	friend class ViewMemento;
 public:
-	Camera();
+	Camera(const wstring& name, SceneManager* originSceneMgr);
 	virtual ~Camera();
 	virtual void  refresh();
 	virtual void  setNeedUpdate(bool isUpdate);
@@ -70,6 +70,10 @@ public:
 
 	virtual bool setViewMemento(const wstring& name);
 	virtual bool getViewMemento(const wstring& name);
+	virtual bool hasViewMemento(const wstring& name);
+
+	virtual void serialize(XMLElement* outXml);
+	virtual bool deserialize(XMLElement* inXml);
 
 protected:
 	virtual void regenerateViewArea();
@@ -96,12 +100,12 @@ protected:
 };
 
 // 第一人称摄像机
-class _VayoExport FPSCamera : public MovableObject, public Camera
+class _VayoExport FPSCamera : public Camera
 {
 	friend class ViewMementoFPS;
-	VAYO_REFLEX_WITHPARA_DECLARE(FPSCamera, const wstring&)
+	static Reflex<FPSCamera, const wstring&, SceneManager*> _dynReflex;
 public:
-	FPSCamera(const wstring& name);
+	FPSCamera(const wstring& name, SceneManager* originSceneMgr);
 	~FPSCamera();
 	void update(float dt);
 	void setMoveSpeed(float speed);
@@ -120,14 +124,15 @@ protected:
 };
 
 // 轨道摄像机
-class _VayoExport OrbitCamera : public MovableObject, public Camera
+class _VayoExport OrbitCamera : public Camera
 {
 	friend class ViewMementoOrbit;
-	VAYO_REFLEX_WITHPARA_DECLARE(OrbitCamera, const wstring&)
+	static Reflex<OrbitCamera, const wstring&, SceneManager*> _dynReflex;
 public:
-	OrbitCamera(const wstring& name);
+	OrbitCamera(const wstring& name, SceneManager* originSceneMgr);
 	~OrbitCamera();
 	void update(float dt);
+	void resetArcball();
 	void setMoveSpeed(float speed);
 	void setZoomSpeed(float speed);
 	void setLens(float fovY, float aspect, float zn, float zf);
@@ -154,9 +159,9 @@ protected:
 class _VayoExport EagleEyeCamera : public OrbitCamera
 {
 	friend class ViewMementoEagleEye;
-	VAYO_REFLEX_WITHPARA_DECLARE(EagleEyeCamera, const wstring&)
+	static Reflex<EagleEyeCamera, const wstring&, SceneManager*> _dynReflex;
 public:
-	EagleEyeCamera(const wstring& name);
+	EagleEyeCamera(const wstring& name, SceneManager* originSceneMgr);
 	~EagleEyeCamera();
 	void  update(float dt);
 	bool  isOrthogonal() { return true; }

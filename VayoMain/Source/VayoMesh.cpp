@@ -266,10 +266,7 @@ Mesh::Mesh(const wstring& name)
 
 Mesh::~Mesh()
 {
-	vector<SubMesh*>::iterator it = _subMeshList.begin();
-	for (; it != _subMeshList.end(); ++it)
-		delete *it;
-	_subMeshList.clear();
+	destroyAllSubMeshs();
 }
 
 const wstring& Mesh::getName() const
@@ -349,6 +346,15 @@ void Mesh::destroySubMesh(const wstring& name)
 {
 	unsigned short index = getSubMeshIndex(name);
 	destroySubMesh(index);
+}
+
+void Mesh::destroyAllSubMeshs()
+{
+	vector<SubMesh*>::iterator it = _subMeshList.begin();
+	for (; it != _subMeshList.end(); ++it)
+		delete *it;
+	_subMeshList.clear();
+	_subMeshNameMap.clear();
 }
 
 unsigned int Mesh::getSubMeshIndex(const wstring& name) const

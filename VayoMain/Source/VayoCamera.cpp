@@ -13,8 +13,11 @@ void Camera::setNeedUpdate(bool isUpdate)
 	_needUpdate = isUpdate;
 }
 
-Camera::Camera()
-	: _right(1.0f, 0.0f, 0.0f)
+Camera::Camera(const wstring& name, SceneManager* originSceneMgr)
+	: MovableObject(name, originSceneMgr)
+	, TouchDelegate(originSceneMgr->getName())
+	, KeypadDelegate(originSceneMgr->getName())
+	, _right(1.0f, 0.0f, 0.0f)
 	, _up(0.0f, 1.0f, 0.0f)
 	, _look(0.0f, 0.0f, -1.0f)
 	, _needUpdate(true)
@@ -27,8 +30,6 @@ Camera::Camera()
 
 Camera::~Camera()
 {
-	Root::getSingleton().getTouchDispatcher()->removeTouchDelegate(this);
-	Root::getSingleton().getKeypadDispatcher()->removeKeypadDelegate(this);
 }
 
 void Camera::refresh()
@@ -306,6 +307,12 @@ bool Camera::getViewMemento(const wstring& name)
 	return true;
 }
 
+bool Camera::hasViewMemento(const wstring& name)
+{
+	map<wstring, ViewMementoPtr>::iterator it = _viewMementoPool.find(name);
+	return it != _viewMementoPool.end();
+}
+
 void Camera::regenerateViewArea()
 {
 	_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _affector;
@@ -318,10 +325,79 @@ void Camera::recalculateViewArea()
 	_viewArea.setFrom(m);
 }
 
+void Camera::serialize(XMLElement* outXml)
+{
+	MovableObject::serialize(outXml);
+	char szbuf[256];
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _position._x, _position._y, _position._z);
+	outXml->SetAttribute("position", szbuf);
+	Vector3df targetPos = _position + (_look*10.0f);
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", targetPos._x, targetPos._y, targetPos._z);
+	outXml->SetAttribute("target", szbuf);
+	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _up._x, _up._y, _up._z);
+	outXml->SetAttribute("worldUp", szbuf);
+	if (!isOrthogonal())
+		outXml->SetAttribute("fovY", getFovY());
+	outXml->SetAttribute("zn", getNearZ());
+	outXml->SetAttribute("zf", getFarZ());
+}
+
+bool Camera::deserialize(XMLElement* inXml)
+{
+	if (!MovableObject::deserialize(inXml))
+		return false;
+
+	Vector3df position(0, 0, 0), target(0, 0, -1), worldUp(0, 1, 0);
+	vector<string> container;
+	string strTemp = inXml->Attribute("position");
+	stringtok(container, strTemp, ",");
+	if (container.size() >= 3)
+	{
+		float x = (float)atof(container[0].c_str());
+		float y = (float)atof(container[1].c_str());
+		float z = (float)atof(container[2].c_str());
+		position.set(x, y, z);
+	}
+
+	strTemp = inXml->Attribute("target");
+	container.clear();
+	stringtok(container, strTemp, ",");
+	if (container.size() >= 3)
+	{
+		float x = (float)atof(container[0].c_str());
+		float y = (float)atof(container[1].c_str());
+		float z = (float)atof(container[2].c_str());
+		target.set(x, y, z);
+	}
+
+	strTemp = inXml->Attribute("worldUp");
+	container.clear();
+	stringtok(container, strTemp, ",");
+	if (container.size() >= 3)
+	{
+		float x = (float)atof(container[0].c_str());
+		float y = (float)atof(container[1].c_str());
+		float z = (float)atof(container[2].c_str());
+		worldUp.set(x, y, z);
+	}
+
+	lookAt(position, target, worldUp);
+
+	float zn = inXml->FloatAttribute("zn");
+	float zf = inXml->FloatAttribute("zf");
+
+	if (isOrthogonal())
+		setLens(_nearWindowHeight, _farWindowHeight, zn, zf);
+	else
+		setLens(inXml->FloatAttribute("fovY"), getAspect(), zn, zf);
+
+	return true;
+}
+
 //////////////////////////////////////////////////////////////////////////
-VAYO_REFLEX_WITHPARA_IMPLEMENT(FPSCamera, const wstring&)
-FPSCamera::FPSCamera(const wstring& name)
-	: MovableObject(name)
+Reflex<FPSCamera, const wstring&, SceneManager*> FPSCamera::_dynReflex;
+FPSCamera::FPSCamera(const wstring& name, SceneManager* originSceneMgr)
+	: Camera(name, originSceneMgr)
 {
 	_moveSpeed[0] = _moveSpeed[1] = 20.0f;
 }
@@ -409,75 +485,22 @@ ViewMementoPtr FPSCamera::createViewMemento()
 
 void FPSCamera::serialize(XMLElement* outXml)
 {
-	MovableObject::serialize(outXml);
-	char szbuf[256];
-	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _position._x, _position._y, _position._z);
-	outXml->SetAttribute("position", szbuf);
-	Vector3df targetPos = _position + (_look*10.0f);
-	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", targetPos._x, targetPos._y, targetPos._z);
-	outXml->SetAttribute("target", szbuf);
-	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _up._x, _up._y, _up._z);
-	outXml->SetAttribute("worldUp", szbuf);
-	outXml->SetAttribute("fovY", getFovY());
-	outXml->SetAttribute("zn", getNearZ());
-	outXml->SetAttribute("zf", getFarZ());
+	Camera::serialize(outXml);
 	outXml->SetAttribute("moveSpeed", _moveSpeed[1]);
 }
 
 bool FPSCamera::deserialize(XMLElement* inXml)
 {
-	if (!MovableObject::deserialize(inXml))
+	if (!Camera::deserialize(inXml))
 		return false;
-
-	Vector3df position(0, 0, 0), target(0, 0, -1), worldUp(0, 1, 0);
-	vector<string> container;
-	string strTemp = inXml->Attribute("position");
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		position.set(x, y, z);
-	}
-
-	strTemp = inXml->Attribute("target");
-	container.clear();
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		target.set(x, y, z);
-	}
-
-	strTemp = inXml->Attribute("worldUp");
-	container.clear();
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		worldUp.set(x, y, z);
-	}
-
-	lookAt(position, target, worldUp);
-
-	float fovY = inXml->FloatAttribute("fovY");
-	float zn = inXml->FloatAttribute("zn");
-	float zf = inXml->FloatAttribute("zf");
-
-	setLens(fovY, getAspect(), zn, zf);
 	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
-VAYO_REFLEX_WITHPARA_IMPLEMENT(OrbitCamera, const wstring&)
-OrbitCamera::OrbitCamera(const wstring& name)
-	: MovableObject(name)
+Reflex<OrbitCamera, const wstring&, SceneManager*> OrbitCamera::_dynReflex;
+OrbitCamera::OrbitCamera(const wstring& name, SceneManager* originSceneMgr)
+	: Camera(name, originSceneMgr)
 	, _arcball(0, 0)
 {
 	_moveSpeed[0] = _moveSpeed[1] = _zoomSpeed[0] = _zoomSpeed[1] = 5.0f;
@@ -495,6 +518,14 @@ void OrbitCamera::update(float dt)
 	if (Root::getSingleton().getCurSceneMgr()->getActiveCamera() != this)
 		return;
 	Camera::refresh();
+}
+
+void OrbitCamera::resetArcball()
+{
+	_arcball._transform.makeIdentity();
+	_arcball._thisRot.makeIdentity();
+	_arcball._lastRot.makeIdentity();
+	_arcball._deltaRot.makeIdentity();
 }
 
 void OrbitCamera::setMoveSpeed(float speed)
@@ -605,81 +636,24 @@ ViewMementoPtr OrbitCamera::createViewMemento()
 
 void OrbitCamera::serialize(XMLElement* outXml)
 {
-	MovableObject::serialize(outXml);
-	char szbuf[256];
-	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _position._x, _position._y, _position._z);
-	outXml->SetAttribute("position", szbuf);
-	Vector3df targetPos = _position + (_look*10.0f);
-	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", targetPos._x, targetPos._y, targetPos._z);
-	outXml->SetAttribute("target", szbuf);
-	sprintf_s(szbuf, sizeof(szbuf), "%f,%f,%f", _up._x, _up._y, _up._z);
-	outXml->SetAttribute("worldUp", szbuf);
-	if (!isOrthogonal())
-		outXml->SetAttribute("fovY", getFovY());
-	outXml->SetAttribute("zn", getNearZ());
-	outXml->SetAttribute("zf", getFarZ());
+	Camera::serialize(outXml);
 	outXml->SetAttribute("moveSpeed", _moveSpeed[1]);
 	outXml->SetAttribute("zoomSpeed", _zoomSpeed[1]);
 }
 
 bool OrbitCamera::deserialize(XMLElement* inXml)
 {
-	if (!MovableObject::deserialize(inXml))
+	if (!Camera::deserialize(inXml))
 		return false;
-
-	Vector3df position(0, 0, 0), target(0, 0, -1), worldUp(0, 1, 0);
-	vector<string> container;
-	string strTemp = inXml->Attribute("position");
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		position.set(x, y, z);
-	}
-
-	strTemp = inXml->Attribute("target");
-	container.clear();
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		target.set(x, y, z);
-	}
-
-	strTemp = inXml->Attribute("worldUp");
-	container.clear();
-	stringtok(container, strTemp, ",");
-	if (container.size() >= 3)
-	{
-		float x = (float)atof(container[0].c_str());
-		float y = (float)atof(container[1].c_str());
-		float z = (float)atof(container[2].c_str());
-		worldUp.set(x, y, z);
-	}
-
-	lookAt(position, target, worldUp);
-
-	float zn = inXml->FloatAttribute("zn");
-	float zf = inXml->FloatAttribute("zf");
-
-	if (isOrthogonal())
-		setLens(_nearWindowHeight, _farWindowHeight, zn, zf);
-	else
-		setLens(inXml->FloatAttribute("fovY"), getAspect(), zn, zf);
-
 	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
 	_zoomSpeed[0] = _zoomSpeed[1] = inXml->FloatAttribute("zoomSpeed");
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
-VAYO_REFLEX_WITHPARA_IMPLEMENT(EagleEyeCamera, const wstring&)
-EagleEyeCamera::EagleEyeCamera(const wstring& name)
-	: OrbitCamera(name)
+Reflex<EagleEyeCamera, const wstring&, SceneManager*> EagleEyeCamera::_dynReflex;
+EagleEyeCamera::EagleEyeCamera(const wstring& name, SceneManager* originSceneMgr)
+	: OrbitCamera(name, originSceneMgr)
 	, _zoomFactor(1.0f)
 {
 	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();

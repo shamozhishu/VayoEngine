@@ -24,6 +24,16 @@ public:
 		UserDataBind(rhs).swap(*this);
 		return *this;
 	}
+	inline friend wstringstream& operator<<(wstringstream& ss, const UserDataBind& in)
+	{
+		return in.operator<<(ss);
+	}
+	inline friend wstringstream& operator>>(wstringstream& ss, UserDataBind& out)
+	{
+		return out.operator>>(ss);
+	}
+	wstringstream& operator<<(wstringstream& ss) const;
+	wstringstream& operator>>(wstringstream& ss);
 
 public:
 	void setUserData(const Any& anything);

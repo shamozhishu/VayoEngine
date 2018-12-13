@@ -82,6 +82,7 @@ public:
 	unsigned int            getSubMeshCount() const;
 	void                    destroySubMesh(unsigned int index);
 	void                    destroySubMesh(const wstring& name);
+	void                    destroyAllSubMeshs();
 	unsigned int            getSubMeshIndex(const wstring& name) const;
 	void                    nameSubMesh(const wstring& name, unsigned int index);
 	void                    unnameSubMesh(const wstring& name);

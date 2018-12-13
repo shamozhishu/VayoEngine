@@ -53,6 +53,8 @@ namespace Vayo
 	class ViewMemento;
 	class SpriteBox;
 	class MovableObject;
+	class ManualObject;
+	class Entity;
 	class Node;
 	class NodeAnimator;
 	class SceneNode;

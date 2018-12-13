@@ -6,7 +6,7 @@
 
 class CTessgridView;
 // CTessgridBuilderDlg 对话框
-class CTessgridBuilderDlg : public CDialogEx
+class CTessgridBuilderDlg : public CDialog
 {
 // 构造
 public:
@@ -29,6 +29,9 @@ protected:
 	void InitStatusBar();
 	BOOL InitTreeCtrl();
 	void Resize();
+	void CheckToTree(HTREEITEM hItem, BOOL bCheck);
+	void SetChildCheck(HTREEITEM hItem, BOOL bCheck);
+	void SetParentCheck(HTREEITEM hItem, BOOL bCheck);
 
 // 实现
 protected:
@@ -41,7 +44,8 @@ protected:
 	HDITEM m_gridCtrlItem;
 	CMFCPropertyGridCtrl m_wndPropList;
 	CListCtrl m_listCtrl;
-	HTREEITEM m_treeItem;
+	HTREEITEM m_treeCircleItem;
+	HTREEITEM m_treePolyItem;
 	TVINSERTSTRUCT m_treeStruct;
 	CImageList m_treeImg;
 	CTreeCtrl m_treeCtrl;
@@ -60,4 +64,8 @@ public:
 	afx_msg void OnOpenFile();
 	afx_msg void OnSaveFile();
 	afx_msg void OnSaveAs();
+	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
+	afx_msg void OnInsertContour();
+	afx_msg void OnDeleteContour();
+	afx_msg void OnNMTVStateImageChangingTreeContourIdx(NMHDR *pNMHDR, LRESULT *pResult);
 };

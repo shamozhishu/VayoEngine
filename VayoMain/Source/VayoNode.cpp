@@ -13,13 +13,12 @@ void Node::updateAbsPosition()
 		_absTransformation = getRelTransformation();
 }
 
-Node::Node(const wstring& name, Node* parent, SceneManager* mgr)
+Node::Node(const wstring& name, Node* parent, SceneManager* originSceneMgr)
 	: _name(name)
 	, _parent(parent)
-	, _sceneMgr(mgr)
+	, _originSceneMgr(originSceneMgr)
 	, _canVisit(true)
 {
-	_relSpace._scale.set(1.0f, 1.0f, 1.0f);
 	if (_parent)
 		_parent->addChild(this);
 	updateAbsPosition();
@@ -78,12 +77,11 @@ void Node::setName(wstring name)
 
 void Node::addChild(Node* child)
 {
-	if (child)
-	{
-		child->remove();
-		_children.push_back(child);
-		child->_parent = this;
-	}
+	if (!child || child->getOriginSceneMgr() != getOriginSceneMgr())
+		return;
+	child->remove();
+	_children.push_back(child);
+	child->_parent = this;
 }
 
 bool Node::removeChild(Node* child)
@@ -184,6 +182,8 @@ void Node::animating(float dt)
 
 void Node::addAnimator(NodeAnimator* animator)
 {
+	if (!animator || animator->getOriginSceneMgr() != getOriginSceneMgr())
+		return;
 	list<NodeAnimator*>::iterator it = std::find(_animators.begin(), _animators.end(), animator);
 	if (it == _animators.end())
 		_animators.push_back(animator);

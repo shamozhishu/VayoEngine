@@ -34,11 +34,16 @@
 #include <afxcontrolbars.h>     // 功能区和控件条的 MFC 支持
 
 
+#ifdef _DEBUG
+#pragma comment(lib, "VayoMain_d.lib")
+#else
+#pragma comment(lib, "VayoMain.lib")
+#endif
 
 //#define VAYO_ENABLE_MEM_LEAK_CHECK
 #include "Vayo.h"
 using namespace Vayo;
-
+#include "CommonDef.h"
 
 
 #ifdef _UNICODE

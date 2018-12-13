@@ -40,7 +40,7 @@ public:
 	} Attrib;
 
 public:
-	Device(const Attrib& attrib);
+	Device(int deviceID, const Attrib& attrib);
 	virtual ~Device();
 	virtual bool  init() = 0;
 	virtual bool  openUI();
@@ -52,6 +52,7 @@ public:
 	virtual void  sleep(unsigned int milliSeconds, bool pauseTimer) = 0;
 	virtual void  setWndCaption(const wstring& wndCaption);
 	virtual void  setScreenSize(const Dimension2di& screenSize);
+	virtual wstring getDeviceCode() const;
 	virtual const wstring& getWndCaption() const;
 	virtual const Dimension2di& getScreenSize() const;
 
@@ -73,15 +74,14 @@ public:
 	virtual void  injectInputLanguageChange();
 
 protected:
+	PROPERTY_R(int,      _deviceID,    DeviceID)
 	PROPERTY_R(bool,     _appPaused,   AppPaused)
 	PROPERTY_R(bool,     _minimized,   Minimized)
 	PROPERTY_R(bool,     _maximized,   Maximized)
 	PROPERTY_R(bool,     _resizing,    Resizing)
 	PROPERTY_R(BitState, _mouseIsDown, MouseIsDown)
-	PROPERTY_R_REF(Attrib,        _attribute,        Attrib)
-	PROPERTY_R(UIManager*,        _uiManager,        UIManager)
-	PROPERTY_R(TouchDispatcher*,  _touchDispatcher,  TouchDispatcher)
-	PROPERTY_R(KeypadDispatcher*, _keypadDispatcher, KeypadDispatcher)
+	PROPERTY_R_REF(Attrib, _attribute, Attrib)
+	PROPERTY_R(UIManager*, _uiManager, UIManager)
 };
 
 NS_VAYO_END

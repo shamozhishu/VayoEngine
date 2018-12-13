@@ -12,9 +12,9 @@ NS_VAYO_BEGIN
 
 class _VayoExport TextObject : public MovableObject, public Renderable
 {
-	VAYO_REFLEX_WITHPARA_DECLARE(TextObject, const wstring&)
+	static Reflex<TextObject, const wstring&, SceneManager*> _dynReflex;
 public:
-	TextObject(const wstring& name);
+	TextObject(const wstring& name, SceneManager* originSceneMgr);
 	~TextObject();
 	void update(float dt);
 	void render();

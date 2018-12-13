@@ -2189,7 +2189,7 @@ void UIComboBox::render()
 }
 
 //////////////////////////////////////////////////////////////////////////
-VAYO_REFLEX_WITHPARA_IMPLEMENT(UIDialog, const wstring&)
+Reflex<UIDialog, const wstring&> UIDialog::_dynReflex;
 UIDialog::UIDialog(const wstring& fileName)
 	: _lastSelectedCtrl(NULL)
 {
@@ -2488,16 +2488,17 @@ bool UIDialog::deserialize(XMLElement* inXml)
 }
 
 //////////////////////////////////////////////////////////////////////////
-UIManager::UIManager(Device* device)
-	: _relatedDevice(device)
+UIManager::UIManager(Device* dev)
+	: TouchDelegate(dev->getDeviceCode())
+	, KeypadDelegate(dev->getDeviceCode())
 	, _curDrawImage(NULL)
 	, _currentSkin(NULL)
 	, _clipArea(NULL)
 {
 	memset(_fontArr, 0, sizeof(_fontArr));
 	memset(_imageSetArr, 0, sizeof(_imageSetArr));
-	_relatedDevice->getTouchDispatcher()->addTouchDelegate(this, 0);
-	_relatedDevice->getKeypadDispatcher()->addKeypadDelegate(this, 0);
+	enableTouch(true, 0);
+	enableKeypad(true, 0);
 }
 
 UIManager::~UIManager()
@@ -2514,9 +2515,6 @@ UIManager::~UIManager()
 	{
 		SAFE_DELETE(_imageSetArr[i]);
 	}
-
-	_relatedDevice->getTouchDispatcher()->removeTouchDelegate(this);
-	_relatedDevice->getKeypadDispatcher()->removeKeypadDelegate(this);
 }
 
 bool UIManager::init()

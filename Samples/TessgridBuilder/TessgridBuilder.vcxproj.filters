@@ -9,6 +9,12 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Classes\UserInterface">
+      <UniqueIdentifier>{131cca33-35e6-4907-b4cc-182c8bbeb46c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\DataModel">
+      <UniqueIdentifier>{66da330f-31e5-4239-b777-7c26a52ec9b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -20,9 +26,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="DlgManager.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
     <ClInclude Include="TessgridApp.h">
       <Filter>Classes</Filter>
     </ClInclude>
@@ -30,17 +33,32 @@
       <Filter>Classes</Filter>
     </ClInclude>
     <ClInclude Include="TessgridBuilderDlg.h">
-      <Filter>Classes</Filter>
+      <Filter>Classes\UserInterface</Filter>
     </ClInclude>
     <ClInclude Include="TessgridView.h">
+      <Filter>Classes\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="WzdSplash.h">
+      <Filter>Classes\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgManager.h">
+      <Filter>Classes\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonDef.h">
       <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdManager.h">
+      <Filter>Classes\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="GridDataManager.h">
+      <Filter>Classes\DataModel</Filter>
+    </ClInclude>
+    <ClInclude Include="GridData.h">
+      <Filter>Classes\DataModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Classes</Filter>
-    </ClCompile>
-    <ClCompile Include="DlgManager.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
     <ClCompile Include="TessgridApp.cpp">
@@ -50,10 +68,25 @@
       <Filter>Classes</Filter>
     </ClCompile>
     <ClCompile Include="TessgridBuilderDlg.cpp">
-      <Filter>Classes</Filter>
+      <Filter>Classes\UserInterface</Filter>
     </ClCompile>
     <ClCompile Include="TessgridView.cpp">
-      <Filter>Classes</Filter>
+      <Filter>Classes\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="WzdSplash.cpp">
+      <Filter>Classes\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgManager.cpp">
+      <Filter>Classes\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdManager.cpp">
+      <Filter>Classes\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="GridDataManager.cpp">
+      <Filter>Classes\DataModel</Filter>
+    </ClCompile>
+    <ClCompile Include="GridData.cpp">
+      <Filter>Classes\DataModel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -75,13 +108,13 @@
     <Image Include="res\saveas.ico">
       <Filter>Resource</Filter>
     </Image>
-    <Image Include="res\circular.ico">
-      <Filter>Resource</Filter>
-    </Image>
     <Image Include="res\polygon.ico">
       <Filter>Resource</Filter>
     </Image>
     <Image Include="res\circle.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\logo.bmp">
       <Filter>Resource</Filter>
     </Image>
   </ItemGroup>

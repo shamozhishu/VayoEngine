@@ -14,13 +14,14 @@ const wstring& MovableObject::getName() const
 	return _name;
 }
 
-MovableObject::MovableObject(const wstring& name)
+MovableObject::MovableObject(const wstring& name, SceneManager* originSceneMgr)
 	: _name(name)
 	, _parentNode(NULL)
 	, _visible(true)
 	, _queueID(ERQ_MAIN_SOLID)
 	, _collideMask(0)
 	, _triContainer(NULL)
+	, _originSceneMgr(originSceneMgr)
 {
 	static unsigned short idx = 0;
 	if (0 == _name.compare(L""))
@@ -110,6 +111,14 @@ void MovableObject::serialize(XMLElement* outXml)
 		outXml->SetAttribute("queueid", _queueID);
 	if (!_collideMask.isEmptyState())
 		outXml->SetAttribute("collideMask", _collideMask());
+
+	wstringstream ss;
+	ss << _userDataBind;
+	string strUserData = unicodeToUtf8(ss.str());
+	if (!strUserData.empty())
+	{
+		outXml->LinkEndChild(outXml->GetDocument()->NewText(strUserData.c_str()));
+	}
 }
 
 bool MovableObject::deserialize(XMLElement* inXml)
@@ -119,6 +128,15 @@ bool MovableObject::deserialize(XMLElement* inXml)
 	inXml->QueryBoolAttribute("visible", &_visible);
 	inXml->QueryUnsignedAttribute("queueid", &_queueID);
 	_collideMask(inXml->UnsignedAttribute("collideMask"));
+
+	const char* szUserData = inXml->GetText();
+	if (szUserData)
+	{
+		wstringstream ss;
+		ss << utf8ToUnicode(szUserData);
+		ss >> _userDataBind;
+	}
+
 	return true;
 }
 

@@ -117,7 +117,7 @@ void combineModel(const wstring& connectorName, const wstring& rearCoverName, co
 	float scaleFactor = rearCoverRadius / connectorRadius;
 	float zOffset = 0.0f;
 
-	TableCSV* pTalbe = any_cast<TableCSV*>(pConnectorObj->getUserDataBind().getUserData(L"tablecsv"));
+	TableCSV* pTalbe = (TableCSV*)any_cast<void*>(pConnectorObj->getUserDataBind().getUserData(L"tablecsv"));
 	if (pTalbe)
 	{
 		int num = pTalbe->getItemCount();

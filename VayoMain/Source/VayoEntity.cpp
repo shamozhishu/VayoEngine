@@ -50,9 +50,9 @@ SubMesh* SubEntity::getSubMesh() const
 }
 
 //////////////////////////////////////////////////////////////////////////
-VAYO_REFLEX_WITHPARA_IMPLEMENT(Entity, const wstring&)
-Entity::Entity(const wstring& name)
-	: MovableObject(name)
+Reflex<Entity, const wstring&, SceneManager*> Entity::_dynReflex;
+Entity::Entity(const wstring& name, SceneManager* originSceneMgr)
+	: MovableObject(name, originSceneMgr)
 	, _changedMeshID(0)
 {
 }

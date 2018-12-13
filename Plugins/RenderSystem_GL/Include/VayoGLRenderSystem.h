@@ -17,7 +17,7 @@ public:
 	GLRenderSystem(const wstring& name);
 	~GLRenderSystem();
 
-	Device*      createDevice(const Device::Attrib& attrib);
+	Device*      createDevice(int deviceID, const Device::Attrib& attrib);
 	TexturePtr   createTexture(const wstring& name, Image* image, bool generateMipLevels);
 	DisplayList* createDisplayList(const wstring& name = L"");
 	Tesselator*  createTesselator(const wstring& name = L"");

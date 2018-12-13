@@ -7,6 +7,8 @@
 #include "TessgridBuilderDlg.h"
 #include "afxdialogex.h"
 #include "TessgridView.h"
+#include "WzdSplash.h"
+#include "GridDataManager.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -51,8 +53,10 @@ END_MESSAGE_MAP()
 
 
 CTessgridBuilderDlg::CTessgridBuilderDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(IDD_MODELBUILDER_DIALOG, pParent)
+	: CDialog(IDD_MODELBUILDER_DIALOG, pParent)
 	, m_modelView(NULL)
+	, m_treeCircleItem(NULL)
+	, m_treePolyItem(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -86,7 +90,7 @@ bool CTessgridBuilderDlg::isInitOK() const
 
 void CTessgridBuilderDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
+	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_MFCPROPERTYGRID1, m_wndPropList);
 	DDX_Control(pDX, IDC_LIST_CONTOUR_IDX, m_listCtrl);
 	DDX_Control(pDX, IDC_TREE_CONTOUR_IDX, m_treeCtrl);
@@ -130,7 +134,7 @@ BOOL CTessgridBuilderDlg::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 
-	return CDialogEx::PreTranslateMessage(pMsg);
+	return CDialog::PreTranslateMessage(pMsg);
 }
 
 BOOL CTessgridBuilderDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
@@ -159,12 +163,12 @@ BOOL CTessgridBuilderDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, L
 		}
 	}
 
-	return CDialogEx::OnWndMsg(message, wParam, lParam, pResult);
+	return CDialog::OnWndMsg(message, wParam, lParam, pResult);
 }
 
 void CTessgridBuilderDlg::OnCancel()
 {
-	CDialogEx::OnCancel();
+	CDialog::OnCancel();
 	PostQuitMessage(0);
 }
 
@@ -362,10 +366,12 @@ BOOL CTessgridBuilderDlg::InitTreeCtrl()
 		hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_POLYGON), IMAGE_ICON, 16, 16, 0);
 		m_treeImg.Add(hIcon);
 
-		m_treeItem = m_treeCtrl.InsertItem(TEXT("圆形轮廓"), 0, 0, NULL);
-		m_treeCtrl.SetItemState(m_treeItem, INDEXTOSTATEIMAGEMASK(0), TVIS_STATEIMAGEMASK);
-		m_treeItem = m_treeCtrl.InsertItem(TEXT("多边形轮廓"), 1, 1, NULL);
-		m_treeCtrl.SetItemState(m_treeItem, INDEXTOSTATEIMAGEMASK(0), TVIS_STATEIMAGEMASK);
+		m_treeCircleItem = m_treeCtrl.InsertItem(TEXT("圆形轮廓"), 0, 0, NULL);
+		//m_treeCtrl.SetItemState(m_treeCircleItem, INDEXTOSTATEIMAGEMASK(0), TVIS_STATEIMAGEMASK);
+		m_treeCtrl.SetItemData(m_treeCircleItem, ESCT_CIRCLE);
+		m_treePolyItem = m_treeCtrl.InsertItem(TEXT("多边形轮廓"), 1, 1, NULL);
+		//m_treeCtrl.SetItemState(m_treePolyItem, INDEXTOSTATEIMAGEMASK(0), TVIS_STATEIMAGEMASK);
+		m_treeCtrl.SetItemData(m_treePolyItem, ESCT_POLYGON);
 	}
 
 	return isSucc;
@@ -402,7 +408,80 @@ void CTessgridBuilderDlg::Resize()
 	m_modelView->MoveWindow(rc);
 }
 
-BEGIN_MESSAGE_MAP(CTessgridBuilderDlg, CDialogEx)
+void CTessgridBuilderDlg::CheckToTree(HTREEITEM hItem, BOOL bCheck)
+{
+	if (hItem != NULL)
+	{
+		SetChildCheck(hItem, bCheck);
+		SetParentCheck(hItem, bCheck);
+	}
+}
+
+void CTessgridBuilderDlg::SetChildCheck(HTREEITEM hItem, BOOL bCheck)
+{
+	HTREEITEM hChildItem = m_treeCtrl.GetChildItem(hItem);
+	while (hChildItem)
+	{
+		m_treeCtrl.SetCheck(hChildItem, bCheck);
+		SetChildCheck(hChildItem, bCheck);
+		hChildItem = m_treeCtrl.GetNextSiblingItem(hChildItem);
+	}
+}
+
+void CTessgridBuilderDlg::SetParentCheck(HTREEITEM hItem, BOOL bCheck)
+{
+	HTREEITEM hParent = m_treeCtrl.GetParentItem(hItem);
+	if (hParent == NULL)
+		return;
+
+	if (bCheck)
+	{
+		HTREEITEM hSlibing = m_treeCtrl.GetNextSiblingItem(hItem);
+		BOOL bFlag = TRUE;
+
+		// 当前Item的前后兄弟节点中是否全都选中
+		while (hSlibing)
+		{
+			if (!m_treeCtrl.GetCheck(hSlibing))
+			{
+				bFlag = FALSE; // 后继兄弟节点中有一个没有选中
+				break;
+			}
+
+			hSlibing = m_treeCtrl.GetNextSiblingItem(hSlibing);
+		}
+
+		if (bFlag)
+		{
+			hSlibing = m_treeCtrl.GetPrevSiblingItem(hItem);
+
+			while (hSlibing)
+			{
+				if (!m_treeCtrl.GetCheck(hSlibing))
+				{
+					bFlag = FALSE; // 前驱兄弟节点中有一个没有选中
+					break;
+				}
+
+				hSlibing = m_treeCtrl.GetPrevSiblingItem(hSlibing);
+			}
+		}
+
+		// bFlag为TRUE，表示当前节点的所有前后兄弟节点都已选中，因此设置其父节点也为选中
+		if (bFlag)
+			m_treeCtrl.SetCheck(hParent, TRUE);
+	}
+	else
+	{
+		// 当前节点设为未选中，当然其父节点也要设置为未选中
+		m_treeCtrl.SetCheck(hParent, FALSE);
+	}
+
+	// 递归调用
+	SetParentCheck(hParent, m_treeCtrl.GetCheck(hParent));
+}
+
+BEGIN_MESSAGE_MAP(CTessgridBuilderDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
@@ -417,6 +496,10 @@ BEGIN_MESSAGE_MAP(CTessgridBuilderDlg, CDialogEx)
 	ON_COMMAND(IDC_TOOLBAR_SAVE, &CTessgridBuilderDlg::OnSaveFile)
 	ON_COMMAND(ID_32779, &CTessgridBuilderDlg::OnSaveAs)
 	ON_COMMAND(IDC_TOOLBAR_SAVEAS, &CTessgridBuilderDlg::OnSaveAs)
+	ON_WM_CONTEXTMENU()
+	ON_COMMAND(ID_32780, &CTessgridBuilderDlg::OnInsertContour)
+	ON_COMMAND(ID_32783, &CTessgridBuilderDlg::OnDeleteContour)
+	ON_NOTIFY(NM_TVSTATEIMAGECHANGING, IDC_TREE_CONTOUR_IDX, &CTessgridBuilderDlg::OnNMTVStateImageChangingTreeContourIdx)
 END_MESSAGE_MAP()
 
 
@@ -424,20 +507,24 @@ END_MESSAGE_MAP()
 
 BOOL CTessgridBuilderDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CDialog::OnInitDialog();
 
 	// 设置此对话框的图标。  当应用程序主窗口不是对话框时，框架将自动
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	ShowWindow(SW_SHOWMAXIMIZED);
+	CWzdSplash* wzdSplash = new CWzdSplash();
+	wzdSplash->Create(IDB_BITMAP_LOGO, this);
+	wzdSplash->CenterWindow();
+	wzdSplash->UpdateWindow();
+
 	m_mainMenu.LoadMenu(IDR_MENU1);
 	SetMenu(&m_mainMenu);
 	InitToolBar();
 	InitStatusBar();
 	InitTreeCtrl();
-	// TODO: 在此添加额外的初始化代码
+
 	m_modelView = new CTessgridView();
 	m_modelView->Create(NULL, NULL, AFX_WS_DEFAULT_VIEW, CRect(0, 0, 200, 200), this, 999);
 	if (!m_modelView->Init())
@@ -445,6 +532,15 @@ BOOL CTessgridBuilderDlg::OnInitDialog()
 
 	InitPropGridCtrl();
 	Resize();
+
+	if (wzdSplash)
+	{
+		wzdSplash->DestroyWindow();
+		delete wzdSplash;
+		wzdSplash = NULL;
+		ShowWindow(SW_MAXIMIZE);
+	}
+
 	UpdateData(FALSE);
 	UpdateWindow();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -452,7 +548,7 @@ BOOL CTessgridBuilderDlg::OnInitDialog()
 
 void CTessgridBuilderDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	CDialogEx::OnSysCommand(nID, lParam);
+	CDialog::OnSysCommand(nID, lParam);
 }
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
@@ -480,7 +576,7 @@ void CTessgridBuilderDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		CDialog::OnPaint();
 	}
 }
 
@@ -543,31 +639,105 @@ BOOL CTessgridBuilderDlg::OnToolTipText(UINT nID, NMHDR* pNMHDR, LRESULT* pResul
 
 void CTessgridBuilderDlg::OnAboutMe()
 {
-	// TODO: 在此添加命令处理程序代码
 	CAboutDlg dlgAbout;
 	dlgAbout.DoModal();
 }
-
 
 void CTessgridBuilderDlg::OnNewBuild()
 {
 	// TODO: 在此添加命令处理程序代码
 }
 
-
 void CTessgridBuilderDlg::OnOpenFile()
 {
-	// TODO: 在此添加命令处理程序代码
+	CString defaultPath = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath.c_str();
+	CString filter = _T("文件 (*.tessgrid)|*.tessgrid||");
+	CFileDialog dlg(TRUE, defaultPath, _T(""), OFN_HIDEREADONLY | OFN_READONLY, filter, NULL);
+	if (IDOK == dlg.DoModal())
+	{
+		if (!CGridDataManager::GetIns().OpenTessgridFile(dlg.GetPathName()))
+		{
+			AfxMessageBox(_T("打开文件失败！"));
+		}
+	}
 }
-
 
 void CTessgridBuilderDlg::OnSaveFile()
 {
 	// TODO: 在此添加命令处理程序代码
 }
 
-
 void CTessgridBuilderDlg::OnSaveAs()
 {
 	// TODO: 在此添加命令处理程序代码
+}
+
+void CTessgridBuilderDlg::OnContextMenu(CWnd* pWnd, CPoint point)
+{
+	m_treeCtrl.ScreenToClient(&point);
+	UINT uFlags;
+	HTREEITEM hItem = m_treeCtrl.HitTest(point, &uFlags);
+	if ((hItem != NULL) && (TVHT_ONITEM & uFlags))
+	{
+		m_treeCtrl.ClientToScreen(&point);
+		m_treeCtrl.Select(hItem, TVGN_CARET);
+		CMenu menu;
+		menu.LoadMenu(IDR_MENU2);
+		CMenu* subMenu = menu.GetSubMenu(0);
+
+		if (hItem == m_treeCircleItem || hItem == m_treePolyItem)
+		{
+			subMenu->RemoveMenu(1, MF_BYPOSITION);
+		}
+
+		subMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
+	}
+}
+
+void CTessgridBuilderDlg::OnInsertContour()
+{
+	HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+	EShapeContourType contourType = (EShapeContourType)m_treeCtrl.GetItemData(hItem);
+	switch (contourType)
+	{
+	case ESCT_CIRCLE:
+		m_treeCtrl.InsertItem(_T("圆形"), 0, 0, m_treeCircleItem);
+		m_treeCtrl.Expand(m_treeCircleItem, TVE_EXPAND);
+		break;
+	case ESCT_POLYGON:
+		m_treeCtrl.InsertItem(_T("多边形"), 1, 1, m_treePolyItem);
+		m_treeCtrl.Expand(m_treePolyItem, TVE_EXPAND);
+		break;
+	default:
+		break;
+	}
+}
+
+void CTessgridBuilderDlg::OnDeleteContour()
+{
+	HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+	if (hItem)
+	{
+		m_treeCtrl.DeleteItem(hItem);
+	}
+}
+
+void CTessgridBuilderDlg::OnNMTVStateImageChangingTreeContourIdx(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	CPoint pt;
+	GetCursorPos(&pt);
+	ScreenToClient(&pt);
+	MapWindowPoints((CWnd*)&m_treeCtrl, &pt, 1);
+	UINT flag = TVHT_ONITEM;
+	HTREEITEM hCurrentItem = m_treeCtrl.HitTest(pt, &flag);
+	if (hCurrentItem)
+	{
+		m_treeCtrl.SelectItem(hCurrentItem);
+		if (flag & (TVHT_ONITEMSTATEICON))
+		{
+			CheckToTree(hCurrentItem, !m_treeCtrl.GetCheck(hCurrentItem));
+		}
+	}
+
+	*pResult = 0;
 }

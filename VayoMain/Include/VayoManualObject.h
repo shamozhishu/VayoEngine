@@ -17,9 +17,9 @@ NS_VAYO_BEGIN
 
 class _VayoExport ManualObject : public MovableObject, public Renderable
 {
-	VAYO_REFLEX_WITHPARA_DECLARE(ManualObject, const wstring&)
+	static Reflex<ManualObject, const wstring&, SceneManager*> _dynReflex;
 public:
-	ManualObject(const wstring& name);
+	ManualObject(const wstring& name, SceneManager* originSceneMgr);
 	~ManualObject();
 	void     update(float dt);
 	void     render();
