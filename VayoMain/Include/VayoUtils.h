@@ -136,6 +136,10 @@ _VayoExport wstring  strToLower(wstring str);
 _VayoExport bool     compareNoCase(string strA, const string strB);
 _VayoExport bool     compareNoCase(wstring strA, const wstring strB);
 
+/* 加密解密 */
+_VayoExport string   encrypt(string str, unsigned short key);
+_VayoExport string   decrypt(string str, unsigned short key);
+
 /* 得到工作目录 */
 _VayoExport wstring  getWorkingDirectory();
 

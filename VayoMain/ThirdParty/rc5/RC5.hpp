@@ -1,12 +1,10 @@
-//#include "stdafx.h"
-//
 #ifndef HEADER_RC5_HPP
 #define HEADER_RC5_HPP
 
 #include <string.h>
 #include "rc5.h"
 
-#define RC5_MAX_BUFF_LEN 1024*64 //64kb
+#define RC5_MAX_BUFF_LEN 1024*64 // 64KB
 
 static int RC5Encode(unsigned char* key,unsigned int keyLen,unsigned int rounds,unsigned char* srcData,unsigned int srcLen,unsigned char* dstData,unsigned int& dstLen)
 {

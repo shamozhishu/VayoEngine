@@ -101,6 +101,63 @@ bool compareNoCase(wstring strA, const wstring strB)
 	return (str1 == str2);
 }
 
+string encrypt(string str, unsigned short key)
+{
+	const int C1 = 52845;
+	const int C2 = 22719;
+	string strRet, strTmp;
+	unsigned int i, j;
+	strRet = str; // 初始化结果字符串
+
+	for (i = 0; i < str.size(); ++i) // 依次对字符串中各字符进行操作
+	{
+		strRet[i] = str[i] ^ (key >> 8); // 将密钥移位后与字符异或
+		key = ((BYTE)strRet[i] + key) * C1 + C2; // 产生下一个密钥
+	}
+
+	str = strRet; // 保存结果
+	strRet.clear(); // 清除结果
+
+	for (i = 0; i < str.size(); ++i) // 对加密结果进行转换
+	{
+		j = (BYTE)str[i]; // 提取字符
+		// 将字符转换为两个字母保存
+		strTmp = "12"; // 设置strTmp长度为2
+		strTmp[0] = 65 + j / 26;
+		strTmp[1] = 65 + j % 26;
+		strRet += strTmp;
+	}
+
+	return strRet;
+}
+
+string decrypt(string str, unsigned short key)
+{
+	const int C1 = 52845;
+	const int C2 = 22719;
+	string strRet, strTmp;
+	unsigned int i, j;
+
+	for (i = 0; i < str.size() / 2; ++i) // 将字符串两个字母一组进行处理
+	{
+		j = ((BYTE)str[2 * i] - 65) * 26;
+		j += (BYTE)str[2 * i + 1] - 65;
+		strTmp = "1"; // 设置strTmp长度为1
+		strTmp[0] = j;
+		strRet += strTmp; // 追加字符，还原字符串
+	}
+
+	str = strRet; // 保存中间结果
+
+	for (i = 0; i < str.size(); ++i) // 依次对字符串中各字符进行操作
+	{
+		strRet[i] = (BYTE)str[i] ^ (key >> 8); // 将密钥移位后与字符异或
+		key = ((BYTE)str[i] + key) * C1 + C2; // 产生下一个密钥
+	}
+
+	return strRet;
+}
+
 wstring getWorkingDirectory()
 {
 	wchar_t tmp[_MAX_PATH];
