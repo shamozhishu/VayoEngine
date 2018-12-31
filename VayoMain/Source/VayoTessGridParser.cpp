@@ -280,15 +280,16 @@ bool TessGridParser::parseStretchingBody(wstringstream& strin, TessGridHandler& 
 				transformMats.push_back(transformMat);
 			}
 
-			tess.beginStretch(pObj, idx, reverse, materialName);
-
-			for (int k = 0; k < num; ++k)
+			if (tess.beginStretch(pObj, idx, reverse, materialName))
 			{
-				tess.stretching(transformMats[k]);
-				tess.transformPositionList(transformMats[k], idx);
-			}
+				for (int k = 0; k < num; ++k)
+				{
+					tess.stretching(transformMats[k]);
+					tess.transformPositionList(transformMats[k], idx);
+				}
 
-			tess.endStretch();
+				tess.endStretch();
+			}
 		}
 		else if (tag == L"range")
 		{
@@ -315,15 +316,16 @@ bool TessGridParser::parseStretchingBody(wstringstream& strin, TessGridHandler& 
 
 			for (int j = contourLowerIdx; j <= contourUpperIdx; ++j)
 			{
-				tess.beginStretch(pObj, (unsigned int)j, reverse, materialName);
-
-				for (int k = 0; k < num; ++k)
+				if (tess.beginStretch(pObj, (unsigned int)j, reverse, materialName))
 				{
-					tess.stretching(transformMats[k]);
-					tess.transformPositionList(transformMats[k], (unsigned int)j);
-				}
+					for (int k = 0; k < num; ++k)
+					{
+						tess.stretching(transformMats[k]);
+						tess.transformPositionList(transformMats[k], (unsigned int)j);
+					}
 
-				tess.endStretch();
+					tess.endStretch();
+				}
 			}
 		}
 		else if (tag == L"array")
@@ -355,15 +357,16 @@ bool TessGridParser::parseStretchingBody(wstringstream& strin, TessGridHandler& 
 
 			for (int j = 0; j < idxNum; ++j)
 			{
-				tess.beginStretch(pObj, (unsigned int)indexes[j], reverse, materialName);
-
-				for (int k = 0; k < num; ++k)
+				if (tess.beginStretch(pObj, (unsigned int)indexes[j], reverse, materialName))
 				{
-					tess.stretching(transformMats[k]);
-					tess.transformPositionList(transformMats[k], (unsigned int)indexes[j]);
-				}
+					for (int k = 0; k < num; ++k)
+					{
+						tess.stretching(transformMats[k]);
+						tess.transformPositionList(transformMats[k], (unsigned int)indexes[j]);
+					}
 
-				tess.endStretch();
+					tess.endStretch();
+				}
 			}
 		}
 		else

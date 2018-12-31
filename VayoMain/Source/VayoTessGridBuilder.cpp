@@ -224,6 +224,7 @@ void TessGridBuilder::rebuild()
 	if (_hasBuildStream)
 	{
 		_hasBuildStream = false;
+		_stream.str(L"");
 		_stream.clear();
 		_polyContourIdx = 0;
 		_prop.modelName.clear();

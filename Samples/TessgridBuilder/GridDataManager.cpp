@@ -10,6 +10,11 @@ CGridDataManager& CGridDataManager::GetIns()
 	return *g_pDataMedelMgr;
 }
 
+void CGridDataManager::Destroy()
+{
+	SAFE_DELETE(g_pDataMedelMgr);
+}
+
 CGridDataManager::CGridDataManager()
 {
 }
@@ -43,6 +48,177 @@ bool CGridDataManager::OpenTessgridFile(CString filePath)
 	}
 
 	return false;
+}
+
+bool CGridDataManager::GeneratingModel(CString modelName, bool display)
+{
+	SceneManager* pCurSceneMgr = Root::getSingleton().getCurSceneMgr();
+	if (!pCurSceneMgr)
+		return false;
+
+	CGridData* pGridData = GetGridData(modelName);
+	if (!pGridData)
+		return false;
+
+	CGridData& refGridData = *pGridData;
+	if (display)
+	{
+		if (!refGridData.m_needUpdateModel)
+			return false;
+	}
+
+	ManualObject* pObj = pCurSceneMgr->findObject<ManualObject>(refGridData.m_prop.m_modelName.GetString());
+	if (!pObj)
+	{
+		pObj = pCurSceneMgr->createObject<ManualObject>(refGridData.m_prop.m_modelName.GetString());
+		SceneNode* pSceneNode = pCurSceneMgr->findSceneNode<SceneNode>(L"Model_Root_SceneNode");
+		if (!pSceneNode)
+		{
+			pSceneNode = pCurSceneMgr->getRootSceneNode()->createChildSceneNode(L"Model_Root_SceneNode");
+		}
+
+		pSceneNode->createChildSceneNode(pObj->getName() + L"_SceneNode")->attachObject(pObj);
+	}
+
+	HideOtherModel(pObj->getName());
+	if (!refGridData.m_needUpdateModel)
+		return false;
+
+	refGridData.m_needUpdateModel = false;
+	m_gridBuilder.rebuild();
+	m_gridBuilder.setProp(refGridData.m_prop.m_modelName.GetString(), refGridData.m_prop.m_materialName.GetString());
+
+	TessGridBuilder::EPlace place = TessGridBuilder::EP_XY;
+	if (refGridData.m_place.m_plane == _T("XZ平面"))
+		place = TessGridBuilder::EP_XZ;
+	else if (refGridData.m_place.m_plane == _T("YZ平面"))
+		place = TessGridBuilder::EP_YZ;
+
+	m_gridBuilder.setPlace(place, refGridData.m_place.m_spaceInfo._translation,
+		refGridData.m_place.m_spaceInfo._rotation, refGridData.m_place.m_spaceInfo._scale);
+
+	list<CGridCircle>::iterator itCircle = refGridData.m_circles.begin();
+	for (; itCircle != refGridData.m_circles.end(); ++itCircle)
+	{
+		CGridCircle& refCir = *itCircle;
+		int idx = m_gridBuilder.addCircle(refCir.m_diameter, refCir.m_pos, refCir.m_cnt, refCir.m_clockwise);
+
+		if (refCir.m_shapeOp.m_hasTopCaps)
+		{
+			m_gridBuilder.setTopCap(idx, refCir.m_shapeOp.m_topCap.normal,
+				refCir.m_shapeOp.m_topCap.materialName.GetString(), refCir.m_shapeOp.m_topCap.reverse);
+		}
+
+		if (refCir.m_shapeOp.m_hasStretchBodies)
+		{
+			m_gridBuilder.beginAddStretBody(idx, refCir.m_shapeOp.m_stretchingBodies.materialName.GetString(), refCir.m_shapeOp.m_stretchingBodies.reverse);
+			list<SpatialInfo>::iterator itSpatial = refCir.m_shapeOp.m_stretchingBodies.spaceInfo.begin();
+			for (; itSpatial != refCir.m_shapeOp.m_stretchingBodies.spaceInfo.end(); ++itSpatial)
+			{
+				SpatialInfo& spaceInfo = *itSpatial;
+				m_gridBuilder.addSingleStret(spaceInfo._translation, spaceInfo._rotation, spaceInfo._scale);
+			}
+			m_gridBuilder.endAddStretBody();
+		}
+
+		if (refCir.m_shapeOp.m_hasBottomCaps)
+		{
+			m_gridBuilder.setBottomCap(idx, refCir.m_shapeOp.m_bottomCap.normal,
+				refCir.m_shapeOp.m_bottomCap.materialName.GetString(), refCir.m_shapeOp.m_bottomCap.reverse);
+		}
+	}
+
+	list<CGridPolygon>::iterator itPoly = refGridData.m_polygons.begin();
+	for (; itPoly != refGridData.m_polygons.end(); ++itPoly)
+	{
+		CGridPolygon& refPoly = *itPoly;
+		int idx = m_gridBuilder.beginAddPoly();
+		list<CGridPolygon::SPolyPoint>::iterator itPt = refPoly.m_polyPts.begin();
+		for (; itPt != refPoly.m_polyPts.end(); ++itPt)
+		{
+			CGridPolygon::SPolyPoint& refPt = *itPt;
+			m_gridBuilder.addPolyPoint(refPt.m_pos, refPt.m_degree, refPt.m_cnt, refPt.m_clockwise);
+		}
+		m_gridBuilder.endAddPoly();
+
+		if (refPoly.m_shapeOp.m_hasTopCaps)
+		{
+			m_gridBuilder.setTopCap(idx, refPoly.m_shapeOp.m_topCap.normal,
+				refPoly.m_shapeOp.m_topCap.materialName.GetString(), refPoly.m_shapeOp.m_topCap.reverse);
+		}
+
+		if (refPoly.m_shapeOp.m_hasStretchBodies)
+		{
+			m_gridBuilder.beginAddStretBody(idx, refPoly.m_shapeOp.m_stretchingBodies.materialName.GetString(), refPoly.m_shapeOp.m_stretchingBodies.reverse);
+			list<SpatialInfo>::iterator itSpatial = refPoly.m_shapeOp.m_stretchingBodies.spaceInfo.begin();
+			for (; itSpatial != refPoly.m_shapeOp.m_stretchingBodies.spaceInfo.end(); ++itSpatial)
+			{
+				SpatialInfo& spaceInfo = *itSpatial;
+				m_gridBuilder.addSingleStret(spaceInfo._translation, spaceInfo._rotation, spaceInfo._scale);
+			}
+			m_gridBuilder.endAddStretBody();
+		}
+
+		if (refPoly.m_shapeOp.m_hasBottomCaps)
+		{
+			m_gridBuilder.setBottomCap(idx, refPoly.m_shapeOp.m_bottomCap.normal,
+				refPoly.m_shapeOp.m_bottomCap.materialName.GetString(), refPoly.m_shapeOp.m_bottomCap.reverse);
+		}
+	}
+
+	if (refGridData.m_isTopCapTessAll)
+	{
+		m_gridBuilder.setTopCap(-1, refGridData.m_topCap.normal, refGridData.m_topCap.materialName.GetString(), refGridData.m_topCap.reverse);
+	}
+
+	if (refGridData.m_isBottomCapTessAll)
+	{
+		m_gridBuilder.setBottomCap(-1, refGridData.m_bottomCap.normal, refGridData.m_bottomCap.materialName.GetString(), refGridData.m_bottomCap.reverse);
+	}
+
+	return m_gridHandler.parseTessgridFile(m_gridBuilder.getStream());
+}
+
+void CGridDataManager::ClearAllModel()
+{
+	SceneManager* pCurSceneMgr = Root::getSingleton().getCurSceneMgr();
+	if (pCurSceneMgr)
+		pCurSceneMgr->destroySceneNode(L"Model_Root_SceneNode", true);
+}
+
+CGridData* CGridDataManager::GetGridData(CString modelName)
+{
+	static CGridData findGridData;
+	findGridData.m_prop.m_modelName = modelName;
+	list<CGridData>::iterator it = std::find(m_gridDataset.begin(), m_gridDataset.end(), findGridData);
+	if (it == m_gridDataset.end())
+		return NULL;
+	return &(*it);
+}
+
+const CGridData* CGridDataManager::GetGridData(CString modelName) const
+{
+	static CGridData findGridData;
+	findGridData.m_prop.m_modelName = modelName;
+	list<CGridData>::const_iterator cit = std::find(m_gridDataset.cbegin(), m_gridDataset.cend(), findGridData);
+	if (cit == m_gridDataset.cend())
+		return NULL;
+	return &(*cit);
+}
+
+unsigned int CGridDataManager::GetGridDataCnt() const
+{
+	return m_gridDataset.size();
+}
+
+list<CGridData>& CGridDataManager::GetGridDataset()
+{
+	return m_gridDataset;
+}
+
+const std::list<CGridData>& CGridDataManager::GetGridDataset() const
+{
+	return m_gridDataset;
 }
 
 bool CGridDataManager::ParseTessgridFile(wstringstream& filestream)
@@ -148,6 +324,9 @@ bool CGridDataManager::ParseCap(wstringstream& strin, bool topCap)
 	for (int i = 0; i < cnt; ++i)
 	{
 		strin >> reverse >> materialname >> norm._x >> norm._y >> norm._z >> tag;
+		capData.reverse = reverse;
+		capData.materialName = materialname.c_str();
+		capData.normal = norm;
 
 		if (tag == L"index")
 		{
@@ -199,11 +378,11 @@ bool CGridDataManager::ParsePlace(wstringstream& strin)
 	wstring tag;
 	strin >> tag;
 	if (tag == L"xy")
-		m_currentGridData.m_place.m_place = _T("XY平面");
+		m_currentGridData.m_place.m_plane = _T("XY平面");
 	else if (tag == L"xz")
-		m_currentGridData.m_place.m_place = _T("XZ平面");
+		m_currentGridData.m_place.m_plane = _T("XZ平面");
 	else if (tag == L"yz")
-		m_currentGridData.m_place.m_place = _T("YZ平面");
+		m_currentGridData.m_place.m_plane = _T("YZ平面");
 	else
 		return false;
 
@@ -437,6 +616,28 @@ bool CGridDataManager::ParseGridding(wstringstream& strin)
 	return ParseCapAndBody(strin, tag);
 }
 
+void CGridDataManager::HideOtherModel(const wstring& excludedModel /*= L""*/)
+{
+	SceneManager* pCurSceneMgr = Root::getSingleton().getCurSceneMgr();
+	if (!pCurSceneMgr)
+		return;
+
+	SceneNode* pSceneNode = pCurSceneMgr->findSceneNode<SceneNode>(L"Model_Root_SceneNode");
+	if (pSceneNode)
+	{
+		const list<Node*>& nodes = pSceneNode->getChildren();
+		list<Node*>::const_iterator cit = nodes.cbegin();
+		for (; cit != nodes.cend(); ++cit)
+		{
+			Node* pChild = *cit;
+			if (pChild->getName() != excludedModel + L"_SceneNode")
+				pChild->setCanVisit(false);
+			else
+				pChild->setCanVisit(true);
+		}
+	}
+}
+
 bool CGridDataManager::OperateCurGridData(unsigned idx, EGRIDDATA_OP opType, const CGridShapeOp::SCap& capData, const CGridShapeOp::SStretchingBody& bodyData)
 {
 	if (idx == -1)
@@ -459,16 +660,34 @@ bool CGridDataManager::OperateCurGridData(unsigned idx, EGRIDDATA_OP opType, con
 
 	if (idx >= m_currentGridData.m_circBaseContourIdx && idx < m_currentGridData.m_circBaseContourIdx + m_currentGridData.m_circles.size())
 	{
+		list<CGridCircle>::iterator it = m_currentGridData.m_circles.begin();
+		std::advance(it, idx - m_currentGridData.m_circBaseContourIdx);
+
 		switch (opType)
 		{
 		case EGRIDDATA_OP_TOPCAP:
-			m_currentGridData.m_circles[idx - m_currentGridData.m_circBaseContourIdx].m_shapeOp.m_topCaps = capData;
+			if (it != m_currentGridData.m_circles.end())
+			{
+				CGridCircle& gridCircle = (*it);
+				gridCircle.m_shapeOp.m_hasTopCaps = true;
+				gridCircle.m_shapeOp.m_topCap = capData;
+			}
 			break;
 		case EGRIDDATA_OP_BOTTOMCAP:
-			m_currentGridData.m_circles[idx - m_currentGridData.m_circBaseContourIdx].m_shapeOp.m_bottomCaps = capData;
+			if (it != m_currentGridData.m_circles.end())
+			{
+				CGridCircle& gridCircle = (*it);
+				gridCircle.m_shapeOp.m_hasBottomCaps = true;
+				gridCircle.m_shapeOp.m_bottomCap = capData;
+			}
 			break;
 		case EGRIDDATA_OP_STRETCH:
-			m_currentGridData.m_circles[idx - m_currentGridData.m_circBaseContourIdx].m_shapeOp.m_stretchingBodies = bodyData;
+			if (it != m_currentGridData.m_circles.end())
+			{
+				CGridCircle& gridCircle = (*it);
+				gridCircle.m_shapeOp.m_hasStretchBodies = true;
+				gridCircle.m_shapeOp.m_stretchingBodies = bodyData;
+			}
 			break;
 		default:
 			return false;
@@ -477,17 +696,34 @@ bool CGridDataManager::OperateCurGridData(unsigned idx, EGRIDDATA_OP opType, con
 	}
 	else if (idx >= m_currentGridData.m_polyBaseContourIdx && idx < m_currentGridData.m_polyBaseContourIdx + m_currentGridData.m_polygons.size())
 	{
-		int polyIdxOffset = 0;
+		list<CGridPolygon>::iterator it = m_currentGridData.m_polygons.begin();
+		std::advance(it, idx - m_currentGridData.m_polyBaseContourIdx);
+
 		switch (opType)
 		{
 		case EGRIDDATA_OP_TOPCAP:
-			m_currentGridData.m_polygons[idx - m_currentGridData.m_polyBaseContourIdx].m_shapeOp.m_topCaps = capData;
+			if (it != m_currentGridData.m_polygons.end())
+			{
+				CGridPolygon& gridPoly = (*it);
+				gridPoly.m_shapeOp.m_hasTopCaps = true;
+				gridPoly.m_shapeOp.m_topCap = capData;
+			}
 			break;
 		case EGRIDDATA_OP_BOTTOMCAP:
-			m_currentGridData.m_polygons[idx - m_currentGridData.m_polyBaseContourIdx].m_shapeOp.m_bottomCaps = capData;
+			if (it != m_currentGridData.m_polygons.end())
+			{
+				CGridPolygon& gridPoly = (*it);
+				gridPoly.m_shapeOp.m_hasBottomCaps = true;
+				gridPoly.m_shapeOp.m_bottomCap = capData;
+			}
 			break;
 		case EGRIDDATA_OP_STRETCH:
-			m_currentGridData.m_polygons[idx - m_currentGridData.m_polyBaseContourIdx].m_shapeOp.m_stretchingBodies = bodyData;
+			if (it != m_currentGridData.m_polygons.end())
+			{
+				CGridPolygon& gridPoly = (*it);
+				gridPoly.m_shapeOp.m_hasStretchBodies = true;
+				gridPoly.m_shapeOp.m_stretchingBodies = bodyData;
+			}
 			break;
 		default:
 			return false;

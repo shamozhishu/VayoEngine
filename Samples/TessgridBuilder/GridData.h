@@ -2,31 +2,26 @@
 
 class CGridProp
 {
-	friend class CGridDataManager;
 public:
 	CGridProp();
 	~CGridProp();
 
-private:
 	CString m_modelName;
 	CString m_materialName;
 };
 
 class CGridPlace
 {
-	friend class CGridDataManager;
 public:
 	CGridPlace();
 	~CGridPlace();
 
-private:
-	CString m_place;
+	CString m_plane;
 	SpatialInfo m_spaceInfo;
 };
 
 class CGridShapeOp
 {
-	friend class CGridDataManager;
 public:
 	CGridShapeOp();
 	~CGridShapeOp();
@@ -42,23 +37,23 @@ public:
 	{
 		bool reverse;
 		CString materialName;
-		vector<SpatialInfo> spaceInfo;
+		list<SpatialInfo> spaceInfo;
 	};
 
-private:
-	SCap m_topCaps;
-	SCap m_bottomCaps;
+	bool m_hasTopCaps;
+	bool m_hasBottomCaps;
+	bool m_hasStretchBodies;
+	SCap m_topCap;
+	SCap m_bottomCap;
 	SStretchingBody m_stretchingBodies;
 };
 
 class CGridCircle
 {
-	friend class CGridDataManager;
 public:
 	CGridCircle();
 	~CGridCircle();
 
-private:
 	float m_diameter;
 	Vector2df m_pos;
 	unsigned int m_cnt;
@@ -68,7 +63,6 @@ private:
 
 class CGridPolygon
 {
-	friend class CGridDataManager;
 public:
 	CGridPolygon();
 	~CGridPolygon();
@@ -82,28 +76,27 @@ public:
 		bool m_clockwise;
 	};
 
-private:
-	vector<SPolyPoint> m_polyPts;
+	list<SPolyPoint> m_polyPts;
 	CGridShapeOp m_shapeOp;
 };
 
 class CGridData
 {
-	friend class CGridDataManager;
 public:
 	CGridData();
 	~CGridData();
 	void ClearAll();
+	bool operator==(const CGridData &rhs) const;
 
-private:
 	CGridProp m_prop;
 	CGridPlace m_place;
+	bool m_needUpdateModel;
 	bool m_isTopCapTessAll;
 	bool m_isBottomCapTessAll;
 	CGridShapeOp::SCap m_topCap;
 	CGridShapeOp::SCap m_bottomCap;
 	unsigned int m_circBaseContourIdx;
 	unsigned int m_polyBaseContourIdx;
-	vector<CGridCircle> m_circles;
-	vector<CGridPolygon> m_polygons;
+	list<CGridCircle> m_circles;
+	list<CGridPolygon> m_polygons;
 };

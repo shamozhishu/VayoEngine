@@ -6,9 +6,18 @@ class CGridDataManager
 {
 public:
 	static CGridDataManager& GetIns();
+	static void Destroy();
 	CGridDataManager();
 	~CGridDataManager();
 	bool OpenTessgridFile(CString filePath);
+	bool GeneratingModel(CString modelName, bool display);
+	void HideOtherModel(const wstring& excludedModel = L"");
+	void ClearAllModel();
+	CGridData* GetGridData(CString modelName);
+	const CGridData* GetGridData(CString modelName) const;
+	unsigned int GetGridDataCnt() const;
+	list<CGridData>& GetGridDataset();
+	const list<CGridData>& GetGridDataset() const;
 
 private:
 	bool ParseTessgridFile(wstringstream& filestream);
@@ -20,7 +29,6 @@ private:
 	bool ParsePolygon(wstringstream& strin);
 	bool ParseCircle(wstringstream& strin);
 	bool ParseGridding(wstringstream& strin);
-
 	enum EGRIDDATA_OP { EGRIDDATA_OP_TOPCAP, EGRIDDATA_OP_BOTTOMCAP, EGRIDDATA_OP_STRETCH };
 	bool OperateCurGridData(unsigned idx, EGRIDDATA_OP opType, const CGridShapeOp::SCap& capData, const CGridShapeOp::SStretchingBody& bodyData);
 

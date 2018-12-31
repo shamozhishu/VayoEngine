@@ -10,7 +10,7 @@ CGridProp::~CGridProp()
 }
 //------------------------------------------------------------------------
 CGridPlace::CGridPlace()
-	: m_place(_T("XY平面"))
+	: m_plane(_T("XY平面"))
 {
 }
 
@@ -19,12 +19,15 @@ CGridPlace::~CGridPlace()
 }
 //------------------------------------------------------------------------
 CGridShapeOp::CGridShapeOp()
+	: m_hasTopCaps(false)
+	, m_hasBottomCaps(false)
+	, m_hasStretchBodies(false)
 {
-	m_topCaps.reverse = false;
-	m_topCaps.normal.set(0, 0, 1);
+	m_topCap.reverse = false;
+	m_topCap.normal.set(0, 0, 1);
 
-	m_bottomCaps.reverse = true;
-	m_bottomCaps.normal.set(0, 0, -1);
+	m_bottomCap.reverse = true;
+	m_bottomCap.normal.set(0, 0, -1);
 
 	m_stretchingBodies.reverse = false;
 }
@@ -57,6 +60,7 @@ CGridData::CGridData()
 	, m_isBottomCapTessAll(false)
 	, m_circBaseContourIdx(0)
 	, m_polyBaseContourIdx(0)
+	, m_needUpdateModel(true)
 {
 }
 
@@ -72,4 +76,9 @@ void CGridData::ClearAll()
 	m_polyBaseContourIdx = 0;
 	m_circles.clear();
 	m_polygons.clear();
+}
+
+bool CGridData::operator==(const CGridData &rhs) const
+{
+	return m_prop.m_modelName == rhs.m_prop.m_modelName;
 }

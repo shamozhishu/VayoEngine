@@ -87,6 +87,9 @@ GLRenderSystem::~GLRenderSystem()
 
 bool GLRenderSystem::init(unsigned char antiAliasFactor /*= 0*/, bool handleSRGB /*= false*/)
 {
+	g_pfd = { sizeof(PIXELFORMATDESCRIPTOR), 1, PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+		PFD_TYPE_RGBA, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 8, 0, PFD_MAIN_PLANE, 0, 0, 0, 0 };
+
 	_pixelFormat = 0;
 	const Device::Attrib& devAttrib = Root::getSingleton().getActiveDevice()->getAttrib();
 	_antiAliasFactor = antiAliasFactor;
@@ -790,13 +793,19 @@ bool GLRenderSystem::setWndPixelFormat(Win32Device* renderWnd)
 		_pixelFormat = ChoosePixelFormat(_hCurrentDC, &g_pfd);
 		if (!_pixelFormat)
 		{
-			Log::print(ELL_ERROR, "Cannot create a GL device context, %s.", "No suitable format");
+			Log::print(ELL_ERROR, "Cannot create a GL device context, No suitable format.");
 			return false;
 		}
 
 		if (!SetPixelFormat(_hCurrentDC, _pixelFormat, &g_pfd))
 		{
-			Log::print(ELL_ERROR, "Cannot set the pixel format.");
+			DWORD errCode = GetLastError();
+			Log::print(ELL_ERROR, "Cannot set the pixel format %d, error code is %d.", _pixelFormat, errCode);
+			LPVOID lpMsgBuf = NULL;
+			FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL, errCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+			Log::wprint(ELL_ERROR, (LPCTSTR)lpMsgBuf);
+			LocalFree(lpMsgBuf);
 			return false;
 		}
 	}
@@ -1709,6 +1718,8 @@ Device* GLRenderSystem::createDevice(int deviceID, const Device::Attrib& attrib)
 
 TexturePtr GLRenderSystem::createTexture(const wstring& name, Image* image, bool generateMipLevels)
 {
+	if (GLVersion.major < 3)
+		generateMipLevels = false;
 	return new GLTexture(name, image, generateMipLevels, this);
 }
 

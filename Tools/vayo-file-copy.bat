@@ -1,6 +1,6 @@
 @echo off
-set source_path=D:\______svn-code\vayo-engine-master\
-set target_path=D:\_____git-code\VayoEngine\
+set source_path=D:\###repository###\svn-repository\VayoEngine\
+set target_path=D:\###repository###\git-repository\VayoEngine\
 echo copy[%source_path%]to[%target_path%]:
 pause
 
@@ -77,7 +77,6 @@ xcopy /y %source_path%Samples\TessgridBuilder\*.h %target_path%Samples\TessgridB
 xcopy /y %source_path%Samples\TessgridBuilder\*.cpp %target_path%Samples\TessgridBuilder\*.cpp
 xcopy /y %source_path%Samples\TessgridBuilder\*.rc %target_path%Samples\TessgridBuilder\*.rc
 xcopy /y %source_path%Samples\TessgridBuilder\res\*.* %target_path%Samples\TessgridBuilder\res\*.*
-copy %source_path%Samples\TessgridBuilder\ReadMe.txt %target_path%Samples\TessgridBuilder\ReadMe.txt
 copy %source_path%Samples\TessgridBuilder\TessgridBuilder.vcxproj %target_path%Samples\TessgridBuilder\TessgridBuilder.vcxproj
 copy %source_path%Samples\TessgridBuilder\TessgridBuilder.vcxproj.filters %target_path%Samples\TessgridBuilder\TessgridBuilder.vcxproj.filters
 copy %source_path%Samples\TessgridBuilder\TessgridBuilder.vcxproj.user %target_path%Samples\TessgridBuilder\TessgridBuilder.vcxproj.user
@@ -90,7 +89,13 @@ echo ----------------------------------------VayoMainĿ¼
 xcopy /y %source_path%VayoMain\*.* %target_path%VayoMain\*.*
 xcopy /y /s /e %source_path%VayoMain\Include\*.* %target_path%VayoMain\Include\
 xcopy /y /s /e %source_path%VayoMain\Source\*.* %target_path%VayoMain\Source\
-xcopy /y /s /e %source_path%VayoMain\ThirdParty\*.* %target_path%VayoMain\ThirdParty\
+xcopy /y %source_path%VayoMain\ThirdParty\*.cpp %target_path%VayoMain\ThirdParty\*.cpp
+xcopy /y /s /e %source_path%VayoMain\ThirdParty\rc5\*.* %target_path%VayoMain\ThirdParty\rc5\
+xcopy /y /s /e %source_path%VayoMain\ThirdParty\zlib\*.* %target_path%VayoMain\ThirdParty\zlib\
+xcopy /y /s /e %source_path%VayoMain\ThirdParty\stb_image\*.* %target_path%VayoMain\ThirdParty\stb_image\
+xcopy /y %source_path%VayoMain\ThirdParty\freetype-2.9.1\*.* %target_path%VayoMain\ThirdParty\freetype-2.9.1\*.*
+xcopy /y /s /e %source_path%VayoMain\ThirdParty\freetype-2.9.1\include\*.* %target_path%VayoMain\ThirdParty\freetype-2.9.1\include\
+xcopy /y /s /e %source_path%VayoMain\ThirdParty\freetype-2.9.1\src\*.* %target_path%VayoMain\ThirdParty\freetype-2.9.1\src\
 
 echo ----------------------------------------
 

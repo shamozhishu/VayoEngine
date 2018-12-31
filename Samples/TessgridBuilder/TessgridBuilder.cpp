@@ -23,6 +23,7 @@ END_MESSAGE_MAP()
 
 CTessgridBuilderApp::CTessgridBuilderApp()
 	: m_pShellManager(NULL)
+	, m_pMainDlg(NULL)
 {
 	// 支持重新启动管理器
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -71,7 +72,7 @@ BOOL CTessgridBuilderApp::InitInstance()
 	// TODO: 应适当修改该字符串，
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
-	m_pMainWnd = CDlgManager::GetIns()->getTessgridBuilderDlg();
+	m_pMainWnd = m_pMainDlg = CDlgManager::GetIns()->getTessgridBuilderDlg();
 	return TRUE;
 }
 
@@ -99,6 +100,8 @@ BOOL CTessgridBuilderApp::OnIdle(LONG lCount)
 	if (Root::getSingletonPtr() && Root::getSingletonPtr()->IsLaunched())
 	{
 		Root::getSingleton().renderOneFrame();
+		if (m_pMainDlg)
+			m_pMainDlg->DisplayModel();
 	}
 
 	return CWinApp::OnIdle(lCount);

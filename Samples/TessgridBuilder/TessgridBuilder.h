@@ -14,7 +14,7 @@
 // CTessgridBuilderApp:
 // 有关此类的实现，请参阅 TessgridBuilder.cpp
 //
-
+class CTessgridBuilderDlg;
 class CTessgridBuilderApp : public CWinApp
 {
 public:
@@ -30,6 +30,7 @@ public:
 	DECLARE_MESSAGE_MAP()
 private:
 	CShellManager* m_pShellManager;
+	CTessgridBuilderDlg* m_pMainDlg;
 };
 
 extern CTessgridBuilderApp theApp;

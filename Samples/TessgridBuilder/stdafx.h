@@ -1,4 +1,3 @@
-
 // stdafx.h : 标准系统包含文件的包含文件，
 // 或是经常使用但不常更改的
 // 特定于项目的包含文件
@@ -40,11 +39,8 @@
 #pragma comment(lib, "VayoMain.lib")
 #endif
 
-//#define VAYO_ENABLE_MEM_LEAK_CHECK
 #include "Vayo.h"
 using namespace Vayo;
-#include "CommonDef.h"
-
 
 #ifdef _UNICODE
 #if defined _M_IX86
@@ -55,5 +51,3 @@ using namespace Vayo;
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 #endif
-
-

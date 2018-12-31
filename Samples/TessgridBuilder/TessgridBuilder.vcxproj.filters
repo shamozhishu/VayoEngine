@@ -44,9 +44,6 @@
     <ClInclude Include="DlgManager.h">
       <Filter>Classes\UserInterface</Filter>
     </ClInclude>
-    <ClInclude Include="CommonDef.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
     <ClInclude Include="CmdManager.h">
       <Filter>Classes\UserInterface</Filter>
     </ClInclude>
@@ -115,6 +112,24 @@
       <Filter>Resource</Filter>
     </Image>
     <Image Include="res\logo.bmp">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\generatemodel.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\circlecontour.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\model.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\polycontour.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\polypoint.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\expand.ico">
       <Filter>Resource</Filter>
     </Image>
   </ItemGroup>

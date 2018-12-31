@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TessgridView.h"
 #include "TessgridApp.h"
+#include "GridDataManager.h"
 
 static TessgridApp* g_app = NULL;
 IMPLEMENT_DYNCREATE(CTessgridView, CView)
@@ -13,6 +14,7 @@ CTessgridView::CTessgridView()
 
 CTessgridView::~CTessgridView()
 {
+	CGridDataManager::Destroy();
 	g_app->cleanup();
 	SAFE_DELETE(g_app);
 }

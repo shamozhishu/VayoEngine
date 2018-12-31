@@ -36,10 +36,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>Static</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -151,6 +151,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -196,7 +197,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CmdManager.h" />
-    <ClInclude Include="CommonDef.h" />
     <ClInclude Include="GridData.h" />
     <ClInclude Include="GridDataManager.h" />
     <ClInclude Include="DlgManager.h" />
@@ -234,9 +234,15 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\circle.ico" />
+    <Image Include="res\circlecontour.ico" />
+    <Image Include="res\expand.ico" />
+    <Image Include="res\generatemodel.ico" />
     <Image Include="res\logo.bmp" />
+    <Image Include="res\model.ico" />
     <Image Include="res\new.ico" />
+    <Image Include="res\polycontour.ico" />
     <Image Include="res\polygon.ico" />
+    <Image Include="res\polypoint.ico" />
     <Image Include="res\saveas.ico" />
     <Image Include="res\TessgridBuilder.ico" />
     <Image Include="res\open.ico" />
