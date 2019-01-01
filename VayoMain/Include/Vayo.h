@@ -1,6 +1,6 @@
 /*************************************************************************\
 * 望友引擎1.0
-* Copyright (c) 2018-2018 authored by 朱加浩
+* Copyright (c) 2018-2019 authored by 朱加浩
 * 提供给用户使用的头文件
 \*************************************************************************/
 #ifndef __VAYO_H__
@@ -66,9 +66,11 @@
 #include "VayoCamera.h"
 #include "VayoEntity.h"
 #include "VayoRenderable.h"
+#include "VayoRenderQueue.h"
 #include "VayoTiledMap.h"
 #include "VayoManualObject.h"
 #include "VayoTextObject.h"
+#include "VayoViewMemento.h"
 #include "VayoNode.h"
 #include "VayoNodeAnimator.h"
 #include "VayoCollision.h"

@@ -1,6 +1,6 @@
 /*************************************************************************\
 * 望友引擎1.0
-* Copyright (c) 2018-2018 authored by 朱加浩
+* Copyright (c) 2018-2019 authored by 朱加浩
 * 渲染队列
 \*************************************************************************/
 #ifndef __VAYO_RENDER_QUEUE_H__
@@ -22,7 +22,7 @@ enum ERenderQueueID
 	ERQ_COUNT = 100
 };
 
-class RenderQueue
+class _VayoExport RenderQueue
 {
 public:
 	RenderQueue();
@@ -64,7 +64,7 @@ private:
 	vector<TransparentSolid> _transparentSolids;
 };
 
-class RenderQueueGroup
+class _VayoExport RenderQueueGroup
 {
 public:
 	RenderQueueGroup(SceneManager* relatedSceneMgr);
