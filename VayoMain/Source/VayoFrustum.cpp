@@ -2,7 +2,7 @@
 
 NS_VAYO_BEGIN
 
-inline void Frustum::setFrom(const Matrix4x4& mat)
+void Frustum::setFrom(const Matrix4x4& mat)
 {
 	// left clipping plane
 	_planes[EVP_LEFT_PLANE]._normal._x = mat[3] + mat[0];
@@ -52,7 +52,7 @@ inline void Frustum::setFrom(const Matrix4x4& mat)
 	recalculateBoundingBox();
 }
 
-inline Frustum::Frustum(const Frustum& other)
+Frustum::Frustum(const Frustum& other)
 {
 	_cameraPosition = other._cameraPosition;
 	_boundingBox = other._boundingBox;
@@ -65,12 +65,12 @@ inline Frustum::Frustum(const Frustum& other)
 		_matrices[i] = other._matrices[i];
 }
 
-inline Frustum::Frustum(const Matrix4x4& mat)
+Frustum::Frustum(const Matrix4x4& mat)
 {
 	setFrom(mat);
 }
 
-inline void Frustum::transform(const Matrix4x4& mat)
+void Frustum::transform(const Matrix4x4& mat)
 {
 	for (unsigned int i = 0; i < EVP_PLANE_COUNT; ++i)
 		mat.transformPlane(_planes[i]);
@@ -78,7 +78,7 @@ inline void Frustum::transform(const Matrix4x4& mat)
 	recalculateBoundingBox();
 }
 
-inline Vector3df Frustum::getFarLeftUp() const
+Vector3df Frustum::getFarLeftUp() const
 {
 	Vector3df p;
 	_planes[EVP_FAR_PLANE].getIntersectionWithPlanes(
@@ -87,7 +87,7 @@ inline Vector3df Frustum::getFarLeftUp() const
 	return p;
 }
 
-inline Vector3df Frustum::getFarLeftDown() const
+Vector3df Frustum::getFarLeftDown() const
 {
 	Vector3df p;
 	_planes[EVP_FAR_PLANE].getIntersectionWithPlanes(
@@ -96,7 +96,7 @@ inline Vector3df Frustum::getFarLeftDown() const
 	return p;
 }
 
-inline Vector3df Frustum::getFarRightUp() const
+Vector3df Frustum::getFarRightUp() const
 {
 	Vector3df p;
 	_planes[EVP_FAR_PLANE].getIntersectionWithPlanes(
@@ -105,7 +105,7 @@ inline Vector3df Frustum::getFarRightUp() const
 	return p;
 }
 
-inline Vector3df Frustum::getFarRightDown() const
+Vector3df Frustum::getFarRightDown() const
 {
 	Vector3df p;
 	_planes[EVP_FAR_PLANE].getIntersectionWithPlanes(
@@ -114,7 +114,7 @@ inline Vector3df Frustum::getFarRightDown() const
 	return p;
 }
 
-inline Vector3df Frustum::getNearLeftUp() const
+Vector3df Frustum::getNearLeftUp() const
 {
 	Vector3df p;
 	_planes[EVP_NEAR_PLANE].getIntersectionWithPlanes(
@@ -123,7 +123,7 @@ inline Vector3df Frustum::getNearLeftUp() const
 	return p;
 }
 
-inline Vector3df Frustum::getNearLeftDown() const
+Vector3df Frustum::getNearLeftDown() const
 {
 	Vector3df p;
 	_planes[EVP_NEAR_PLANE].getIntersectionWithPlanes(
@@ -132,7 +132,7 @@ inline Vector3df Frustum::getNearLeftDown() const
 	return p;
 }
 
-inline Vector3df Frustum::getNearRightUp() const
+Vector3df Frustum::getNearRightUp() const
 {
 	Vector3df p;
 	_planes[EVP_NEAR_PLANE].getIntersectionWithPlanes(
@@ -141,7 +141,7 @@ inline Vector3df Frustum::getNearRightUp() const
 	return p;
 }
 
-inline Vector3df Frustum::getNearRightDown() const
+Vector3df Frustum::getNearRightDown() const
 {
 	Vector3df p;
 	_planes[EVP_NEAR_PLANE].getIntersectionWithPlanes(
@@ -150,12 +150,12 @@ inline Vector3df Frustum::getNearRightDown() const
 	return p;
 }
 
-inline const Aabbox3df& Frustum::getBoundingBox() const
+const Aabbox3df& Frustum::getBoundingBox() const
 {
 	return _boundingBox;
 }
 
-inline void Frustum::recalculateBoundingBox()
+void Frustum::recalculateBoundingBox()
 {
 	_boundingBox.reset(_cameraPosition);
 	_boundingBox.addInternalPoint(getFarLeftUp());
@@ -164,19 +164,19 @@ inline void Frustum::recalculateBoundingBox()
 	_boundingBox.addInternalPoint(getFarRightDown());
 }
 
-inline Matrix4x4& Frustum::getTransform(EFrustumTransformation state)
+Matrix4x4& Frustum::getTransform(EFrustumTransformation state)
 {
 	VAYO_ASSERT((state == EFT_VIEW || state == EFT_PROJECTION) && L"Index out of bounds(Frustum::getTransform).");
 	return _matrices[state];
 }
 
-inline const Matrix4x4& Frustum::getTransform(EFrustumTransformation state) const
+const Matrix4x4& Frustum::getTransform(EFrustumTransformation state) const
 {
 	VAYO_ASSERT((state == EFT_VIEW || state == EFT_PROJECTION) && L"Index out of bounds(Frustum::getTransform).");
 	return _matrices[state];
 }
 
-inline bool Frustum::clipLine(Line3df& line) const
+bool Frustum::clipLine(Line3df& line) const
 {
 	bool wasClipped = false;
 	for (unsigned int i = 0; i < EVP_PLANE_COUNT; ++i)

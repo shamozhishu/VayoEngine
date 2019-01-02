@@ -41,6 +41,9 @@
     <ProjectReference Include="..\..\VayoMain\VayoMain.vcxproj">
       <Project>{e8605e2e-db10-4ca2-a234-0a895eafdda2}</Project>
     </ProjectReference>
+    <ProjectReference Include="lua5.2.4\lua5.2.4.vcxproj">
+      <Project>{5c83cb5d-fde7-484e-b8c5-ac360de5140f}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FCA985D0-3C75-4DC7-B57D-7709E21F50DB}</ProjectGuid>
@@ -129,7 +132,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SCRIPTSYSTEM_LUA_EXPORTS;VAYO_LUAPLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>lua5.2.4_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)Lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
@@ -159,15 +162,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTSYSTEM_LUA_EXPORTS;VAYO_LUAPLUGIN_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ImportLibrary>$(SolutionDir)Lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>lua5.2.4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
