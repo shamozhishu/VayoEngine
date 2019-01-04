@@ -189,6 +189,7 @@ public:
 		if (this == &other)
 			return *this;
 
+		_materialName = other._materialName;
 		_materialType = other._materialType;
 		_ambientColor = other._ambientColor;
 		_diffuseColor = other._diffuseColor;

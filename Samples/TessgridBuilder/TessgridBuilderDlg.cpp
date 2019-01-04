@@ -13,6 +13,21 @@
 #define new DEBUG_NEW
 #endif
 
+class GeneCampare
+{
+public:
+	GeneCampare(SpatialInfo* pCmp) : m_pSpatialInfo(pCmp) {}
+	bool operator()(const SpatialInfo& other)
+	{
+		if (m_pSpatialInfo == &other)
+			return true;
+		else
+			return false;
+	}
+private:
+	SpatialInfo* m_pSpatialInfo;
+};
+
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
@@ -51,6 +66,7 @@ CTessgridBuilderDlg::CTessgridBuilderDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_MODELBUILDER_DIALOG, pParent)
 	, m_modelView(NULL)
 	, m_isTreeCtrlExpand(false)
+	, m_listCtrlDeleteGridData(false)
 	, m_curSelItemType(EICON_NONE)
 	, m_hParentModelItem(NULL)
 	, m_curSelTreeCtrlItem(NULL)
@@ -71,6 +87,8 @@ void CTessgridBuilderDlg::FinishDlg(CTessgridBuilderDlg* &pDlg)
 	if (pDlg)
 	{
 		pDlg->m_modelView = NULL;
+		pDlg->m_listCtrl.DeleteAllItems();
+		pDlg->m_treeCtrl.DeleteAllItems();
 		pDlg->DestroyWindow();
 		delete pDlg;
 		pDlg = NULL;
@@ -141,7 +159,7 @@ BOOL CTessgridBuilderDlg::PreTranslateMessage(MSG* pMsg)
 				pDevice->injectKeyboard(pMsg->wParam, pMsg->lParam, keyDown);
 
 				if (pMsg->message == WM_SYSKEYDOWN || pMsg->message == WM_SYSKEYUP)
-					return PreTranslateMessage(pMsg);
+					return CDialog::PreTranslateMessage(pMsg);
 				else
 					return TRUE;
 			}
@@ -208,7 +226,9 @@ void CTessgridBuilderDlg::InitPropGridCtrl()
 
 	CMFCPropertyGridProperty* pGroupProp = new CMFCPropertyGridProperty(_T("属性"));
 	m_wndPropList.AddProperty(pGroupProp);
-	pGroupProp->AddSubItem(new CMFCPropertyGridProperty(_T("模型名称"), oleVarStr, _T("当前所选择的ManualObject对象名称")));
+	CMFCPropertyGridProperty* pChildProp = new CMFCPropertyGridProperty(_T("模型名称"), oleVarStr, _T("当前所选择的ManualObject对象名称"));
+	pGroupProp->AddSubItem(pChildProp);
+	pChildProp->AllowEdit(FALSE);
 	CMFCPropertyGridProperty* pValueProp = new CMFCPropertyGridProperty(_T("材质名称"), oleVarStr, _T("所选ManualObject对象的公共材质"));
 	pGroupProp->AddSubItem(pValueProp);
 
@@ -339,9 +359,9 @@ void CTessgridBuilderDlg::RefreshPropGridCtrl(ETreeCtrlItemType itemType, HTREEI
 		m_wndPropList.GetProperty(2)->GetSubItem(3)->SetValue(_variant_t(pGridCircle->m_cnt));
 		m_wndPropList.GetProperty(2)->GetSubItem(4)->SetValue(_variant_t(pGridCircle->m_clockwise));
 
-		if (pGridCircle->m_shapeOp.m_hasStretchBodies)
+		m_curSelTreeCtrlItem = hItem;
+		
 		{
-			m_curSelTreeCtrlItem = hItem;
 			const list<SpatialInfo>& spatialInfos = pGridCircle->m_shapeOp.m_stretchingBodies.spaceInfo;
 			list<SpatialInfo>::const_iterator stretchIt = spatialInfos.cbegin();
 			for (int i = 0; stretchIt != spatialInfos.cend(); ++stretchIt, ++i)
@@ -364,9 +384,9 @@ void CTessgridBuilderDlg::RefreshPropGridCtrl(ETreeCtrlItemType itemType, HTREEI
 		if (!pGridPoly)
 			break;
 
-		if (pGridPoly->m_shapeOp.m_hasStretchBodies)
+		m_curSelTreeCtrlItem = hItem;
+
 		{
-			m_curSelTreeCtrlItem = hItem;
 			const list<SpatialInfo>& spatialInfos = pGridPoly->m_shapeOp.m_stretchingBodies.spaceInfo;
 			list<SpatialInfo>::const_iterator stretchIt = spatialInfos.cbegin();
 			for (int i = 0; stretchIt != spatialInfos.cend(); ++stretchIt, ++i)
@@ -417,6 +437,16 @@ void CTessgridBuilderDlg::RefreshPropGridCtrl(ETreeCtrlItemType itemType, HTREEI
 		break;
 	default:
 		break;
+	}
+}
+
+void CTessgridBuilderDlg::NeedRefreshModel()
+{
+	if (m_hParentModelItem)
+	{
+		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+		if (pGridData)
+			pGridData->m_needUpdateModel = true;
 	}
 }
 
@@ -548,6 +578,430 @@ void CTessgridBuilderDlg::SetStretchBodyGridCtrlValue(const CGridShapeOp::SStret
 			m_wndPropList.GetProperty(4)->GetSubItem(9)->SetValue(pSpaceData->_scale._y);
 			m_wndPropList.GetProperty(4)->GetSubItem(10)->SetValue(pSpaceData->_scale._z);
 		}
+	}
+}
+
+void CTessgridBuilderDlg::TopCapPropertyChanged(CString propName, CString propValue)
+{
+	CGridData* pGridData;
+	CGridCircle* pGridCircle;
+	CGridPolygon* pGridPoly;
+	switch (m_curSelItemType)
+	{
+	case EICON_CIRCLE:
+		if (m_curSelTreeCtrlItem != NULL)
+		{
+			pGridCircle = (CGridCircle*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+			if (pGridCircle)
+			{
+				if (propName == _T("激活盖顶"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridCircle->m_shapeOp.m_hasTopCaps)
+					{
+						pGridCircle->m_shapeOp.m_hasTopCaps = bVal;
+						m_wndPropList.GetProperty(5)->GetSubItem(1)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(2)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(3)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(4)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(5)->Enable(bVal);
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标X"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridCircle->m_shapeOp.m_topCap.normal._x))
+					{
+						pGridCircle->m_shapeOp.m_topCap.normal._x = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标Y"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridCircle->m_shapeOp.m_topCap.normal._y))
+					{
+						pGridCircle->m_shapeOp.m_topCap.normal._y = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标Z"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridCircle->m_shapeOp.m_topCap.normal._z))
+					{
+						pGridCircle->m_shapeOp.m_topCap.normal._z = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("盖顶材质"))
+				{
+					if (propValue != pGridCircle->m_shapeOp.m_topCap.materialName)
+					{
+						pGridCircle->m_shapeOp.m_topCap.materialName = propValue;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("顺时针"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridCircle->m_shapeOp.m_topCap.reverse)
+					{
+						pGridCircle->m_shapeOp.m_topCap.reverse = bVal;
+						NeedRefreshModel();
+					}
+				}
+			}
+		}
+		break;
+	case EICON_POLYGON:
+		if (m_curSelTreeCtrlItem != NULL)
+		{
+			pGridPoly = (CGridPolygon*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+			if (pGridPoly)
+			{
+				if (propName == _T("激活盖顶"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridPoly->m_shapeOp.m_hasTopCaps)
+					{
+						pGridPoly->m_shapeOp.m_hasTopCaps = bVal;
+						m_wndPropList.GetProperty(5)->GetSubItem(1)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(2)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(3)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(4)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(5)->Enable(bVal);
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标X"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridPoly->m_shapeOp.m_topCap.normal._x))
+					{
+						pGridPoly->m_shapeOp.m_topCap.normal._x = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标Y"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridPoly->m_shapeOp.m_topCap.normal._y))
+					{
+						pGridPoly->m_shapeOp.m_topCap.normal._y = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标Z"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridPoly->m_shapeOp.m_topCap.normal._z))
+					{
+						pGridPoly->m_shapeOp.m_topCap.normal._z = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("盖顶材质"))
+				{
+					if (propValue != pGridPoly->m_shapeOp.m_topCap.materialName)
+					{
+						pGridPoly->m_shapeOp.m_topCap.materialName = propValue;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("顺时针"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridPoly->m_shapeOp.m_topCap.reverse)
+					{
+						pGridPoly->m_shapeOp.m_topCap.reverse = bVal;
+						NeedRefreshModel();
+					}
+				}
+			}
+		}
+		break;
+	case EICON_CIRCLECONTOUR:
+	case EICON_POLYCONTOUR:
+		if (m_hParentModelItem != NULL)
+		{
+			pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			if (pGridData)
+			{
+				if (propName == _T("激活盖顶"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridData->m_isTopCapTessAll)
+					{
+						pGridData->m_isTopCapTessAll = bVal;
+						m_wndPropList.GetProperty(5)->GetSubItem(1)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(2)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(3)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(4)->Enable(bVal);
+						m_wndPropList.GetProperty(5)->GetSubItem(5)->Enable(bVal);
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("法线坐标X"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridData->m_topCap.normal._x))
+					{
+						pGridData->m_topCap.normal._x = fVal;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("法线坐标Y"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridData->m_topCap.normal._y))
+					{
+						pGridData->m_topCap.normal._y = fVal;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("法线坐标Z"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridData->m_topCap.normal._z))
+					{
+						pGridData->m_topCap.normal._z = fVal;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("盖顶材质"))
+				{
+					if (propValue != pGridData->m_topCap.materialName)
+					{
+						pGridData->m_topCap.materialName = propValue;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("顺时针"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridData->m_topCap.reverse)
+					{
+						pGridData->m_topCap.reverse = bVal;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+			}
+		}
+		break;
+	}
+}
+
+void CTessgridBuilderDlg::BottomCapPropertyChanged(CString propName, CString propValue)
+{
+	CGridData* pGridData;
+	CGridCircle* pGridCircle;
+	CGridPolygon* pGridPoly;
+	switch (m_curSelItemType)
+	{
+	case EICON_CIRCLE:
+		if (m_curSelTreeCtrlItem != NULL)
+		{
+			pGridCircle = (CGridCircle*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+			if (pGridCircle)
+			{
+				if (propName == _T("激活盖底"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridCircle->m_shapeOp.m_hasBottomCaps)
+					{
+						pGridCircle->m_shapeOp.m_hasBottomCaps = bVal;
+						m_wndPropList.GetProperty(6)->GetSubItem(1)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(2)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(3)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(4)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(5)->Enable(bVal);
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标X"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridCircle->m_shapeOp.m_bottomCap.normal._x))
+					{
+						pGridCircle->m_shapeOp.m_bottomCap.normal._x = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标Y"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridCircle->m_shapeOp.m_bottomCap.normal._y))
+					{
+						pGridCircle->m_shapeOp.m_bottomCap.normal._y = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标Z"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridCircle->m_shapeOp.m_bottomCap.normal._z))
+					{
+						pGridCircle->m_shapeOp.m_bottomCap.normal._z = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("盖底材质"))
+				{
+					if (propValue != pGridCircle->m_shapeOp.m_bottomCap.materialName)
+					{
+						pGridCircle->m_shapeOp.m_bottomCap.materialName = propValue;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("顺时针"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridCircle->m_shapeOp.m_bottomCap.reverse)
+					{
+						pGridCircle->m_shapeOp.m_bottomCap.reverse = bVal;
+						NeedRefreshModel();
+					}
+				}
+			}
+		}
+		break;
+	case EICON_POLYGON:
+		if (m_curSelTreeCtrlItem != NULL)
+		{
+			pGridPoly = (CGridPolygon*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+			if (pGridPoly)
+			{
+				if (propName == _T("激活盖底"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridPoly->m_shapeOp.m_hasBottomCaps)
+					{
+						pGridPoly->m_shapeOp.m_hasBottomCaps = bVal;
+						m_wndPropList.GetProperty(6)->GetSubItem(1)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(2)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(3)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(4)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(5)->Enable(bVal);
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标X"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridPoly->m_shapeOp.m_bottomCap.normal._x))
+					{
+						pGridPoly->m_shapeOp.m_bottomCap.normal._x = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标Y"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridPoly->m_shapeOp.m_bottomCap.normal._y))
+					{
+						pGridPoly->m_shapeOp.m_bottomCap.normal._y = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("法线坐标Z"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridPoly->m_shapeOp.m_bottomCap.normal._z))
+					{
+						pGridPoly->m_shapeOp.m_bottomCap.normal._z = fVal;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("盖底材质"))
+				{
+					if (propValue != pGridPoly->m_shapeOp.m_bottomCap.materialName)
+					{
+						pGridPoly->m_shapeOp.m_bottomCap.materialName = propValue;
+						NeedRefreshModel();
+					}
+				}
+				else if (propName == _T("顺时针"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridPoly->m_shapeOp.m_bottomCap.reverse)
+					{
+						pGridPoly->m_shapeOp.m_bottomCap.reverse = bVal;
+						NeedRefreshModel();
+					}
+				}
+			}
+		}
+		break;
+	case EICON_CIRCLECONTOUR:
+	case EICON_POLYCONTOUR:
+		if (m_hParentModelItem != NULL)
+		{
+			pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			if (pGridData)
+			{
+				if (propName == _T("激活盖底"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridData->m_isBottomCapTessAll)
+					{
+						pGridData->m_isBottomCapTessAll = bVal;
+						m_wndPropList.GetProperty(6)->GetSubItem(1)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(2)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(3)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(4)->Enable(bVal);
+						m_wndPropList.GetProperty(6)->GetSubItem(5)->Enable(bVal);
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("法线坐标X"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridData->m_bottomCap.normal._x))
+					{
+						pGridData->m_bottomCap.normal._x = fVal;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("法线坐标Y"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridData->m_bottomCap.normal._y))
+					{
+						pGridData->m_bottomCap.normal._y = fVal;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("法线坐标Z"))
+				{
+					float fVal = (float)_wtof(propValue.GetString());
+					if (!equals(fVal, pGridData->m_bottomCap.normal._z))
+					{
+						pGridData->m_bottomCap.normal._z = fVal;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("盖底材质"))
+				{
+					if (propValue != pGridData->m_bottomCap.materialName)
+					{
+						pGridData->m_bottomCap.materialName = propValue;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+				else if (propName == _T("顺时针"))
+				{
+					bool bVal = _wtoi(propValue.GetString()) != 0;
+					if (bVal != pGridData->m_bottomCap.reverse)
+					{
+						pGridData->m_bottomCap.reverse = bVal;
+						pGridData->m_needUpdateModel = true;
+					}
+				}
+			}
+		}
+		break;
 	}
 }
 
@@ -788,6 +1242,9 @@ BEGIN_MESSAGE_MAP(CTessgridBuilderDlg, CDialog)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_CONTOUR_IDX, &OnLvnItemchangedListContourIdx)
 	ON_REGISTERED_MESSAGE(AFX_WM_PROPERTY_CHANGED, &OnPropertyChanged)
 	ON_NOTIFY(TVN_DELETEITEM, IDC_TREE_CONTOUR_IDX, &OnTvnDeleteitemTreeContourIdx)
+	ON_COMMAND(ID_32787, &OnAddStretchBody)
+	ON_COMMAND(ID_32788, &OnRemoveStretchBody)
+	ON_NOTIFY(LVN_DELETEITEM, IDC_LIST_CONTOUR_IDX, &OnLvnDeleteitemListContourIdx)
 END_MESSAGE_MAP()
 
 // CTessgridBuilderDlg 消息处理程序
@@ -981,6 +1438,7 @@ void CTessgridBuilderDlg::OnExpandTreeCtrl()
 
 void CTessgridBuilderDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 {
+	CPoint pt = point;
 	m_treeCtrl.ScreenToClient(&point);
 	UINT uFlags;
 	HTREEITEM hItem = m_treeCtrl.HitTest(point, &uFlags);
@@ -1007,6 +1465,25 @@ void CTessgridBuilderDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 		}
 
 		subMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
+	}
+
+	CRect rc;
+	m_listCtrl.ScreenToClient(&pt);
+	m_listCtrl.GetClientRect(rc);
+	if ((m_curSelItemType == EICON_CIRCLE || m_curSelItemType == EICON_POLYGON) && rc.PtInRect(pt))
+	{
+		CMenu menu;
+		menu.LoadMenu(IDR_MENU3);
+		CMenu* subMenu = menu.GetSubMenu(0);
+
+		int nListItem = m_listCtrl.HitTest(pt, &uFlags);
+		if (nListItem == -1)
+		{
+			subMenu->RemoveMenu(1, MF_BYPOSITION);
+		}
+
+		m_listCtrl.ClientToScreen(&pt);
+		subMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, this);
 	}
 }
 
@@ -1071,6 +1548,63 @@ void CTessgridBuilderDlg::OnDeleteContour()
 	HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
 	if (hItem)
 		m_treeCtrl.DeleteItem(hItem);
+}
+
+void CTessgridBuilderDlg::OnAddStretchBody()
+{
+	switch (m_curSelItemType)
+	{
+	case EICON_CIRCLE:
+		if (m_curSelTreeCtrlItem != NULL)
+		{
+			CGridCircle* pGridCircle = (CGridCircle*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+			if (pGridCircle)
+			{
+				list<SpatialInfo>& refList = pGridCircle->m_shapeOp.m_stretchingBodies.spaceInfo;
+				refList.push_back(SpatialInfo());
+				int nItem = m_listCtrl.InsertItem(m_listCtrl.GetItemCount(), _T("拉伸"), 0);
+				m_listCtrl.SetItemData(nItem, (DWORD_PTR)&refList.back());
+
+				CString strStretchNum;
+				strStretchNum.Format(_T("形体拉伸次数：%d次"), m_listCtrl.GetItemCount());
+				m_staStretchNum.SetWindowText(strStretchNum);
+				NeedRefreshModel();
+			}
+		}
+		break;
+	case EICON_POLYGON:
+		if (m_curSelTreeCtrlItem != NULL)
+		{
+			CGridPolygon* pGridPoly = (CGridPolygon*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+			if (pGridPoly)
+			{
+				list<SpatialInfo>& refList = pGridPoly->m_shapeOp.m_stretchingBodies.spaceInfo;
+				refList.push_back(SpatialInfo());
+				int nItem = m_listCtrl.InsertItem(m_listCtrl.GetItemCount(), _T("拉伸"), 0);
+				m_listCtrl.SetItemData(nItem, (DWORD_PTR)&refList.back());
+
+				CString strStretchNum;
+				strStretchNum.Format(_T("形体拉伸次数：%d次"), m_listCtrl.GetItemCount());
+				m_staStretchNum.SetWindowText(strStretchNum);
+				NeedRefreshModel();
+			}
+		}
+		break;
+	}
+}
+
+void CTessgridBuilderDlg::OnRemoveStretchBody()
+{
+	int mark = m_listCtrl.GetSelectionMark();
+	if (mark != -1)
+	{
+		m_listCtrlDeleteGridData = true;
+		m_listCtrl.DeleteItem(mark);
+		m_listCtrlDeleteGridData = false;
+		CString strStretchNum;
+		strStretchNum.Format(_T("形体拉伸次数：%d次"), m_listCtrl.GetItemCount());
+		m_staStretchNum.SetWindowText(strStretchNum);
+	}
 }
 
 void CTessgridBuilderDlg::OnTvnSelchangedTreeContourIdx(NMHDR *pNMHDR, LRESULT *pResult)
@@ -1317,287 +1851,580 @@ void CTessgridBuilderDlg::OnLvnItemchangedListContourIdx(NMHDR *pNMHDR, LRESULT 
 	*pResult = 0;
 }
 
+void CTessgridBuilderDlg::OnLvnDeleteitemListContourIdx(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	if (m_listCtrlDeleteGridData && pNMLV && pNMLV->iItem != -1)
+	{
+		SpatialInfo* pSpatialInfo = (SpatialInfo*)m_listCtrl.GetItemData(pNMLV->iItem);
+		if (pSpatialInfo)
+		{
+			switch (m_curSelItemType)
+			{
+			case EICON_CIRCLE:
+				if (m_curSelTreeCtrlItem != NULL)
+				{
+					CGridCircle* pGridCircle = (CGridCircle*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+					if (pGridCircle)
+					{
+						list<SpatialInfo>& refList = pGridCircle->m_shapeOp.m_stretchingBodies.spaceInfo;
+						list<SpatialInfo>::const_iterator it = std::find_if(refList.cbegin(), refList.cend(), GeneCampare(pSpatialInfo));
+						if (it != refList.cend())
+						{
+							refList.erase(it);
+							NeedRefreshModel();
+						}
+					}
+				}
+				break;
+			case EICON_POLYGON:
+				if (m_curSelTreeCtrlItem != NULL)
+				{
+					CGridPolygon* pGridPoly = (CGridPolygon*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+					if (pGridPoly)
+					{
+						list<SpatialInfo>& refList = pGridPoly->m_shapeOp.m_stretchingBodies.spaceInfo;
+						list<SpatialInfo>::const_iterator it = std::find_if(refList.cbegin(), refList.cend(), GeneCampare(pSpatialInfo));
+						if (it != refList.cend())
+						{
+							refList.erase(it);
+							NeedRefreshModel();
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+	*pResult = 0;
+}
+
 LRESULT CTessgridBuilderDlg::OnPropertyChanged(WPARAM wParam, LPARAM lParam)
 {
 	CMFCPropertyGridProperty* pGridPropCtrl = (CMFCPropertyGridProperty*)lParam;
+	CString parentPropName = pGridPropCtrl->GetParent() ? pGridPropCtrl->GetParent()->GetName() : _T("");
 	CString propName = pGridPropCtrl->GetName();
 	CString propValue = pGridPropCtrl->GetValue();
-	if (propName == _T("模型名称"))
+	if (parentPropName == _T("属性"))
 	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		if (pGridData && propValue != pGridData->m_prop.m_modelName)
+		if (propName == _T("模型名称"))
 		{
-			pGridData->m_prop.m_modelName = propValue;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("材质名称"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		if (pGridData && propValue != pGridData->m_prop.m_materialName)
-		{
-			pGridData->m_prop.m_materialName = propValue;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("基准平面"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		if (pGridData && propValue != pGridData->m_place.m_plane)
-		{
-			pGridData->m_place.m_plane = propValue;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("X轴平移"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._translation._x))
-		{
-			pGridData->m_place.m_spaceInfo._translation._x = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("Y轴平移"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._translation._y))
-		{
-			pGridData->m_place.m_spaceInfo._translation._y = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("Z轴平移"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._translation._z))
-		{
-			pGridData->m_place.m_spaceInfo._translation._z = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("X轴旋转"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._rotation._x))
-		{
-			pGridData->m_place.m_spaceInfo._rotation._x = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("Y轴旋转"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._rotation._y))
-		{
-			pGridData->m_place.m_spaceInfo._rotation._y = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("Z轴旋转"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._rotation._z))
-		{
-			pGridData->m_place.m_spaceInfo._rotation._z = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("X轴缩放"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._scale._x))
-		{
-			pGridData->m_place.m_spaceInfo._scale._x = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("Y轴缩放"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._scale._y))
-		{
-			pGridData->m_place.m_spaceInfo._scale._y = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("Z轴缩放"))
-	{
-		CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._scale._z))
-		{
-			pGridData->m_place.m_spaceInfo._scale._z = fVal;
-			pGridData->m_needUpdateModel = true;
-		}
-	}
-	else if (propName == _T("直径"))
-	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridCir && !equals(fVal, pGridCir->m_diameter))
-		{
-			pGridCir->m_diameter = fVal;
-			if (m_hParentModelItem)
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			if (pGridData && propValue != pGridData->m_prop.m_modelName)
 			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
+				pGridData->m_prop.m_modelName = propValue;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("材质名称"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			if (pGridData && propValue != pGridData->m_prop.m_materialName)
+			{
+				pGridData->m_prop.m_materialName = propValue;
+				pGridData->m_needUpdateModel = true;
 			}
 		}
 	}
-	else if (propName == _T("圆心X"))
+	else if (parentPropName == _T("位置"))
 	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridCir && !equals(fVal, pGridCir->m_pos._x))
+		if (propName == _T("基准平面"))
 		{
-			pGridCir->m_pos._x = fVal;
-			if (m_hParentModelItem)
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			if (pGridData && propValue != pGridData->m_place.m_plane)
 			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
+				pGridData->m_place.m_plane = propValue;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("X轴平移"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._translation._x))
+			{
+				pGridData->m_place.m_spaceInfo._translation._x = fVal;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("Y轴平移"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._translation._y))
+			{
+				pGridData->m_place.m_spaceInfo._translation._y = fVal;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("Z轴平移"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._translation._z))
+			{
+				pGridData->m_place.m_spaceInfo._translation._z = fVal;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("X轴旋转"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._rotation._x))
+			{
+				pGridData->m_place.m_spaceInfo._rotation._x = fVal;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("Y轴旋转"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._rotation._y))
+			{
+				pGridData->m_place.m_spaceInfo._rotation._y = fVal;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("Z轴旋转"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._rotation._z))
+			{
+				pGridData->m_place.m_spaceInfo._rotation._z = fVal;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("X轴缩放"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._scale._x))
+			{
+				pGridData->m_place.m_spaceInfo._scale._x = fVal;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("Y轴缩放"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._scale._y))
+			{
+				pGridData->m_place.m_spaceInfo._scale._y = fVal;
+				pGridData->m_needUpdateModel = true;
+			}
+		}
+		else if (propName == _T("Z轴缩放"))
+		{
+			CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridData && !equals(fVal, pGridData->m_place.m_spaceInfo._scale._z))
+			{
+				pGridData->m_place.m_spaceInfo._scale._z = fVal;
+				pGridData->m_needUpdateModel = true;
 			}
 		}
 	}
-	else if (propName == _T("圆心Y"))
+	else if (parentPropName == _T("圆形"))
 	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		float fVal = (float)_wtof(propValue.GetString());
-		if (pGridCir && !equals(fVal, pGridCir->m_pos._y))
+		if (propName == _T("直径"))
 		{
-			pGridCir->m_pos._y = fVal;
-			if (m_hParentModelItem)
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridCir && !equals(fVal, pGridCir->m_diameter))
 			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
+				pGridCir->m_diameter = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("圆心X"))
+		{
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridCir && !equals(fVal, pGridCir->m_pos._x))
+			{
+				pGridCir->m_pos._x = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("圆心Y"))
+		{
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridCir && !equals(fVal, pGridCir->m_pos._y))
+			{
+				pGridCir->m_pos._y = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("采样点"))
+		{
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
+			unsigned int uVal = (unsigned int)_wtoi(propValue.GetString());
+			if (pGridCir && uVal != pGridCir->m_cnt)
+			{
+				pGridCir->m_cnt = uVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("顺时针"))
+		{
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
+			bool bVal = _wtoi(propValue.GetString()) != 0;
+			if (pGridCir && bVal != pGridCir->m_clockwise)
+			{
+				pGridCir->m_clockwise = bVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
 			}
 		}
 	}
-	else if (propName == _T("采样点"))
+	else if (parentPropName == _T("顶点"))
 	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		unsigned int uVal = (unsigned int)_wtoi(propValue.GetString());
-		if (pGridCir && uVal != pGridCir->m_cnt)
+		if (propName == _T("点坐标X"))
 		{
-			pGridCir->m_cnt = uVal;
-			if (m_hParentModelItem)
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridPolygon::SPolyPoint* pGridPolyPt = (CGridPolygon::SPolyPoint*)m_treeCtrl.GetItemData(hItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridPolyPt && !equals(fVal, pGridPolyPt->m_pos._x))
 			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
+				pGridPolyPt->m_pos._x = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("点坐标Y"))
+		{
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridPolygon::SPolyPoint* pGridPolyPt = (CGridPolygon::SPolyPoint*)m_treeCtrl.GetItemData(hItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridPolyPt && !equals(fVal, pGridPolyPt->m_pos._y))
+			{
+				pGridPolyPt->m_pos._y = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("角度"))
+		{
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridPolygon::SPolyPoint* pGridPolyPt = (CGridPolygon::SPolyPoint*)m_treeCtrl.GetItemData(hItem);
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pGridPolyPt && !equals(fVal, pGridPolyPt->m_degree))
+			{
+				pGridPolyPt->m_degree = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("采样点"))
+		{
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridPolygon::SPolyPoint* pGridPolyPt = (CGridPolygon::SPolyPoint*)m_treeCtrl.GetItemData(hItem);
+			unsigned int uVal = (unsigned int)_wtoi(propValue.GetString());
+			if (pGridPolyPt && uVal != pGridPolyPt->m_cnt)
+			{
+				pGridPolyPt->m_cnt = uVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("顺时针"))
+		{
+			HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
+			CGridPolygon::SPolyPoint* pGridPolyPt = (CGridPolygon::SPolyPoint*)m_treeCtrl.GetItemData(hItem);
+			bool bVal = _wtoi(propValue.GetString()) != 0;
+			if (pGridPolyPt && bVal != pGridPolyPt->m_clockwise)
+			{
+				pGridPolyPt->m_clockwise = bVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
 			}
 		}
 	}
-	else if (propName == _T("顺时针"))
+	else if (parentPropName == _T("拉伸"))
 	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		bool bVal = (bool)_wtoi(propValue.GetString());
-		if (pGridCir && bVal != pGridCir->m_clockwise)
+		if (propName == _T("拉伸侧面材质"))
 		{
-			pGridCir->m_clockwise = bVal;
-			if (m_hParentModelItem)
+			CGridCircle* pGridCircle;
+			CGridPolygon* pGridPoly;
+			switch (m_curSelItemType)
 			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
+			case EICON_CIRCLE:
+				if (m_curSelTreeCtrlItem != NULL)
+				{
+					pGridCircle = (CGridCircle*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+					if (pGridCircle)
+					{
+						pGridCircle->m_shapeOp.m_stretchingBodies.materialName = propValue;
+						if (m_hParentModelItem)
+						{
+							CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+							if (pGridData)
+								pGridData->m_needUpdateModel = true;
+						}
+					}
+				}
+				break;
+			case EICON_POLYGON:
+				if (m_curSelTreeCtrlItem != NULL)
+				{
+					pGridPoly = (CGridPolygon*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+					if (pGridPoly)
+					{
+						pGridPoly->m_shapeOp.m_stretchingBodies.materialName = propValue;
+						if (m_hParentModelItem)
+						{
+							CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+							if (pGridData)
+								pGridData->m_needUpdateModel = true;
+						}
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		else if (propName == _T("顺时针"))
+		{
+			CGridCircle* pGridCircle;
+			CGridPolygon* pGridPoly;
+			switch (m_curSelItemType)
+			{
+			case EICON_CIRCLE:
+				if (m_curSelTreeCtrlItem != NULL)
+				{
+					pGridCircle = (CGridCircle*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+					if (pGridCircle)
+					{
+						pGridCircle->m_shapeOp.m_stretchingBodies.reverse = _wtoi(propValue.GetString()) != 0;
+						if (m_hParentModelItem)
+						{
+							CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+							if (pGridData)
+								pGridData->m_needUpdateModel = true;
+						}
+					}
+				}
+				break;
+			case EICON_POLYGON:
+				if (m_curSelTreeCtrlItem != NULL)
+				{
+					pGridPoly = (CGridPolygon*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+					if (pGridPoly)
+					{
+						pGridPoly->m_shapeOp.m_stretchingBodies.reverse = _wtoi(propValue.GetString()) != 0;
+						if (m_hParentModelItem)
+						{
+							CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+							if (pGridData)
+								pGridData->m_needUpdateModel = true;
+						}
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		else if (propName == _T("X轴平移"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_translation._x))
+			{
+				pSpaceData->_translation._x = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("Y轴平移"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_translation._y))
+			{
+				pSpaceData->_translation._y = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("Z轴平移"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_translation._z))
+			{
+				pSpaceData->_translation._z = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("X轴旋转"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_rotation._x))
+			{
+				pSpaceData->_rotation._x = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("Y轴旋转"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_rotation._y))
+			{
+				pSpaceData->_rotation._y = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("Z轴旋转"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_rotation._z))
+			{
+				pSpaceData->_rotation._z = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("X轴缩放"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_scale._x))
+			{
+				pSpaceData->_scale._x = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("Y轴缩放"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_scale._y))
+			{
+				pSpaceData->_scale._y = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
+			}
+		}
+		else if (propName == _T("Z轴缩放"))
+		{
+			SpatialInfo* pSpaceData = (SpatialInfo*)m_listCtrl.GetItemData(m_listCtrl.GetSelectionMark());
+			float fVal = (float)_wtof(propValue.GetString());
+			if (pSpaceData && !equals(fVal, pSpaceData->_scale._z))
+			{
+				pSpaceData->_scale._z = fVal;
+				if (m_hParentModelItem)
+				{
+					CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
+					if (pGridData)
+						pGridData->m_needUpdateModel = true;
+				}
 			}
 		}
 	}
-	else if (propName == _T("点坐标X"))
+	else if (parentPropName == _T("盖顶"))
 	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		bool bVal = (bool)_wtoi(propValue.GetString());
-		if (pGridCir && bVal != pGridCir->m_clockwise)
-		{
-			pGridCir->m_clockwise = bVal;
-			if (m_hParentModelItem)
-			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
-			}
-		}
+		if (!propName.IsEmpty())
+			TopCapPropertyChanged(propName, propValue);
 	}
-	else if (propName == _T("点坐标Y"))
+	else if (parentPropName == _T("盖底"))
 	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		bool bVal = (bool)_wtoi(propValue.GetString());
-		if (pGridCir && bVal != pGridCir->m_clockwise)
-		{
-			pGridCir->m_clockwise = bVal;
-			if (m_hParentModelItem)
-			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
-			}
-		}
-	}
-	else if (propName == _T("角度"))
-	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		bool bVal = (bool)_wtoi(propValue.GetString());
-		if (pGridCir && bVal != pGridCir->m_clockwise)
-		{
-			pGridCir->m_clockwise = bVal;
-			if (m_hParentModelItem)
-			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
-			}
-		}
-	}
-	else if (propName == _T("采样点"))
-	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		bool bVal = (bool)_wtoi(propValue.GetString());
-		if (pGridCir && bVal != pGridCir->m_clockwise)
-		{
-			pGridCir->m_clockwise = bVal;
-			if (m_hParentModelItem)
-			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
-			}
-		}
-	}
-	else if (propName == _T("顺时针"))
-	{
-		HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
-		CGridCircle* pGridCir = (CGridCircle*)m_treeCtrl.GetItemData(hItem);
-		bool bVal = (bool)_wtoi(propValue.GetString());
-		if (pGridCir && bVal != pGridCir->m_clockwise)
-		{
-			pGridCir->m_clockwise = bVal;
-			if (m_hParentModelItem)
-			{
-				CGridData* pGridData = (CGridData*)m_treeCtrl.GetItemData(m_hParentModelItem);
-				if (pGridData)
-					pGridData->m_needUpdateModel = true;
-			}
-		}
+		if (!propName.IsEmpty())
+			BottomCapPropertyChanged(propName, propValue);
 	}
 	return 0;
 }

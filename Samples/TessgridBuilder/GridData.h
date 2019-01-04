@@ -42,7 +42,6 @@ public:
 
 	bool m_hasTopCaps;
 	bool m_hasBottomCaps;
-	bool m_hasStretchBodies;
 	SCap m_topCap;
 	SCap m_bottomCap;
 	SStretchingBody m_stretchingBodies;

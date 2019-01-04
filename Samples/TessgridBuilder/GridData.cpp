@@ -21,7 +21,6 @@ CGridPlace::~CGridPlace()
 CGridShapeOp::CGridShapeOp()
 	: m_hasTopCaps(false)
 	, m_hasBottomCaps(false)
-	, m_hasStretchBodies(false)
 {
 	m_topCap.reverse = false;
 	m_topCap.normal.set(0, 0, 1);

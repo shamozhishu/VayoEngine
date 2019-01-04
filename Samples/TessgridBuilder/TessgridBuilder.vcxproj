@@ -248,11 +248,6 @@
     <Image Include="res\save.ico" />
     <Image Include="res\toolbar.bmp" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\VayoMain\VayoMain.vcxproj">
-      <Project>{e8605e2e-db10-4ca2-a234-0a895eafdda2}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

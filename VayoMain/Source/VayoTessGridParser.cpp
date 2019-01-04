@@ -89,6 +89,8 @@ inline ManualObject* TessGridParser::parseProp(wstringstream& strin, TessGridHan
 	strin >> tag;
 	if (tag != L"default_material")
 		pObj->setMaterial(tag);
+	else
+		pObj->setMaterial(L"");
 
 	unsigned int vertexCount, contourCount;
 	strin >> vertexCount >> contourCount;

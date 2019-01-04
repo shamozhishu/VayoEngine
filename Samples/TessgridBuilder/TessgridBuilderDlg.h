@@ -61,12 +61,15 @@ protected:
 	void Resize();
 
 private:
+	void NeedRefreshModel();
 	void ResetCtrlLayout();
 	void RecursionShowPropGridCtrl(BOOL bShow, CMFCPropertyGridProperty* pGridProperty);
 	bool SetPropAndPlaceGridCtrlValue(const CGridData* pGridData);
 	bool SetTopAndBottomCapGridCtrlValue(const CGridData* pGridData);
 	void SetTopAndBottomCapGridCtrlValue(const CGridShapeOp& shapeOp);
 	void SetStretchBodyGridCtrlValue(const CGridShapeOp::SStretchingBody& shapeOpStretchBody, int iItem);
+	void TopCapPropertyChanged(CString propName, CString propValue);
+	void BottomCapPropertyChanged(CString propName, CString propValue);
 
 // й╣ож
 protected:
@@ -78,6 +81,7 @@ protected:
 	CStatusBar m_statusbar;
 	HDITEM m_gridCtrlItem;
 	CMFCPropertyGridCtrl m_wndPropList;
+	bool m_listCtrlDeleteGridData;
 	CListCtrl m_listCtrl;
 	CImageList m_listCtrlImg;
 	bool m_isTreeCtrlExpand;
@@ -108,8 +112,11 @@ public:
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	afx_msg void OnInsertContour();
 	afx_msg void OnDeleteContour();
+	afx_msg void OnAddStretchBody();
+	afx_msg void OnRemoveStretchBody();
 	afx_msg void OnTvnSelchangedTreeContourIdx(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTvnDeleteitemTreeContourIdx(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnItemchangedListContourIdx(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnDeleteitemListContourIdx(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg LRESULT OnPropertyChanged(WPARAM wParam, LPARAM lParam);
 };

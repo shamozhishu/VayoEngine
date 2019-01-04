@@ -109,7 +109,7 @@ bool CGridDataManager::GeneratingModel(CString modelName, bool display)
 				refCir.m_shapeOp.m_topCap.materialName.GetString(), refCir.m_shapeOp.m_topCap.reverse);
 		}
 
-		if (refCir.m_shapeOp.m_hasStretchBodies)
+		if (refCir.m_shapeOp.m_stretchingBodies.spaceInfo.size() > 0)
 		{
 			m_gridBuilder.beginAddStretBody(idx, refCir.m_shapeOp.m_stretchingBodies.materialName.GetString(), refCir.m_shapeOp.m_stretchingBodies.reverse);
 			list<SpatialInfo>::iterator itSpatial = refCir.m_shapeOp.m_stretchingBodies.spaceInfo.begin();
@@ -147,7 +147,7 @@ bool CGridDataManager::GeneratingModel(CString modelName, bool display)
 				refPoly.m_shapeOp.m_topCap.materialName.GetString(), refPoly.m_shapeOp.m_topCap.reverse);
 		}
 
-		if (refPoly.m_shapeOp.m_hasStretchBodies)
+		if (refPoly.m_shapeOp.m_stretchingBodies.spaceInfo.size() > 0)
 		{
 			m_gridBuilder.beginAddStretBody(idx, refPoly.m_shapeOp.m_stretchingBodies.materialName.GetString(), refPoly.m_shapeOp.m_stretchingBodies.reverse);
 			list<SpatialInfo>::iterator itSpatial = refPoly.m_shapeOp.m_stretchingBodies.spaceInfo.begin();
@@ -685,7 +685,6 @@ bool CGridDataManager::OperateCurGridData(unsigned idx, EGRIDDATA_OP opType, con
 			if (it != m_currentGridData.m_circles.end())
 			{
 				CGridCircle& gridCircle = (*it);
-				gridCircle.m_shapeOp.m_hasStretchBodies = true;
 				gridCircle.m_shapeOp.m_stretchingBodies = bodyData;
 			}
 			break;
@@ -721,7 +720,6 @@ bool CGridDataManager::OperateCurGridData(unsigned idx, EGRIDDATA_OP opType, con
 			if (it != m_currentGridData.m_polygons.end())
 			{
 				CGridPolygon& gridPoly = (*it);
-				gridPoly.m_shapeOp.m_hasStretchBodies = true;
 				gridPoly.m_shapeOp.m_stretchingBodies = bodyData;
 			}
 			break;
