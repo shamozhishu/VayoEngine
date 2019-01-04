@@ -60,31 +60,44 @@ void TessGridHandler::reset(int vertexSize /*= 0*/, int contourSize /*= 0*/)
 		_contourList.resize((size_t)contourSize);
 }
 
-bool TessGridHandler::parseTessgridFile(const wstring& filename)
+bool TessGridHandler::parseTessgridFile(const wstring& filename, bool fullPath /*= false*/)
 {
 	wstring fileName = filename;
 	trim(fileName);
 	if (fileName != L"" && fileName.substr(fileName.rfind(L'.')) == L".tessgrid")
 	{
-		wstring filePath = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + fileName;
+		wstring filePath;
+		if (fullPath)
+			filePath = fileName;
+		else
+			filePath = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + fileName;
+
 		std::wifstream fin(filePath);
 		if (!fin)
 		{
-			Log::wprint(ELL_ERROR, L"文件[%s]打开失败", fileName.c_str());
+			Log::wprint(ELL_ERROR, L"文件[%s]打开失败", filePath.c_str());
 			return false;
 		}
 
+		fin.seekg(0, ios_base::end);
+		if ((int)fin.tellg() == 0)
+		{
+			Log::wprint(ELL_ERROR, L"文件[%s]为空", filePath.c_str());
+			return false;
+		}
+
+		fin.seekg(0, ios_base::beg);
 		fin.imbue(locale("chs"));
 		wstringstream filestream;
 		filestream << fin.rdbuf();
 		
 		if (parseTessgridFile(filestream))
 		{
-			Log::wprint(ELL_INFORMATION, L"文件[%s]解析成功", fileName.c_str());
+			Log::wprint(ELL_INFORMATION, L"文件[%s]解析成功", filePath.c_str());
 			return true;
 		}
 		
-		Log::wprint(ELL_ERROR, L"文件[%s]解析失败", fileName.c_str());
+		Log::wprint(ELL_ERROR, L"文件[%s]解析失败", filePath.c_str());
 	}
 
 	return false;

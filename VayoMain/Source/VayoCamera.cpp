@@ -551,6 +551,7 @@ void OrbitCamera::lookAt(const Vector3df& pos, const Vector3df& target /*= Vecto
 	_position.set(0, 0, zpos);
 	_affector.buildCameraLookAtMatrixRH(pos, target, worldUp);
 	_affector.setTranslation(Vector3df::Origin);
+	_needUpdate = true;
 }
 
 bool OrbitCamera::touchBegan(const Touch& touch, EMouseKeys key)

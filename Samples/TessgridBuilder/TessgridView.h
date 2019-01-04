@@ -6,7 +6,7 @@ public:
 	CTessgridView();
 	~CTessgridView();
 	bool Init();
-	bool IsOK() const;
+	bool IsStartup() const;
 
 protected:
 	virtual void OnDraw(CDC* pDC);
@@ -16,5 +16,5 @@ protected:
 	DECLARE_DYNCREATE(CTessgridView)
 
 private:
-	bool m_bInitOK;
+	bool m_bIsStartup;
 };

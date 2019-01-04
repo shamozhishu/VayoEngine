@@ -55,12 +55,17 @@ CGridPolygon::~CGridPolygon()
 }
 //------------------------------------------------------------------------
 CGridData::CGridData()
-	: m_isTopCapTessAll(false)
+	: m_needUpdateModel(true)
+	, m_isTopCapTessAll(false)
 	, m_isBottomCapTessAll(false)
 	, m_circBaseContourIdx(0)
 	, m_polyBaseContourIdx(0)
-	, m_needUpdateModel(true)
 {
+	m_topCap.reverse = false;
+	m_topCap.normal.set(0, 0, 1);
+
+	m_bottomCap.reverse = true;
+	m_bottomCap.normal.set(0, 0, -1);
 }
 
 CGridData::~CGridData()
@@ -69,12 +74,27 @@ CGridData::~CGridData()
 
 void CGridData::ClearAll()
 {
+	m_needUpdateModel = true;
 	m_isTopCapTessAll = false;
 	m_isBottomCapTessAll = false;
 	m_circBaseContourIdx = 0;
 	m_polyBaseContourIdx = 0;
 	m_circles.clear();
 	m_polygons.clear();
+
+	m_prop.m_modelName.Empty();
+	m_prop.m_materialName.Empty();
+
+	m_place.m_plane = _T("XYÆ½Ãæ");
+	m_place.m_spaceInfo = SpatialInfo();
+
+	m_topCap.materialName.Empty();
+	m_topCap.reverse = false;
+	m_topCap.normal.set(0, 0, 1);
+
+	m_bottomCap.materialName.Empty();
+	m_bottomCap.reverse = true;
+	m_bottomCap.normal.set(0, 0, -1);
 }
 
 bool CGridData::operator==(const CGridData &rhs) const

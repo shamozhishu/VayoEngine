@@ -18,7 +18,7 @@ public:
 	TessGridHandler(unsigned int vertexCount, unsigned int contourCount);
 	~TessGridHandler();
 	void reset(int vertexSize = 0, int contourSize = 0);
-	bool parseTessgridFile(const wstring& filename);
+	bool parseTessgridFile(const wstring& filename, bool fullPath = false);
 	bool parseTessgridFile(wstringstream& filestream);
 	bool tesselating(ManualObject* tessObj, bool reverse = false, const wstring& materialName = L"");
 	bool tesselatingOnce(ManualObject* tessObj, unsigned int contourIdx, bool reverse = false, const wstring& materialName = L"");

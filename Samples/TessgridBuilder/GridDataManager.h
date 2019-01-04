@@ -10,6 +10,7 @@ public:
 	CGridDataManager();
 	~CGridDataManager();
 	bool OpenTessgridFile(CString filePath);
+	bool SaveTessgridFile(CString filePath);
 	bool GeneratingModel(CString modelName, bool display);
 	void HideOtherModel(const wstring& excludedModel = L"");
 	void ClearAllModel();
@@ -20,6 +21,7 @@ public:
 	const list<CGridData>& GetGridDataset() const;
 
 private:
+	bool BuildModelData(const CGridData& gridData, bool isBuildManulObject);
 	bool ParseTessgridFile(wstringstream& filestream);
 	bool ParseProp(wstringstream& strin);
 	bool ParseCapAndBody(wstringstream& strin, const wstring& tag);

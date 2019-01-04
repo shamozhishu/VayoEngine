@@ -13,7 +13,7 @@ public:
 	CTessgridBuilderDlg(CWnd* pParent = NULL);	// 标准构造函数
 	static CTessgridBuilderDlg* StartDlg(CWnd* pParent = NULL);
 	static void FinishDlg(CTessgridBuilderDlg* &pDlg);
-	bool IsInitOK() const;
+	bool IsEngineInit() const;
 	void DisplayModel();
 
 // 对话框数据
@@ -74,6 +74,7 @@ private:
 // 实现
 protected:
 	HICON m_hIcon;
+	CString m_savePath;
 	CTessgridView* m_modelView;
 	CMenu m_mainMenu;
 	CToolBar m_toolbar;
@@ -81,6 +82,8 @@ protected:
 	CStatusBar m_statusbar;
 	HDITEM m_gridCtrlItem;
 	CMFCPropertyGridCtrl m_wndPropList;
+	bool m_activeSelchangedAfxMsg;
+	bool m_treeCtrlDeleteGridData;
 	bool m_listCtrlDeleteGridData;
 	CListCtrl m_listCtrl;
 	CImageList m_listCtrlImg;

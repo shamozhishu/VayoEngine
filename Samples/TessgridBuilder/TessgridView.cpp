@@ -8,7 +8,7 @@ IMPLEMENT_DYNCREATE(CTessgridView, CView)
 BEGIN_MESSAGE_MAP(CTessgridView, CView)
 END_MESSAGE_MAP()
 CTessgridView::CTessgridView()
-	: m_bInitOK(false)
+	: m_bIsStartup(false)
 {
 }
 
@@ -28,14 +28,14 @@ bool CTessgridView::Init()
 		configInfo.MainDeviceAttrib.WndHandle = GetSafeHwnd();
 		configInfo.MainDeviceAttrib.WndQuit = false;
 		g_app = new TessgridApp(configInfo);
-		m_bInitOK = Root::getSingleton().IsLaunched() && g_app->startup();
+		m_bIsStartup = Root::getSingleton().IsLaunched() && g_app->startup();
 	}
-	return m_bInitOK;
+	return m_bIsStartup;
 }
 
-bool CTessgridView::IsOK() const
+bool CTessgridView::IsStartup() const
 {
-	return m_bInitOK;
+	return m_bIsStartup;
 }
 
 void CTessgridView::OnDraw(CDC* pDC)
@@ -44,7 +44,7 @@ void CTessgridView::OnDraw(CDC* pDC)
 
 BOOL CTessgridView::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	if (m_bInitOK)
+	if (m_bIsStartup)
 	{
 		Device* dev = Root::getSingleton().getMainDevice();
 		switch (message)

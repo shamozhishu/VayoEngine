@@ -212,9 +212,20 @@ wstringstream& TessGridBuilder::getStream()
 	return _stream;
 }
 
-void TessGridBuilder::save(const wstring& fileName, bool append/*=true*/)
+void TessGridBuilder::save(const wstring& filename, bool append /*= true*/, bool fullPath /*= false*/)
 {
-	WriteFile fout(Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + fileName + L".tessgrid", append);
+	wstring filePath, fileName;
+	fileName = filename;
+	trim(fileName);
+	if (fileName.substr(fileName.rfind(L'.')) != L".tessgrid")
+		fileName += L".tessgrid";
+
+	if (fullPath)
+		filePath = fileName;
+	else
+		filePath = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath + fileName;
+
+	WriteFile fout(filePath, append);
 	string strtmp = w2a_(getStream().str());
 	fout.write(strtmp.data(), strtmp.size() * sizeof(char));
 }

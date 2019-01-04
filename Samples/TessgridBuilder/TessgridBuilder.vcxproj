@@ -199,6 +199,7 @@
     <ClInclude Include="GridData.h" />
     <ClInclude Include="GridDataManager.h" />
     <ClInclude Include="DlgManager.h" />
+    <ClInclude Include="NewModelDlg.h" />
     <ClInclude Include="TessgridApp.h" />
     <ClInclude Include="TessgridView.h" />
     <ClInclude Include="TessgridBuilder.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="GridData.cpp" />
     <ClCompile Include="GridDataManager.cpp" />
     <ClCompile Include="DlgManager.cpp" />
+    <ClCompile Include="NewModelDlg.cpp" />
     <ClCompile Include="TessgridApp.cpp" />
     <ClCompile Include="TessgridView.cpp" />
     <ClCompile Include="TessgridBuilder.cpp" />
@@ -243,6 +245,7 @@
     <Image Include="res\polygon.ico" />
     <Image Include="res\polypoint.ico" />
     <Image Include="res\saveas.ico" />
+    <Image Include="res\stretch.ico" />
     <Image Include="res\TessgridBuilder.ico" />
     <Image Include="res\open.ico" />
     <Image Include="res\save.ico" />

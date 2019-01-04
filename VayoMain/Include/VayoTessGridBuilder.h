@@ -21,7 +21,7 @@ public:
 		EP_XY, EP_XZ, EP_YZ
 	};
 	wstringstream& getStream();
-	void save(const wstring& fileName, bool append=true);
+	void save(const wstring& filename, bool append = true, bool fullPath = false);
 	void rebuild();
 	void setProp(const wstring& modelName, const wstring& materialName=L"");
 	void setPlace(EPlace place, const Vector3df& pos=Vector3df::Origin, const Vector3df& rot=Vector3df::Origin, const Vector3df& scale=Vector3df(1,1,1));

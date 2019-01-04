@@ -53,6 +53,9 @@
     <ClInclude Include="GridData.h">
       <Filter>Classes\DataModel</Filter>
     </ClInclude>
+    <ClInclude Include="NewModelDlg.h">
+      <Filter>Classes\UserInterface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -84,6 +87,9 @@
     </ClCompile>
     <ClCompile Include="GridData.cpp">
       <Filter>Classes\DataModel</Filter>
+    </ClCompile>
+    <ClCompile Include="NewModelDlg.cpp">
+      <Filter>Classes\UserInterface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +136,9 @@
       <Filter>Resource</Filter>
     </Image>
     <Image Include="res\expand.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\stretch.ico">
       <Filter>Resource</Filter>
     </Image>
   </ItemGroup>

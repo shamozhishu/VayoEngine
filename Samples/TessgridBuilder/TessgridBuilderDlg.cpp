@@ -8,6 +8,7 @@
 #include "WzdSplash.h"
 #include "GridDataManager.h"
 #include "TessgridApp.h"
+#include "NewModelDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -66,6 +67,8 @@ CTessgridBuilderDlg::CTessgridBuilderDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_MODELBUILDER_DIALOG, pParent)
 	, m_modelView(NULL)
 	, m_isTreeCtrlExpand(false)
+	, m_activeSelchangedAfxMsg(true)
+	, m_treeCtrlDeleteGridData(false)
 	, m_listCtrlDeleteGridData(false)
 	, m_curSelItemType(EICON_NONE)
 	, m_hParentModelItem(NULL)
@@ -95,12 +98,10 @@ void CTessgridBuilderDlg::FinishDlg(CTessgridBuilderDlg* &pDlg)
 	}
 }
 
-bool CTessgridBuilderDlg::IsInitOK() const
+bool CTessgridBuilderDlg::IsEngineInit() const
 {
 	if (m_modelView)
-	{
-		return m_modelView->IsOK();
-	}
+		return m_modelView->IsStartup();
 	return false;
 }
 
@@ -134,7 +135,7 @@ BOOL CTessgridBuilderDlg::PreTranslateMessage(MSG* pMsg)
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN) // 屏蔽Enter键
 		return TRUE;
 
-	if (IsInitOK())
+	if (IsEngineInit())
 	{
 		POINT pos;
 		Device* pDevice = Root::getSingleton().getActiveDevice();
@@ -175,7 +176,7 @@ BOOL CTessgridBuilderDlg::PreTranslateMessage(MSG* pMsg)
 
 BOOL CTessgridBuilderDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	if (IsInitOK())
+	if (IsEngineInit())
 	{
 		Device* pDevice = Root::getSingleton().getActiveDevice();
 		switch (message)
@@ -1100,7 +1101,7 @@ BOOL CTessgridBuilderDlg::InitListCtrl()
 		m_listCtrlImg.SetBkColor(co);
 		m_listCtrl.SetImageList(&m_listCtrlImg, 0);
 
-		HICON hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 16, 16, 0);
+		HICON hIcon = (HICON)::LoadImage(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_STRETCH), IMAGE_ICON, 16, 16, 0);
 		m_listCtrlImg.Add(hIcon);
 	}
 
@@ -1390,34 +1391,91 @@ void CTessgridBuilderDlg::OnAboutMe()
 
 void CTessgridBuilderDlg::OnNewBuild()
 {
+	CNewModelDlg dlg;
+	if (dlg.DoModal() == IDOK)
+	{
+		CGridData gridData;
+		gridData.m_prop.m_modelName = dlg.GetModelName();
+		gridData.m_prop.m_materialName = dlg.GetModelMaterial();
+		std::list<CGridData>& gridDataset = CGridDataManager::GetIns().GetGridDataset();
+		gridDataset.push_back(gridData);
+		const CGridData& refGridData = gridDataset.back();
+		HTREEITEM rootTreeItem = m_treeCtrl.InsertItem(refGridData.m_prop.m_modelName, EICON_MODEL, EICON_MODEL, NULL);
+		m_treeCtrl.SetItemData(rootTreeItem, (DWORD_PTR)&refGridData);
+		HTREEITEM treeItem = m_treeCtrl.InsertItem(_T("圆形轮廓"), EICON_CIRCLECONTOUR, EICON_CIRCLECONTOUR, rootTreeItem);
+		m_treeCtrl.SetItemData(treeItem, (DWORD_PTR)&refGridData);
+		treeItem = m_treeCtrl.InsertItem(_T("多边形轮廓"), EICON_POLYCONTOUR, EICON_POLYCONTOUR, rootTreeItem);
+		m_treeCtrl.SetItemData(treeItem, (DWORD_PTR)&refGridData);
+	}
 }
 
 void CTessgridBuilderDlg::OnOpenFile()
 {
-	CString defaultPath = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath.c_str();
-	CString filter = _T("文件 (*.tessgrid)|*.tessgrid||");
-	CFileDialog dlg(TRUE, defaultPath, _T(""), OFN_HIDEREADONLY | OFN_READONLY, filter, NULL);
+	CString strTmp = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath.c_str();
+	CFileDialog dlg(TRUE, strTmp, _T(""), OFN_HIDEREADONLY | OFN_READONLY, _T("文件 (*.tessgrid)|*.tessgrid||"), NULL);
 	if (IDOK == dlg.DoModal())
 	{
-		m_treeCtrl.DeleteAllItems();
-		m_isTreeCtrlExpand = false;
-		m_curSelItemType = EICON_NONE;
-		m_hParentModelItem = NULL;
-		ResetCtrlLayout();
-		CGridDataManager::GetIns().ClearAllModel();
-		if (CGridDataManager::GetIns().OpenTessgridFile(dlg.GetPathName()))
+		strTmp = dlg.GetPathName();
+		if (CGridDataManager::GetIns().OpenTessgridFile(strTmp))
+		{
+			m_savePath = strTmp;
+			m_isTreeCtrlExpand = false;
+			m_activeSelchangedAfxMsg = false;
+			m_curSelItemType = EICON_NONE;
+			m_hParentModelItem = NULL;
+			ResetCtrlLayout();
+			CGridDataManager::GetIns().ClearAllModel();
 			RefreshTreeCtrl();
+			m_activeSelchangedAfxMsg = true;
+		}
 		else
-			AfxMessageBox(_T("打开文件失败！"));
+		{
+			strTmp.Format(_T("打开文件[%s]失败！"), strTmp);
+			AfxMessageBox(strTmp);
+		}
 	}
 }
 
 void CTessgridBuilderDlg::OnSaveFile()
 {
+	CString strTmp;
+	if (m_savePath.IsEmpty())
+	{
+		strTmp = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath.c_str();
+		CFileDialog dlg(FALSE, strTmp, _T(""), OFN_HIDEREADONLY | OFN_READONLY, _T("文件 (*.tessgrid)|*.tessgrid||"), NULL);
+		if (IDOK == dlg.DoModal())
+		{
+			m_savePath = dlg.GetPathName();
+			if (!CGridDataManager::GetIns().SaveTessgridFile(m_savePath))
+			{
+				strTmp.Format(_T("保存文件[%s]失败！"), m_savePath);
+				AfxMessageBox(strTmp);
+			}
+		}
+	}
+	else
+	{
+		if (!CGridDataManager::GetIns().SaveTessgridFile(m_savePath))
+		{
+			strTmp.Format(_T("保存文件[%s]失败！"), m_savePath);
+			AfxMessageBox(strTmp);
+		}
+	}
 }
 
 void CTessgridBuilderDlg::OnSaveAs()
 {
+	CString strTmp = Root::getSingleton().getConfigManager()->getSceneConfig().ModelsPath.c_str();
+	CFileDialog dlg(FALSE, strTmp, _T(""), OFN_HIDEREADONLY | OFN_READONLY, _T("文件 (*.tessgrid)|*.tessgrid||"), NULL);
+	if (IDOK == dlg.DoModal())
+	{
+		strTmp = dlg.GetPathName();
+		if (!CGridDataManager::GetIns().SaveTessgridFile(strTmp))
+		{
+			strTmp.Format(_T("保存文件[%s]失败！"), strTmp);
+			AfxMessageBox(strTmp);
+		}
+	}
 }
 
 void CTessgridBuilderDlg::OnResetCamera()
@@ -1440,9 +1498,14 @@ void CTessgridBuilderDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 {
 	CPoint pt = point;
 	m_treeCtrl.ScreenToClient(&point);
+
+	CRect rc;
+	m_listCtrl.ScreenToClient(&pt);
+	m_listCtrl.GetClientRect(rc);
+
 	UINT uFlags;
 	HTREEITEM hItem = m_treeCtrl.HitTest(point, &uFlags);
-	if ((hItem != NULL) && (TVHT_ONITEM & uFlags))
+	if ((hItem != NULL))
 	{
 		m_treeCtrl.ClientToScreen(&point);
 		m_treeCtrl.Select(hItem, TVGN_CARET);
@@ -1466,11 +1529,7 @@ void CTessgridBuilderDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 
 		subMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
 	}
-
-	CRect rc;
-	m_listCtrl.ScreenToClient(&pt);
-	m_listCtrl.GetClientRect(rc);
-	if ((m_curSelItemType == EICON_CIRCLE || m_curSelItemType == EICON_POLYGON) && rc.PtInRect(pt))
+	else if ((m_curSelItemType == EICON_CIRCLE || m_curSelItemType == EICON_POLYGON) && rc.PtInRect(pt))
 	{
 		CMenu menu;
 		menu.LoadMenu(IDR_MENU3);
@@ -1547,7 +1606,11 @@ void CTessgridBuilderDlg::OnDeleteContour()
 {
 	HTREEITEM hItem = m_treeCtrl.GetSelectedItem();
 	if (hItem)
+	{
+		m_treeCtrlDeleteGridData = true;
 		m_treeCtrl.DeleteItem(hItem);
+		m_treeCtrlDeleteGridData = false;
+	}
 }
 
 void CTessgridBuilderDlg::OnAddStretchBody()
@@ -1609,77 +1672,80 @@ void CTessgridBuilderDlg::OnRemoveStretchBody()
 
 void CTessgridBuilderDlg::OnTvnSelchangedTreeContourIdx(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	m_listCtrl.DeleteAllItems();
-	m_curSelItemType = EICON_NONE;
-	m_hParentModelItem = NULL;
-	m_curSelTreeCtrlItem = NULL;
-	m_curSelListCtrlItem = -1;
-	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
-	if (pNMTreeView && pNMTreeView->itemOld.hItem != pNMTreeView->itemNew.hItem)
+	if (m_activeSelchangedAfxMsg)
 	{
-		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
-		CString itemText = m_treeCtrl.GetItemText(hItem);
-		if (NULL == m_treeCtrl.GetParentItem(hItem))
+		m_listCtrl.DeleteAllItems();
+		m_curSelItemType = EICON_NONE;
+		m_hParentModelItem = NULL;
+		m_curSelTreeCtrlItem = NULL;
+		m_curSelListCtrlItem = -1;
+		LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+		if (pNMTreeView && pNMTreeView->itemOld.hItem != pNMTreeView->itemNew.hItem)
 		{
-			m_curSelItemType = EICON_MODEL;
-			ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE);
-			RefreshPropGridCtrl(EICON_MODEL, hItem);
-		}
-		else if (itemText == _T("圆形"))
-		{
-			m_curSelItemType = EICON_CIRCLE;
-			ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_CIRCLE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
-			RefreshPropGridCtrl(EICON_CIRCLE, hItem);
-		}
-		else if (itemText == _T("多边形"))
-		{
-			m_curSelItemType = EICON_POLYGON;
-			ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
-			RefreshPropGridCtrl(EICON_POLYGON, hItem);
-		}
-		else if (itemText == _T("顶点"))
-		{
-			m_curSelItemType = EICON_POLYPOINT;
-			ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_POLY);
-			RefreshPropGridCtrl(EICON_POLYPOINT, hItem);
-		}
-		else if (itemText == _T("圆形轮廓"))
-		{
-			m_curSelItemType = EICON_CIRCLECONTOUR;
-			ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
-			RefreshPropGridCtrl(EICON_CIRCLECONTOUR, hItem);
-		}
-		else if (itemText == _T("多边形轮廓"))
-		{
-			m_curSelItemType = EICON_POLYCONTOUR;
-			ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
-			RefreshPropGridCtrl(EICON_POLYCONTOUR, hItem);
+			HTREEITEM hItem = pNMTreeView->itemNew.hItem;
+			CString itemText = m_treeCtrl.GetItemText(hItem);
+			if (NULL == m_treeCtrl.GetParentItem(hItem))
+			{
+				m_curSelItemType = EICON_MODEL;
+				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE);
+				RefreshPropGridCtrl(EICON_MODEL, hItem);
+			}
+			else if (itemText == _T("圆形"))
+			{
+				m_curSelItemType = EICON_CIRCLE;
+				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_CIRCLE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
+				RefreshPropGridCtrl(EICON_CIRCLE, hItem);
+			}
+			else if (itemText == _T("多边形"))
+			{
+				m_curSelItemType = EICON_POLYGON;
+				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
+				RefreshPropGridCtrl(EICON_POLYGON, hItem);
+			}
+			else if (itemText == _T("顶点"))
+			{
+				m_curSelItemType = EICON_POLYPOINT;
+				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_POLY);
+				RefreshPropGridCtrl(EICON_POLYPOINT, hItem);
+			}
+			else if (itemText == _T("圆形轮廓"))
+			{
+				m_curSelItemType = EICON_CIRCLECONTOUR;
+				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
+				RefreshPropGridCtrl(EICON_CIRCLECONTOUR, hItem);
+			}
+			else if (itemText == _T("多边形轮廓"))
+			{
+				m_curSelItemType = EICON_POLYCONTOUR;
+				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
+				RefreshPropGridCtrl(EICON_POLYCONTOUR, hItem);
+			}
+
+			HTREEITEM hParentItem = hItem;
+			while (hItem)
+			{
+				hParentItem = hItem;
+				hItem = m_treeCtrl.GetParentItem(hItem);
+			}
+
+			if (hParentItem)
+			{
+				m_hParentModelItem = hParentItem;
+				CGridDataManager::GetIns().GeneratingModel(m_treeCtrl.GetItemText(hParentItem), false);
+			}
 		}
 
-		HTREEITEM hParentItem = hItem;
-		while (hItem)
-		{
-			hParentItem = hItem;
-			hItem = m_treeCtrl.GetParentItem(hItem);
-		}
-
-		if (hParentItem)
-		{
-			m_hParentModelItem = hParentItem;
-			CGridDataManager::GetIns().GeneratingModel(m_treeCtrl.GetItemText(hParentItem), false);
-		}
+		CString strStretchNum;
+		strStretchNum.Format(_T("形体拉伸次数：%d次"), m_listCtrl.GetItemCount());
+		m_staStretchNum.SetWindowText(strStretchNum);
 	}
-	
-	CString strStretchNum;
-	strStretchNum.Format(_T("形体拉伸次数：%d次"), m_listCtrl.GetItemCount());
-	m_staStretchNum.SetWindowText(strStretchNum);
 	*pResult = 0;
 }
 
 void CTessgridBuilderDlg::OnTvnDeleteitemTreeContourIdx(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
-	if (pNMTreeView && pNMTreeView->itemOld.hItem)
+	if (m_treeCtrlDeleteGridData && pNMTreeView && pNMTreeView->itemOld.hItem)
 	{
 		HTREEITEM hItem = pNMTreeView->itemOld.hItem;
 		DWORD_PTR itemData = m_treeCtrl.GetItemData(hItem);
@@ -1796,58 +1862,60 @@ void CTessgridBuilderDlg::OnTvnDeleteitemTreeContourIdx(NMHDR *pNMHDR, LRESULT *
 
 void CTessgridBuilderDlg::OnLvnItemchangedListContourIdx(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	CGridCircle* pGridCircle;
-	CGridPolygon* pGridPoly;
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	if (pNMLV && pNMLV->uNewState != 0 && pNMLV->uOldState != pNMLV->uNewState)
+	if (m_activeSelchangedAfxMsg)
 	{
-		switch (m_curSelItemType)
+		CGridCircle* pGridCircle;
+		CGridPolygon* pGridPoly;
+		LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+		if (pNMLV && pNMLV->uNewState != 0 && pNMLV->uOldState != pNMLV->uNewState)
 		{
-		case EICON_CIRCLE:
-			if (m_curSelListCtrlItem != pNMLV->iItem)
+			switch (m_curSelItemType)
 			{
-				m_curSelListCtrlItem = pNMLV->iItem;
-				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_CIRCLE | EPGC_STRETCH | EPGC_TOPCAP | EPGC_BOTTOMCAP);
-				if (m_curSelTreeCtrlItem != NULL)
+			case EICON_CIRCLE:
+				if (m_curSelListCtrlItem != pNMLV->iItem)
 				{
-					pGridCircle = (CGridCircle*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
-					if (pGridCircle)
-						SetStretchBodyGridCtrlValue(pGridCircle->m_shapeOp.m_stretchingBodies, pNMLV->iItem);
+					m_curSelListCtrlItem = pNMLV->iItem;
+					ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_CIRCLE | EPGC_STRETCH | EPGC_TOPCAP | EPGC_BOTTOMCAP);
+					if (m_curSelTreeCtrlItem != NULL)
+					{
+						pGridCircle = (CGridCircle*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+						if (pGridCircle)
+							SetStretchBodyGridCtrlValue(pGridCircle->m_shapeOp.m_stretchingBodies, pNMLV->iItem);
+					}
 				}
+				break;
+			case EICON_POLYGON:
+				if (m_curSelListCtrlItem != pNMLV->iItem)
+				{
+					m_curSelListCtrlItem = pNMLV->iItem;
+					ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_STRETCH | EPGC_TOPCAP | EPGC_BOTTOMCAP);
+					if (m_curSelTreeCtrlItem != NULL)
+					{
+						pGridPoly = (CGridPolygon*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
+						if (pGridPoly)
+							SetStretchBodyGridCtrlValue(pGridPoly->m_shapeOp.m_stretchingBodies, pNMLV->iItem);
+					}
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case EICON_POLYGON:
-			if (m_curSelListCtrlItem != pNMLV->iItem)
+		}
+		else if (pNMLV && pNMLV->uNewState == 0)
+		{
+			switch (m_curSelItemType)
 			{
-				m_curSelListCtrlItem = pNMLV->iItem;
-				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_STRETCH | EPGC_TOPCAP | EPGC_BOTTOMCAP);
-				if (m_curSelTreeCtrlItem != NULL)
-				{
-					pGridPoly = (CGridPolygon*)m_treeCtrl.GetItemData(m_curSelTreeCtrlItem);
-					if (pGridPoly)
-						SetStretchBodyGridCtrlValue(pGridPoly->m_shapeOp.m_stretchingBodies, pNMLV->iItem);
-				}
+			case EICON_CIRCLE:
+				m_curSelListCtrlItem = -1;
+				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_CIRCLE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
+				break;
+			case EICON_POLYGON:
+				m_curSelListCtrlItem = -1;
+				ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
+				break;
 			}
-			break;
-		default:
-			break;
 		}
 	}
-	else if (pNMLV && pNMLV->uNewState == 0)
-	{
-		switch (m_curSelItemType)
-		{
-		case EICON_CIRCLE:
-			m_curSelListCtrlItem = -1;
-			ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_CIRCLE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
-			break;
-		case EICON_POLYGON:
-			m_curSelListCtrlItem = -1;
-			ShowPropGridCtrl(EPGC_PROP | EPGC_PLACE | EPGC_TOPCAP | EPGC_BOTTOMCAP);
-			break;
-		}
-	}
-
 	*pResult = 0;
 }
 
