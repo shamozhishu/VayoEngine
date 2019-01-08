@@ -46,6 +46,7 @@ public:
 	void                    clearIndexList();
 	void                    resizeList(unsigned vertSize, unsigned idxSize);
 	void                    reserveList(unsigned vertSize, unsigned idxSize);
+	bool                    computeVertexNormals();
 	void                    recalculateBoundingBox();
 	void                    setDirty(EBufferType bufferType = EBT_VERTEX_AND_INDEX);
 	void                    setHardwareMappingHint(EHardwareMapping newMappingHint, EBufferType bufferType = EBT_VERTEX_AND_INDEX);

@@ -451,7 +451,6 @@ void TessGridHandler::stretching(const Matrix4x4& transform)
 	}
 
 	newVertsList.insert(newVertsList.end(), transformedVertList.begin(), transformedVertList.end());
-	Triangle3df tri;
 	unsigned int newVertsNum = newVertsList.size();
 	unsigned int idx1, idx2, idx3;
 	for (unsigned int i = 0; i < triNum; ++i)
@@ -462,14 +461,10 @@ void TessGridHandler::stretching(const Matrix4x4& transform)
 		if (idx3 >= newVertsNum - triNum)
 			idx3 = newVertsNum - triNum - triNum;
 		_opDstObj->triangle(idx1, idx2, idx3);
-		tri.set(newVertsList[idx1]._position, newVertsList[idx2]._position, newVertsList[idx3]._position);
-		newVertsList[idx1]._normal = newVertsList[idx2]._normal = newVertsList[idx3]._normal = tri.getNormal().normalize();
 
 		idx1 = idx3;
 		idx3 = idx1 + triNum;
 		_opDstObj->triangle(idx1, idx2, idx3);
-		tri.set(newVertsList[idx1]._position, newVertsList[idx2]._position, newVertsList[idx3]._position);
-		newVertsList[idx1]._normal = newVertsList[idx2]._normal = newVertsList[idx3]._normal = tri.getNormal().normalize();
 	}
 
 	pSideSubMesh->setVertexList(newVertsList);

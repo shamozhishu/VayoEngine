@@ -217,7 +217,8 @@ void TessGridBuilder::save(const wstring& filename, bool append /*= true*/, bool
 	wstring filePath, fileName;
 	fileName = filename;
 	trim(fileName);
-	if (fileName.substr(fileName.rfind(L'.')) != L".tessgrid")
+	size_t curpos = fileName.rfind(L'.');
+	if (curpos == wstring::npos || fileName.substr(curpos) != L".tessgrid")
 		fileName += L".tessgrid";
 
 	if (fullPath)

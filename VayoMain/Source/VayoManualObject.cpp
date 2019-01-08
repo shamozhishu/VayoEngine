@@ -102,6 +102,7 @@ void ManualObject::beginUpdate(unsigned int idx)
 void ManualObject::end()
 {
 	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
+	_opSubMesh->computeVertexNormals();
 
 	if (_lastVertNum != _opSubMesh->getVertexCount())
 	{

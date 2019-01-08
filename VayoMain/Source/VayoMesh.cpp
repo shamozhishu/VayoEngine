@@ -1,5 +1,6 @@
 #include "VayoMesh.h"
 #include "VayoLog.h"
+#include "VayoTriangle3d.h"
 
 NS_VAYO_BEGIN
 
@@ -210,6 +211,35 @@ void SubMesh::reserveList(unsigned vertSize, unsigned idxSize)
 		_vertices.reserve(vertSize);
 	if (idxSize != (unsigned)-1)
 		_indices.reserve(idxSize);
+}
+
+bool SubMesh::computeVertexNormals()
+{
+	if (_primType != EPT_TRIANGLES)
+		return false;
+
+	int vertexCount = (int)_vertices.size();
+	if (vertexCount <= 0)
+		return false;
+
+	int indexCount = (int)_indices.size();
+	if (indexCount <= 0)
+		return false;
+
+	for (int i = 0; i < vertexCount; ++i)
+		_vertices[i]._normal.set(0, 0, 0);
+
+	Triangle3df tri;
+	for (int i = 0; i < indexCount; i += 3)
+	{
+		tri.set(_vertices[_indices[i]]._position, _vertices[_indices[i + 1]]._position, _vertices[_indices[i + 2]]._position);
+		_vertices[_indices[i]]._normal = _vertices[_indices[i + 1]]._normal = _vertices[_indices[i + 2]]._normal += tri.getNormal().normalize();
+	}
+
+	for (int i = 0; i < vertexCount; ++i)
+		_vertices[i]._normal.normalize();
+
+	return true;
 }
 
 void SubMesh::recalculateBoundingBox()
