@@ -799,13 +799,9 @@ bool GLRenderSystem::setWndPixelFormat(Win32Device* renderWnd)
 
 		if (!SetPixelFormat(_hCurrentDC, _pixelFormat, &g_pfd))
 		{
-			DWORD errCode = GetLastError();
-			Log::print(ELL_ERROR, "Cannot set the pixel format %d, error code is %d.", _pixelFormat, errCode);
-			LPVOID lpMsgBuf = NULL;
-			FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL, errCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
-			Log::wprint(ELL_ERROR, (LPCTSTR)lpMsgBuf);
-			LocalFree(lpMsgBuf);
+			wchar_t szErrHint[256];
+			wsprintf(szErrHint, L"Can't set the pixel format %d.", _pixelFormat);
+			printLastError(szErrHint);
 			return false;
 		}
 	}

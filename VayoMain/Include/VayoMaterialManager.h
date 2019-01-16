@@ -43,21 +43,21 @@ material examples/test
 	{
 		texture test0.png
 		filtering nearest_filter
-		tex_address_mode texture_clamp_repeat
+		tex_address_mode repeat
 	}
 
 	texture_unit 1
 	{
 		texture test1.jpg
 		filtering bilinear_filter
-		tex_address_mode texture_clamp_clamp
+		tex_address_mode clamp
 	}
 
 	texture_unit 2
 	{
 		texture test2.jpg
 		filtering trilinear_filter
-		tex_address_mode texture_clamp_mirror
+		tex_address_mode mirror
 	}
 }
 ** ----------end----------²ÄÖÊ½Å±¾----------
@@ -133,17 +133,17 @@ class _VayoExport MaterialManager
 public:
 	MaterialManager();
 	~MaterialManager();
-	bool init();
+	bool        init();
+	bool        parseMaterial(const wstring& filename, bool fullPath = false);
+	bool        parseMaterial(stringstream& filestream);
 	MaterialPtr createMaterial(const wstring& name = L"");
 	MaterialPtr findMaterial(const wstring& name);
 	void        destroyMaterial(const wstring& name);
 	void        destroyMaterial(const MaterialPtr& ptr);
+	void        clearAllMaterials();
 	MaterialPtr getDefaultMaterial() const;
-	void registerCallback(unsigned int idx, ShaderConstantSetCallback callback);
-	void unregisterCallback(unsigned int idx);
-
-private:
-	bool parseMaterial(const wstring& filePath);
+	void        registerCallback(unsigned int idx, ShaderConstantSetCallback callback);
+	void        unregisterCallback(unsigned int idx);
 
 private:
 	MaterialPtr                _defaultMaterial;

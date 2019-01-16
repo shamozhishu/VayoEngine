@@ -56,6 +56,30 @@
     <ClInclude Include="NewModelDlg.h">
       <Filter>Classes\UserInterface</Filter>
     </ClInclude>
+    <ClInclude Include="MsgVisitor.h">
+      <Filter>Classes\DataModel</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgModelVisitor.h">
+      <Filter>Classes\DataModel</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgMaterialVisitor.h">
+      <Filter>Classes\DataModel</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelEditorCtrls.h">
+      <Filter>Classes\DataModel</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialEditorCtrls.h">
+      <Filter>Classes\DataModel</Filter>
+    </ClInclude>
+    <ClInclude Include="BgCustomCtrl.h">
+      <Filter>Classes\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialData.h">
+      <Filter>Classes\DataModel</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialDataManager.h">
+      <Filter>Classes\DataModel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -90,6 +114,30 @@
     </ClCompile>
     <ClCompile Include="NewModelDlg.cpp">
       <Filter>Classes\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgModelVisitor.cpp">
+      <Filter>Classes\DataModel</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgVisitor.cpp">
+      <Filter>Classes\DataModel</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgMaterialVisitor.cpp">
+      <Filter>Classes\DataModel</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelEditorCtrls.cpp">
+      <Filter>Classes\DataModel</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialEditorCtrls.cpp">
+      <Filter>Classes\DataModel</Filter>
+    </ClCompile>
+    <ClCompile Include="BgCustomCtrl.cpp">
+      <Filter>Classes\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialData.cpp">
+      <Filter>Classes\DataModel</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialDataManager.cpp">
+      <Filter>Classes\DataModel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +187,12 @@
       <Filter>Resource</Filter>
     </Image>
     <Image Include="res\stretch.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\bgcolor.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="res\material.ico">
       <Filter>Resource</Filter>
     </Image>
   </ItemGroup>

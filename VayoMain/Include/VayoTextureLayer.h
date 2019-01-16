@@ -26,14 +26,14 @@ enum ETextureClamp
 };
 
 static const char* const aTextureClampNames[] = {
-	"texture_clamp_repeat",
-	"texture_clamp_clamp",
-	"texture_clamp_clamp_to_edge",
-	"texture_clamp_clamp_to_border",
-	"texture_clamp_mirror",
-	"texture_clamp_mirror_clamp",
-	"texture_clamp_mirror_clamp_to_edge",
-	"texture_clamp_mirror_clamp_to_border", NULL };
+	"repeat",
+	"clamp",
+	"clamp_to_edge",
+	"clamp_to_border",
+	"mirror",
+	"mirror_clamp",
+	"mirror_clamp_to_edge",
+	"mirror_clamp_to_border", NULL };
 
 class TextureLayer
 {

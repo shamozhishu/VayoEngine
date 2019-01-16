@@ -52,6 +52,7 @@ public:
 	virtual void  sleep(unsigned int milliSeconds, bool pauseTimer) = 0;
 	virtual void  setWndCaption(const wstring& wndCaption);
 	virtual void  setScreenSize(const Dimension2di& screenSize);
+	virtual void  setBgClearColor(Colour bgClr);
 	virtual wstring getDeviceCode() const;
 	virtual const wstring& getWndCaption() const;
 	virtual const Dimension2di& getScreenSize() const;

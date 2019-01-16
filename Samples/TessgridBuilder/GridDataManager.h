@@ -1,5 +1,4 @@
 #pragma once
-
 #include "GridData.h"
 
 class CGridDataManager

@@ -28,93 +28,34 @@ bool MaterialManager::init()
 	_materialPool.clear();
 	MaterialPtr defaultMaterialPtr(new Material());
 	_defaultMaterial = defaultMaterialPtr;
-
-	wstring materialsPath = Root::getSingleton().getConfigManager()->getSceneConfig().MaterialsPath;
 	vector<wstring> allFilePath;
-	findFileDir(allFilePath, materialsPath, L"material");
+	findFileDir(allFilePath, Root::getSingleton().getConfigManager()->getSceneConfig().MaterialsPath, L"material");
 	unsigned len = allFilePath.size();
 
 	for (unsigned i = 0; i < len; i++)
 	{
-		parseMaterial(allFilePath[i]);
+		parseMaterial(allFilePath[i], true);
 	}
 
 	return true;
 }
 
-MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
+bool MaterialManager::parseMaterial(const wstring& filename, bool fullPath /*= false*/)
 {
-	static unsigned short idx = 0;
-	wstring materialName;
-	if (name == L"" || name == L"default_material")
+	wstring fileName = filename;
+	trim(fileName);
+	if (fileName == L"" || fileName.substr(fileName.rfind(L'.')) != L".material")
 	{
-		std::wstringstream ss;
-		ss << L"Material" << idx;
-		++idx;
-		materialName = ss.str();
+		Log::wprint(ELL_ERROR, L"材质脚本[%s]文件扩展名必须是[.material]", fileName.c_str());
+		return false;
 	}
+
+	wstring filePath;
+	if (fullPath)
+		filePath = fileName;
 	else
-	{
-		map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
-		if (it != _materialPool.end())
-			return it->second;
-		materialName = name;
-	}
+		filePath = Root::getSingleton().getConfigManager()->getSceneConfig().MaterialsPath + fileName;
 
-	MaterialPtr materialPtr(new Material());
-	materialPtr->_materialName = materialName;
-	_materialPool[materialPtr->_materialName] = materialPtr;
-	return materialPtr;
-}
-
-MaterialPtr MaterialManager::findMaterial(const wstring& name)
-{
-	if (name == L"" || name == L"default_material")
-		return _defaultMaterial;
-
-	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
-	if (it != _materialPool.end())
-		return it->second;
-
-	Log::wprint(ELL_WARNING, L"材质[%s]不存在，使用默认材质！", name.c_str());
-	return _defaultMaterial;
-}
-
-void MaterialManager::destroyMaterial(const wstring& name)
-{
-	if (name == L"")
-		return;
-
-	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
-	if (it != _materialPool.end())
-		_materialPool.erase(it);
-}
-
-void MaterialManager::destroyMaterial(const MaterialPtr& ptr)
-{
-	if (ptr)
-		destroyMaterial(ptr->_materialName);
-}
-
-MaterialPtr MaterialManager::getDefaultMaterial() const
-{
-	return _defaultMaterial;
-}
-
-void MaterialManager::registerCallback(unsigned int idx, ShaderConstantSetCallback callback)
-{
-	if (idx >= VAYO_MAX_SHADER_CALLBACK_NUM)
-		return;
-	_materialCallback[idx] = callback;
-}
-
-void MaterialManager::unregisterCallback(unsigned int idx)
-{
-	registerCallback(idx, NULL);
-}
-
-bool MaterialManager::parseMaterial(const wstring& filePath)
-{
 	std::ifstream fin(filePath);
 	if (!fin)
 	{
@@ -122,6 +63,21 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 		return false;
 	}
 
+	fin.seekg(0, ios_base::end);
+	if ((int)fin.tellg() == 0)
+	{
+		Log::wprint(ELL_ERROR, L"材质脚本[%s]为空", filePath.c_str());
+		return false;
+	}
+
+	fin.seekg(0, ios_base::beg);
+	stringstream filestream;
+	filestream << fin.rdbuf();
+	return parseMaterial(filestream);
+}
+
+bool MaterialManager::parseMaterial(stringstream& filestream)
+{
 	MaterialPtr    materialPtr;
 	string         materialName;
 	string         strTag;
@@ -133,7 +89,7 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 
 	do
 	{
-		std::getline(fin, strTag);
+		std::getline(filestream, strTag);
 		strTag = trim(strTag);
 
 		if (0 == strTag.find('//') || 0 == strTag.compare(""))
@@ -541,7 +497,7 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			else
 				hasError = true;
 
-			if (!hasError && curSelTexLayer >=0 && curSelTexLayer < MATERIAL_MAX_TEXTURES)
+			if (!hasError && curSelTexLayer >= 0 && curSelTexLayer < MATERIAL_MAX_TEXTURES)
 				continue;
 		}
 
@@ -603,7 +559,7 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 			{
 				bool hasFinded = false;
 				strTag = container[1];
-				for (int i = 0; i < ETC_MIRROR_CLAMP_TO_BORDER+1; ++i)
+				for (int i = 0; i < ETC_MIRROR_CLAMP_TO_BORDER + 1; ++i)
 				{
 					if (0 == strTag.compare(aTextureClampNames[i]))
 					{
@@ -658,13 +614,89 @@ bool MaterialManager::parseMaterial(const wstring& filePath)
 				continue;
 			}
 		}
-		
-		Log::wprint(ELL_ERROR, L"材质脚本[%s]解析失败：[%s:%s]", filePath.c_str(), utf8ToUnicode(materialName).c_str(), utf8ToUnicode(strTag).c_str());
+
+		Log::wprint(ELL_ERROR, L"材质脚本解析失败：[%s:%s]", utf8ToUnicode(materialName).c_str(), utf8ToUnicode(strTag).c_str());
 		return false;
 
-	} while (!fin.eof());
+	} while (!filestream.eof());
 
 	return true;
+}
+
+MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
+{
+	static unsigned short idx = 0;
+	wstring materialName;
+	if (name == L"" || name == L"default_material")
+	{
+		std::wstringstream ss;
+		ss << L"Material" << idx;
+		++idx;
+		materialName = ss.str();
+	}
+	else
+	{
+		map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
+		if (it != _materialPool.end())
+			return it->second;
+		materialName = name;
+	}
+
+	MaterialPtr materialPtr(new Material());
+	materialPtr->_materialName = materialName;
+	_materialPool[materialPtr->_materialName] = materialPtr;
+	return materialPtr;
+}
+
+MaterialPtr MaterialManager::findMaterial(const wstring& name)
+{
+	if (name == L"" || name == L"default_material")
+		return _defaultMaterial;
+
+	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
+	if (it != _materialPool.end())
+		return it->second;
+
+	Log::wprint(ELL_WARNING, L"材质[%s]不存在，使用默认材质！", name.c_str());
+	return _defaultMaterial;
+}
+
+void MaterialManager::destroyMaterial(const wstring& name)
+{
+	if (name == L"")
+		return;
+
+	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
+	if (it != _materialPool.end())
+		_materialPool.erase(it);
+}
+
+void MaterialManager::destroyMaterial(const MaterialPtr& ptr)
+{
+	if (ptr)
+		destroyMaterial(ptr->_materialName);
+}
+
+void MaterialManager::clearAllMaterials()
+{
+	_materialPool.clear();
+}
+
+MaterialPtr MaterialManager::getDefaultMaterial() const
+{
+	return _defaultMaterial;
+}
+
+void MaterialManager::registerCallback(unsigned int idx, ShaderConstantSetCallback callback)
+{
+	if (idx >= VAYO_MAX_SHADER_CALLBACK_NUM)
+		return;
+	_materialCallback[idx] = callback;
+}
+
+void MaterialManager::unregisterCallback(unsigned int idx)
+{
+	registerCallback(idx, NULL);
 }
 
 NS_VAYO_END

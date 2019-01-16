@@ -17,7 +17,7 @@ material examples/plane
 	//{
 		//texture 格子.png
 		//filtering bilinear_filter
-		//tex_address_mode texture_clamp_repeat
+		//tex_address_mode repeat
 	//}
 }
 
@@ -176,7 +176,7 @@ material examples/TextureQuad
 	{
 		texture awesomeface.png
 		filtering bilinear_filter
-		tex_address_mode texture_clamp_mirror
+		tex_address_mode mirror
 	}
 }
 
@@ -192,14 +192,14 @@ material examples/TextureCube
 	{
 		texture container2.png
 		filtering trilinear_filter
-		tex_address_mode texture_clamp_repeat
+		tex_address_mode repeat
 	}
 	
 	texture_unit 1
 	{
 		texture bricks2_disp.jpg
 		filtering trilinear_filter
-		tex_address_mode texture_clamp_repeat
+		tex_address_mode repeat
 	}
 }
 
@@ -272,7 +272,7 @@ material examples/箱子
 	{
 		texture awesomeface.png
 		filtering bilinear_filter
-		tex_address_mode texture_clamp_repeat
+		tex_address_mode repeat
 	}
 }
 

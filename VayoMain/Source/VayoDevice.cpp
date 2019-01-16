@@ -86,6 +86,11 @@ void Device::setScreenSize(const Dimension2di& screenSize)
 	_attribute.ScreenSize = screenSize;
 }
 
+void Device::setBgClearColor(Colour bgClr)
+{
+	_attribute.BgClearColor = bgClr;
+}
+
 wstring Device::getDeviceCode() const
 {
 	wstringstream ss;

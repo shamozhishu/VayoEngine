@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "GridDataManager.h"
 
-static CGridDataManager* g_pDataMedelMgr = NULL;
+static CGridDataManager* g_pGridDataMgr = NULL;
 
 CGridDataManager& CGridDataManager::GetIns()
 {
-	if (!g_pDataMedelMgr)
-		g_pDataMedelMgr = new CGridDataManager();
-	return *g_pDataMedelMgr;
+	if (!g_pGridDataMgr)
+		g_pGridDataMgr = new CGridDataManager();
+	return *g_pGridDataMgr;
 }
 
 void CGridDataManager::Destroy()
 {
-	SAFE_DELETE(g_pDataMedelMgr);
+	SAFE_DELETE(g_pGridDataMgr);
 }
 
 CGridDataManager::CGridDataManager()

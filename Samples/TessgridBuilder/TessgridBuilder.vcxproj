@@ -195,10 +195,18 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BgCustomCtrl.h" />
     <ClInclude Include="CmdManager.h" />
     <ClInclude Include="GridData.h" />
     <ClInclude Include="GridDataManager.h" />
     <ClInclude Include="DlgManager.h" />
+    <ClInclude Include="MaterialData.h" />
+    <ClInclude Include="MaterialDataManager.h" />
+    <ClInclude Include="MaterialEditorCtrls.h" />
+    <ClInclude Include="ModelEditorCtrls.h" />
+    <ClInclude Include="MsgMaterialVisitor.h" />
+    <ClInclude Include="MsgModelVisitor.h" />
+    <ClInclude Include="MsgVisitor.h" />
     <ClInclude Include="NewModelDlg.h" />
     <ClInclude Include="TessgridApp.h" />
     <ClInclude Include="TessgridView.h" />
@@ -210,10 +218,18 @@
     <ClInclude Include="WzdSplash.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BgCustomCtrl.cpp" />
     <ClCompile Include="CmdManager.cpp" />
     <ClCompile Include="GridData.cpp" />
     <ClCompile Include="GridDataManager.cpp" />
     <ClCompile Include="DlgManager.cpp" />
+    <ClCompile Include="MaterialData.cpp" />
+    <ClCompile Include="MaterialDataManager.cpp" />
+    <ClCompile Include="MaterialEditorCtrls.cpp" />
+    <ClCompile Include="ModelEditorCtrls.cpp" />
+    <ClCompile Include="MsgMaterialVisitor.cpp" />
+    <ClCompile Include="MsgModelVisitor.cpp" />
+    <ClCompile Include="MsgVisitor.cpp" />
     <ClCompile Include="NewModelDlg.cpp" />
     <ClCompile Include="TessgridApp.cpp" />
     <ClCompile Include="TessgridView.cpp" />
@@ -234,11 +250,13 @@
     <None Include="res\TessgridBuilder.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\bgcolor.ico" />
     <Image Include="res\circle.ico" />
     <Image Include="res\circlecontour.ico" />
     <Image Include="res\expand.ico" />
     <Image Include="res\generatemodel.ico" />
     <Image Include="res\logo.bmp" />
+    <Image Include="res\material.ico" />
     <Image Include="res\model.ico" />
     <Image Include="res\new.ico" />
     <Image Include="res\polycontour.ico" />

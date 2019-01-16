@@ -1,4 +1,3 @@
-
 // TessgridBuilder.cpp : 定义应用程序的类行为。
 //
 

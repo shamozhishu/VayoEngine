@@ -326,6 +326,9 @@ Win32Device::Win32Device(int deviceID, const Attrib& attrib)
 
 Win32Device::~Win32Device()
 {
+	if (!_externalWindow && _wndHandle)
+		UnregisterClass(getDeviceCode().c_str(), GetModuleHandle(NULL));
+
 	list<SEnvMapper>::iterator it = g_envMapper.begin();
 	for (; it != g_envMapper.end(); ++it)
 	{
@@ -350,6 +353,8 @@ bool Win32Device::init()
 	}
 	else
 	{
+		wstring strClassName = getDeviceCode();
+
 		HINSTANCE hInst = GetModuleHandle(NULL);
 		WNDCLASS wc;
 		wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
@@ -361,9 +366,13 @@ bool Win32Device::init()
 		wc.hCursor = LoadCursor(0, IDC_ARROW);
 		wc.hbrBackground = NULL;
 		wc.lpszMenuName = 0;
-		wc.lpszClassName = L"VayoEngine";
+		wc.lpszClassName = strClassName.c_str();
 
-		RegisterClass(&wc);
+		if (!RegisterClass(&wc))
+		{
+			printLastError(L"×¢²á´°¿ÚÊ§°Ü!");
+			return false;
+		}
 
 		DWORD style = WS_POPUP;
 		if (!_attribute.FullScreen)
@@ -390,11 +399,11 @@ bool Win32Device::init()
 			realHeight = GetSystemMetrics(SM_CYSCREEN);
 		}
 
-		_wndHandle = CreateWindow(L"VayoEngine", _attribute.WndCaption.c_str(), style,
+		_wndHandle = CreateWindow(strClassName.c_str(), _attribute.WndCaption.c_str(), style,
 			windowLeft, windowTop, realWidth, realHeight, NULL, NULL, hInst, NULL);
 		if (!_wndHandle)
 		{
-			MessageBox(0, L"CreateWindow Failed.", 0, 0);
+			printLastError(L"CreateWindow Failed!");
 			return false;
 		}
 
