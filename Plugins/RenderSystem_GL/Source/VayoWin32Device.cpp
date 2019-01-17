@@ -403,6 +403,7 @@ bool Win32Device::init()
 			windowLeft, windowTop, realWidth, realHeight, NULL, NULL, hInst, NULL);
 		if (!_wndHandle)
 		{
+			UnregisterClass(strClassName.c_str(), hInst);
 			printLastError(L"CreateWindow Failed!");
 			return false;
 		}
