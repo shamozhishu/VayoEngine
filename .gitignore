@@ -38,3 +38,4 @@
 /.vs
 /*.db
 /VayoMain/ThirdParty/freetype-2.9.1/src/base/*.aps
+/Vayo3D/Main/ThirdParty/freetype-2.9.1/src/base/*.aps
