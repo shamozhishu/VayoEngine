@@ -1,4 +1,4 @@
-# VayoEngine: A 3D graphics rendering engine.
+# VayoEngine: A fucking great 2D/3D graphics rendering engine.
 ## 引擎特性：
 * 一个高性能的实时三维图形渲染引擎，由C++语言编写，目前只支持OpenGL渲染系统，以后可加入Direct3D支持和软件渲染模块。
 * 项目工程基于Visual Studio 2015，支持Windows操作系统，以后可加入其它平台支持。
