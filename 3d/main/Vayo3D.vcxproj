@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\Vayo3d.h" />
+    <ClInclude Include="inc\Vayo3dApp.h" />
+    <ClInclude Include="inc\Vayo3dArcball.h" />
+    <ClInclude Include="inc\Vayo3dBaseGUI.h" />
+    <ClInclude Include="inc\Vayo3dCamera.h" />
+    <ClInclude Include="inc\Vayo3dCollision.h" />
+    <ClInclude Include="inc\Vayo3dColour.h" />
+    <ClInclude Include="inc\Vayo3dCoreGUI.h" />
+    <ClInclude Include="inc\Vayo3dDevice.h" />
+    <ClInclude Include="inc\Vayo3dDisplayList.h" />
+    <ClInclude Include="inc\Vayo3dEntity.h" />
+    <ClInclude Include="inc\Vayo3dFrustum.h" />
+    <ClInclude Include="inc\Vayo3dImage.h" />
+    <ClInclude Include="inc\Vayo3dLight.h" />
+    <ClInclude Include="inc\Vayo3dLightData.h" />
+    <ClInclude Include="inc\Vayo3dManualObject.h" />
+    <ClInclude Include="inc\Vayo3dMaterial.h" />
+    <ClInclude Include="inc\Vayo3dMaterialManager.h" />
+    <ClInclude Include="inc\Vayo3dMaterialRenderer.h" />
+    <ClInclude Include="inc\Vayo3dMesh.h" />
+    <ClInclude Include="inc\Vayo3dMeshManager.h" />
+    <ClInclude Include="inc\Vayo3dMovableObject.h" />
+    <ClInclude Include="inc\Vayo3dNode.h" />
+    <ClInclude Include="inc\Vayo3dNodeAnimator.h" />
+    <ClInclude Include="inc\Vayo3dRenderable.h" />
+    <ClInclude Include="inc\Vayo3dRenderQueue.h" />
+    <ClInclude Include="inc\Vayo3dRenderSystem.h" />
+    <ClInclude Include="inc\Vayo3dRoot.h" />
+    <ClInclude Include="inc\Vayo3dSceneManager.h" />
+    <ClInclude Include="inc\Vayo3dSceneNode.h" />
+    <ClInclude Include="inc\Vayo3dSpriteBox.h" />
+    <ClInclude Include="inc\Vayo3dSupport.h" />
+    <ClInclude Include="inc\Vayo3dTesselator.h" />
+    <ClInclude Include="inc\Vayo3dTessGridBuilder.h" />
+    <ClInclude Include="inc\Vayo3dTessGridHandler.h" />
+    <ClInclude Include="inc\Vayo3dTextObject.h" />
+    <ClInclude Include="inc\Vayo3dTexture.h" />
+    <ClInclude Include="inc\Vayo3dTextureLayer.h" />
+    <ClInclude Include="inc\Vayo3dTextureManager.h" />
+    <ClInclude Include="inc\Vayo3dTiledMap.h" />
+    <ClInclude Include="inc\Vayo3dVertex.h" />
+    <ClInclude Include="inc\Vayo3dViewMemento.h" />
+    <ClInclude Include="src\Vayo3dFontManager.h" />
+    <ClInclude Include="src\Vayo3dTessGridParser.h" />
+    <ClInclude Include="src\Vayo3dWireBoundingBox.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\VayoCore.vcxproj">
+      <Project>{7e637f2e-79e2-4b29-9334-2ee60a4aafed}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\thirdparty\freetype-2.9.1\freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\thirdparty\stb_image\stb_image.vcxproj">
+      <Project>{947146ae-e322-4e89-a7dd-e1e3a9d9d8b8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\thirdparty\tinyxml2\tinyxml2.vcxproj">
+      <Project>{bbed8a85-19d4-4185-81fd-8784fade8ac4}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Vayo3dApp.cpp" />
+    <ClCompile Include="src\Vayo3dArcball.cpp" />
+    <ClCompile Include="src\Vayo3dBaseGUI.cpp" />
+    <ClCompile Include="src\Vayo3dCamera.cpp" />
+    <ClCompile Include="src\Vayo3dCollision.cpp" />
+    <ClCompile Include="src\Vayo3dCoreGUI.cpp" />
+    <ClCompile Include="src\Vayo3dDevice.cpp" />
+    <ClCompile Include="src\Vayo3dEntity.cpp" />
+    <ClCompile Include="src\Vayo3dFontManager.cpp" />
+    <ClCompile Include="src\Vayo3dFrustum.cpp" />
+    <ClCompile Include="src\Vayo3dImage.cpp" />
+    <ClCompile Include="src\Vayo3dLight.cpp" />
+    <ClCompile Include="src\Vayo3dManualObject.cpp" />
+    <ClCompile Include="src\Vayo3dMaterialManager.cpp" />
+    <ClCompile Include="src\Vayo3dMesh.cpp" />
+    <ClCompile Include="src\Vayo3dMeshManager.cpp" />
+    <ClCompile Include="src\Vayo3dMovableObject.cpp" />
+    <ClCompile Include="src\Vayo3dNode.cpp" />
+    <ClCompile Include="src\Vayo3dNodeAnimator.cpp" />
+    <ClCompile Include="src\Vayo3dRenderable.cpp" />
+    <ClCompile Include="src\Vayo3dRenderQueue.cpp" />
+    <ClCompile Include="src\Vayo3dRenderSystem.cpp" />
+    <ClCompile Include="src\Vayo3dRoot.cpp" />
+    <ClCompile Include="src\Vayo3dSceneManager.cpp" />
+    <ClCompile Include="src\Vayo3dSceneNode.cpp" />
+    <ClCompile Include="src\Vayo3dSpriteBox.cpp" />
+    <ClCompile Include="src\Vayo3dTessGridBuilder.cpp" />
+    <ClCompile Include="src\Vayo3dTessGridHandler.cpp" />
+    <ClCompile Include="src\Vayo3dTessGridParser.cpp" />
+    <ClCompile Include="src\Vayo3dTextObject.cpp" />
+    <ClCompile Include="src\Vayo3dTextureManager.cpp" />
+    <ClCompile Include="src\Vayo3dTiledMap.cpp" />
+    <ClCompile Include="src\Vayo3dViewMemento.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E8605E2E-DB10-4CA2-A234-0A895EAFDDA2}</ProjectGuid>
+    <RootNamespace>VayoEngine_VC14</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>Vayo3D</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(ProjectDir)inc;$(SolutionDir)core\inc;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\freetype-2.9.1\include;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)_d</TargetName>
+    <OutDir>$(SolutionDir)3d\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)inc;$(SolutionDir)core\inc;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\freetype-2.9.1\include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)3d\bin\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)3d\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(ProjectDir)inc;$(SolutionDir)core\inc;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\freetype-2.9.1\include;$(IncludePath)</IncludePath>
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)3d\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(ProjectDir)inc;$(SolutionDir)core\inc;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\freetype-2.9.1\include;$(IncludePath)</IncludePath>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;VAYO3D_NONCLIENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <ImportLibrary>$(SolutionDir)3d\lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;VAYO3D_NONCLIENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <ImportLibrary>$(SolutionDir)3d\lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;VAYO3D_NONCLIENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>$(SolutionDir)3d\lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;VAYO3D_NONCLIENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>$(SolutionDir)3d\lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

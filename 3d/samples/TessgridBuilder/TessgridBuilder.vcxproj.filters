@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="classes">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="classes\data_model">
+      <UniqueIdentifier>{66da330f-31e5-4239-b777-7c26a52ec9b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes\user_interface">
+      <UniqueIdentifier>{131cca33-35e6-4907-b4cc-182c8bbeb46c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h">
+      <Filter>classes</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>classes</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>classes</Filter>
+    </ClInclude>
+    <ClInclude Include="TessgridApp.h">
+      <Filter>classes</Filter>
+    </ClInclude>
+    <ClInclude Include="TessgridBuilder.h">
+      <Filter>classes</Filter>
+    </ClInclude>
+    <ClInclude Include="TessgridBuilderDlg.h">
+      <Filter>classes\user_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="TessgridView.h">
+      <Filter>classes\user_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="WzdSplash.h">
+      <Filter>classes\user_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgManager.h">
+      <Filter>classes\user_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdManager.h">
+      <Filter>classes\user_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="GridDataManager.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+    <ClInclude Include="GridData.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+    <ClInclude Include="NewModelDlg.h">
+      <Filter>classes\user_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgVisitor.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgModelVisitor.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+    <ClInclude Include="MsgMaterialVisitor.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelEditorCtrls.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialEditorCtrls.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+    <ClInclude Include="BgCustomCtrl.h">
+      <Filter>classes\user_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialData.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialDataManager.h">
+      <Filter>classes\data_model</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="TessgridApp.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="TessgridBuilder.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="TessgridBuilderDlg.cpp">
+      <Filter>classes\user_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="TessgridView.cpp">
+      <Filter>classes\user_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="WzdSplash.cpp">
+      <Filter>classes\user_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgManager.cpp">
+      <Filter>classes\user_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdManager.cpp">
+      <Filter>classes\user_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="GridDataManager.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+    <ClCompile Include="GridData.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+    <ClCompile Include="NewModelDlg.cpp">
+      <Filter>classes\user_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgModelVisitor.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgVisitor.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgMaterialVisitor.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelEditorCtrls.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialEditorCtrls.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+    <ClCompile Include="BgCustomCtrl.cpp">
+      <Filter>classes\user_interface</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialData.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialDataManager.cpp">
+      <Filter>classes\data_model</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\open.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\save.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\TessgridBuilder.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\new.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\toolbar.bmp">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\saveas.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\polygon.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\circle.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\logo.bmp">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\generatemodel.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\circlecontour.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\model.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\polycontour.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\polypoint.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\expand.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\stretch.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\bgcolor.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="res\material.ico">
+      <Filter>resource</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TessgridBuilder.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\TessgridBuilder.rc2">
+      <Filter>resource</Filter>
+    </None>
+  </ItemGroup>
+</Project>
