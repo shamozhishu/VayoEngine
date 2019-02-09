@@ -1,6 +1,6 @@
 @echo off
-set source_path=D:\______svn-code\vayo-engine-master\
-set target_path=D:\_____git-code\VayoEngine\
+set source_path=D:\###repository###\svn-repository\VayoEngine\
+set target_path=D:\###repository###\git-repository\VayoEngine\
 echo copy[%source_path%]to[%target_path%]:
 pause
 
@@ -63,7 +63,7 @@ xcopy /y %source_path%thirdparty\freetype-2.9.1\*.* %target_path%thirdparty\free
 xcopy /y /s /e %source_path%thirdparty\freetype-2.9.1\include\*.* %target_path%thirdparty\freetype-2.9.1\include\
 xcopy /y /s /e %source_path%thirdparty\freetype-2.9.1\src\*.* %target_path%thirdparty\freetype-2.9.1\src\
 xcopy /y /s /e %source_path%thirdparty\lua-5.2.4\src\*.* %target_path%thirdparty\lua-5.2.4\src\
-xcopy /y %source_path%thirdparty\lua-5.2.4\lua5.2.4\*.* %target_path%thirdparty\lua-5.2.4\lua5.2.4\*.*
+xcopy /y %source_path%thirdparty\lua-5.2.4\liblua\*.* %target_path%thirdparty\lua-5.2.4\liblua\*.*
 xcopy /y %source_path%thirdparty\lua-5.2.4\lua\*.* %target_path%thirdparty\lua-5.2.4\lua\*.*
 xcopy /y %source_path%thirdparty\lua-5.2.4\luac\*.* %target_path%thirdparty\lua-5.2.4\luac\*.*
 xcopy /y %source_path%thirdparty\lua-5.2.4\tolua++\*.* %target_path%thirdparty\lua-5.2.4\tolua++\*.*
