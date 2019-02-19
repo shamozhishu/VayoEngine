@@ -21,7 +21,7 @@
 
 NS_VAYO3D_BEGIN
 
-enum ETransformationState
+enum ETransformState
 {
 	ETS_VIEW = 0,
 	ETS_WORLD,
@@ -67,8 +67,8 @@ public:
 	virtual void restoreContext() const = 0;
 	virtual bool beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Device* renderWnd);
 	virtual bool endScene();
-	virtual const Matrix4x4& getTransform(ETransformationState state) const = 0;
-	virtual void setTransform(ETransformationState state, const Matrix4x4& mat) = 0;
+	virtual const Matrix4x4& getTransform(ETransformState state) const = 0;
+	virtual void setTransform(ETransformState state, const Matrix4x4& mat) = 0;
 	virtual const Dimension2di& getCurRenderTargetSize() const = 0;
 	virtual void setViewpot(const Recti& area) = 0;
 	virtual void setAmbientLight(const Colour& color) = 0;

@@ -224,7 +224,7 @@ void TessGridBuilder::save(const wstring& filename, bool append /*= true*/, bool
 	if (fullPath)
 		filePath = fileName;
 	else
-		filePath = ConfigManager::getSingleton().getSceneConfig().ModelsPath + fileName;
+		filePath = ConfigManager::getSingleton().getConfig()._3d.modelsPath + fileName;
 
 	WriteFile fout(filePath, append);
 	string strtmp = w2a_(getStream().str());

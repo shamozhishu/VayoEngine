@@ -24,15 +24,20 @@
     <ClInclude Include="inc\Vayo2dColor.h" />
     <ClInclude Include="inc\Vayo2dFeature.h" />
     <ClInclude Include="inc\Vayo2dFeatureManager.h" />
+    <ClInclude Include="inc\Vayo2dGeometry.h" />
     <ClInclude Include="inc\Vayo2dJoint.h" />
     <ClInclude Include="inc\Vayo2dLayer.h" />
     <ClInclude Include="inc\Vayo2dLayerManager.h" />
+    <ClInclude Include="inc\Vayo2dPaintbrush.h" />
     <ClInclude Include="inc\Vayo2dPivot.h" />
     <ClInclude Include="inc\Vayo2dRenderer.h" />
     <ClInclude Include="inc\Vayo2dSupport.h" />
-    <ClInclude Include="inc\Vayo2dRound.h" />
     <ClInclude Include="inc\Vayo2dShape.h" />
+    <ClInclude Include="inc\Vayo2dGraphics.h" />
     <ClInclude Include="inc\Vayo2dSurface.h" />
+    <ClInclude Include="inc\Vayo2dSurfaceManager.h" />
+    <ClInclude Include="inc\Vayo2dWatcher.h" />
+    <ClInclude Include="inc\Vayo2dGraphicQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Vayo2dBody.cpp" />
@@ -42,8 +47,11 @@
     <ClCompile Include="src\Vayo2dLayerManager.cpp" />
     <ClCompile Include="src\Vayo2dPivot.cpp" />
     <ClCompile Include="src\Vayo2dRenderer.cpp" />
-    <ClCompile Include="src\Vayo2dRound.cpp" />
     <ClCompile Include="src\Vayo2dShape.cpp" />
+    <ClCompile Include="src\Vayo2dGraphics.cpp" />
+    <ClCompile Include="src\Vayo2dSurfaceManager.cpp" />
+    <ClCompile Include="src\Vayo2dWatcher.cpp" />
+    <ClCompile Include="src\Vayo2dGraphicQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\thirdparty\tinyxml2\tinyxml2.vcxproj">

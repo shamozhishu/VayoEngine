@@ -14,7 +14,7 @@ class _Vayo3dExport TextObject : public MovableObject, public Renderable
 {
 	static Reflex<TextObject, const wstring&, SceneManager*> _dynReflex;
 public:
-	TextObject(const wstring& name, SceneManager* originSceneMgr);
+	TextObject(const wstring& name, SceneManager* oriSceneMgr);
 	~TextObject();
 	void update(float dt);
 	void render();

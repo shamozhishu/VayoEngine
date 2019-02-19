@@ -27,8 +27,8 @@ bool CTessgridView::Init()
 		configInfo.MainDeviceAttrib.BgClearColor = 0xff080808;
 		configInfo.MainDeviceAttrib.WndHandle = GetSafeHwnd();
 		configInfo.MainDeviceAttrib.WndQuit = false;
-		g_app = new TessgridApp(&configInfo);
-		m_bIsStartup = Root::getSingleton().isLaunched() && g_app->startup();
+		g_app = new TessgridApp();
+		m_bIsStartup = g_app->init<Root>(&configInfo) && Root::getSingleton().isLaunched() && g_app->startup();
 	}
 	return m_bIsStartup;
 }

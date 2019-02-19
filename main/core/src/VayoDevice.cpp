@@ -10,7 +10,7 @@ float Device::getAspectRatio() const
 	return static_cast<float>(_attribute.ScreenSize._width) / _attribute.ScreenSize._height;
 }
 
-Device::Device(int deviceID, const Attrib& attrib)
+Device::Device(EDeviceID deviceID, const Attrib& attrib)
 	: _deviceID(deviceID)
 	, _attribute(attrib)
 	, _appPaused(false)

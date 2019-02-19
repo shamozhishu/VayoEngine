@@ -13,11 +13,14 @@ NS_VAYO2D_BEGIN
 
 enum ERenderTarget
 {
-	ERT_HWND,
-	ERT_BITMAP
+	ERT_NONE,
+	ERT_WINDOW,
+	ERT_MEMORY
 };
 
 class Body;
+class Watcher;
+class Graphics;
 class Shape;
 class Joint;
 class Layer;
@@ -25,11 +28,15 @@ class LayerManager;
 class Pivot;
 class Renderer;
 class Surface;
+class SurfaceManager;
 class Feature;
 class FeatureManager;
+class Geometry;
+class Paintbrush;
 
 typedef SharedPtr<Surface> SurfacePtr;
 typedef SharedPtr<Feature> FeaturePtr;
+typedef SharedPtr<Paintbrush> PaintbrushPtr;
 
 NS_VAYO2D_END
 

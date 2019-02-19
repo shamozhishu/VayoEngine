@@ -35,7 +35,7 @@ class _Vayo3dExport Entity : public MovableObject
 {
 	static Reflex<Entity, const wstring&, SceneManager*> _dynReflex;
 public:
-	Entity(const wstring& name, SceneManager* originSceneMgr);
+	Entity(const wstring& name, SceneManager* oriSceneMgr);
 	~Entity();
 	void         update(float dt);
 	void         setMesh(MeshPtr pMesh);

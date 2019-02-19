@@ -59,7 +59,7 @@ void CMsgModelVisitor::OnNewBuild()
 
 void CMsgModelVisitor::OnOpenFile()
 {
-	CString strTmp = ConfigManager::getSingleton().getSceneConfig().ModelsPath.c_str();
+	CString strTmp = ConfigManager::getSingleton().getConfig()._3d.modelsPath.c_str();
 	CFileDialog dlg(TRUE, strTmp, _T(""), OFN_HIDEREADONLY | OFN_READONLY, _T("文件 (*.tessgrid)|*.tessgrid||"), NULL);
 	if (IDOK == dlg.DoModal())
 	{
@@ -89,7 +89,7 @@ void CMsgModelVisitor::OnSaveFile()
 	CString strTmp;
 	if (m_pEditorCtrls->m_savePath.IsEmpty())
 	{
-		strTmp = ConfigManager::getSingleton().getSceneConfig().ModelsPath.c_str();
+		strTmp = ConfigManager::getSingleton().getConfig()._3d.modelsPath.c_str();
 		CFileDialog dlg(FALSE, strTmp, _T(""), OFN_HIDEREADONLY | OFN_READONLY, _T("文件 (*.tessgrid)|*.tessgrid||"), NULL);
 		if (IDOK == dlg.DoModal())
 		{
@@ -113,7 +113,7 @@ void CMsgModelVisitor::OnSaveFile()
 
 void CMsgModelVisitor::OnSaveAs()
 {
-	CString strTmp = ConfigManager::getSingleton().getSceneConfig().ModelsPath.c_str();
+	CString strTmp = ConfigManager::getSingleton().getConfig()._3d.modelsPath.c_str();
 	CFileDialog dlg(FALSE, strTmp, _T(""), OFN_HIDEREADONLY | OFN_READONLY, _T("文件 (*.tessgrid)|*.tessgrid||"), NULL);
 	if (IDOK == dlg.DoModal())
 	{

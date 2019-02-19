@@ -25,8 +25,8 @@ public:
 	void restoreContext() const;
 	bool beginScene(bool backBuffer, bool zBuffer, bool stencilBuffer, Device* renderWnd);
 	bool endScene();
-	const Matrix4x4& getTransform(ETransformationState state) const;
-	void setTransform(ETransformationState state, const Matrix4x4& mat);
+	const Matrix4x4& getTransform(ETransformState state) const;
+	void setTransform(ETransformState state, const Matrix4x4& mat);
 	const Dimension2di& getCurRenderTargetSize() const;
 	void setViewpot(const Recti& area);
 	void setAmbientLight(const Colour& color);

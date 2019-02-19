@@ -11,12 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\Vayo2dRound.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Vayo2dShape.h">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="inc\Vayo2dSupport.h">
       <Filter>inc</Filter>
     </ClInclude>
@@ -53,14 +47,29 @@
     <ClInclude Include="inc\Vayo2dFeatureManager.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Vayo2dPaintbrush.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Vayo2dSurfaceManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Vayo2dGraphics.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Vayo2dShape.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Vayo2dGeometry.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Vayo2dWatcher.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Vayo2dGraphicQueue.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Vayo2dRound.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Vayo2dShape.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Vayo2dPivot.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -80,6 +89,21 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo2dFeatureManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo2dSurfaceManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo2dGraphics.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo2dShape.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo2dWatcher.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo2dGraphicQueue.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

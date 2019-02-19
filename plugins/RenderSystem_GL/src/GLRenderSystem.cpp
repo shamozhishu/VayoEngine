@@ -424,12 +424,12 @@ bool GLRenderSystem::endScene()
 	return SwapBuffers(_hCurrentDC) == TRUE;
 }
 
-const Matrix4x4& GLRenderSystem::getTransform(ETransformationState state) const
+const Matrix4x4& GLRenderSystem::getTransform(ETransformState state) const
 {
 	return _matrizes[state];
 }
 
-void GLRenderSystem::setTransform(ETransformationState state, const Matrix4x4& mat)
+void GLRenderSystem::setTransform(ETransformState state, const Matrix4x4& mat)
 {
 	_transformation3DChanged = true;
 	_matrizes[state] = mat;
@@ -512,7 +512,7 @@ void GLRenderSystem::setMaterial(const Material& material)
 	for (int i = _maxTextureUnits - 1; i >= 0; --i)
 	{
 		setActiveTexture(i, material._textureLayer[i]._texture.get());
-		setTransform((ETransformationState)(ETS_TEXTURE_0 + i), _curMaterial._textureLayer[i]._textureMatrix);
+		setTransform((ETransformState)(ETS_TEXTURE_0 + i), _curMaterial._textureLayer[i]._textureMatrix);
 	}
 }
 

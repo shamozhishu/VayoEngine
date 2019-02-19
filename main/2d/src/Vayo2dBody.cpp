@@ -1,6 +1,7 @@
 #include "Vayo2dBody.h"
 #include "Vayo2dLayer.h"
 #include "VayoUtils.h"
+#include "Vayo2dGraphicQueue.h"
 
 NS_VAYO2D_BEGIN
 
@@ -13,7 +14,7 @@ Body::Body(const wstring& name, LayerManager* oriLayerMgr)
 	: _name(name)
 	, _parentLayer(NULL)
 	, _visible(true)
-	, _zOrder(0)
+	, _queueID(EZQ_MAIN_BODY)
 	, _collideMask(0)
 	, _oriLayerMgr(oriLayerMgr)
 {
@@ -89,8 +90,8 @@ void Body::serialize(XMLElement* outXml)
 	outXml->SetAttribute("name", unicodeToUtf8(_name).c_str());
 	if (!_visible)
 		outXml->SetAttribute("visible", _visible);
-	if (_zOrder != 0)
-		outXml->SetAttribute("zorder", _zOrder);
+	if (_queueID != EZQ_MAIN_BODY)
+		outXml->SetAttribute("queueid", _queueID);
 	if (!_collideMask.isEmptyState())
 		outXml->SetAttribute("collideMask", _collideMask());
 
@@ -108,7 +109,7 @@ bool Body::deserialize(XMLElement* inXml)
 	if (!inXml)
 		return false;
 	inXml->QueryBoolAttribute("visible", &_visible);
-	inXml->QueryUnsignedAttribute("zorder", &_zOrder);
+	inXml->QueryUnsignedAttribute("queueid", &_queueID);
 	_collideMask(inXml->UnsignedAttribute("collideMask"));
 
 	const char* szUserData = inXml->GetText();

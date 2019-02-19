@@ -32,19 +32,19 @@ Vector3df getRayInViewSpace(int xScreen, int yScreen)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void Camera::setNeedUpdate(bool isUpdate)
+void Camera::setNeedRefresh(bool isRefresh)
 {
-	_needUpdate = isUpdate;
+	_needRefresh = isRefresh;
 }
 
-Camera::Camera(const wstring& name, SceneManager* originSceneMgr)
-	: MovableObject(name, originSceneMgr)
-	, TouchDelegate(originSceneMgr->getName())
-	, KeypadDelegate(originSceneMgr->getName())
+Camera::Camera(const wstring& name, SceneManager* oriSceneMgr)
+	: MovableObject(name, oriSceneMgr)
+	, TouchDelegate(oriSceneMgr->getName())
+	, KeypadDelegate(oriSceneMgr->getName())
 	, _right(1.0f, 0.0f, 0.0f)
 	, _up(0.0f, 1.0f, 0.0f)
 	, _look(0.0f, 0.0f, -1.0f)
-	, _needUpdate(true)
+	, _needRefresh(true)
 {
 	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_aspect = (float)size._width / size._height;
@@ -58,10 +58,37 @@ Camera::~Camera()
 
 void Camera::refresh()
 {
-	if (_needUpdate)
+	if (_needRefresh)
 	{
-		updateViewTransform();
-		_needUpdate = false;
+		_needRefresh = false;
+
+		Vector3df yaxis = _up;
+		Vector3df zaxis = _look;
+		zaxis.invert();
+		zaxis.normalize();
+		Vector3df xaxis = yaxis.crossProduct(zaxis);
+		xaxis.normalize();
+		yaxis = zaxis.crossProduct(xaxis);
+
+		_view(0, 0) = xaxis._x;
+		_view(1, 0) = yaxis._x;
+		_view(2, 0) = zaxis._x;
+		_view(3, 0) = 0;
+
+		_view(0, 1) = xaxis._y;
+		_view(1, 1) = yaxis._y;
+		_view(2, 1) = zaxis._y;
+		_view(3, 1) = 0;
+
+		_view(0, 2) = xaxis._z;
+		_view(1, 2) = yaxis._z;
+		_view(2, 2) = zaxis._z;
+		_view(3, 2) = 0;
+
+		_view(0, 3) = -xaxis.dotProduct(_position);
+		_view(1, 3) = -yaxis.dotProduct(_position);
+		_view(2, 3) = -zaxis.dotProduct(_position);
+		_view(3, 3) = 1.0f;
 	}
 
 	regenerateViewArea();
@@ -153,19 +180,19 @@ const Matrix4x4& Camera::getViewAffector() const
 void Camera::strafe(float d)
 {
 	_position += _right * d;
-	_needUpdate = true;
+	_needRefresh = true;
 }
 
 void Camera::fly(float d)
 {
 	_position += _up * d;
-	_needUpdate = true;
+	_needRefresh = true;
 }
 
 void Camera::walk(float d)
 {
 	_position += _look * d;
-	_needUpdate = true;
+	_needRefresh = true;
 }
 
 void Camera::pitch(float angle)
@@ -174,7 +201,7 @@ void Camera::pitch(float angle)
 	rotMat.setRotationDegrees(angle, _right);
 	rotMat.transformVect(_up);
 	rotMat.transformVect(_look);
-	_needUpdate = true;
+	_needRefresh = true;
 }
 
 void Camera::yaw(float angle)
@@ -183,7 +210,7 @@ void Camera::yaw(float angle)
 	rotMat.setRotationDegrees(angle, _up);
 	rotMat.transformVect(_look);
 	rotMat.transformVect(_right);
-	_needUpdate = true;
+	_needRefresh = true;
 }
 
 void Camera::roll(float angle)
@@ -192,7 +219,7 @@ void Camera::roll(float angle)
 	rotMat.setRotationDegrees(angle, _look*(-1));
 	rotMat.transformVect(_right);
 	rotMat.transformVect(_up);
-	_needUpdate = true;
+	_needRefresh = true;
 }
 
 void Camera::rotateX(float angle)
@@ -223,7 +250,7 @@ void Camera::transform(const Matrix4x4& mat, bool bRotationOnly/*=false*/)
 	mat.transformVect(_look);
 	if (!bRotationOnly)
 		mat.translateVect(_position);
-	_needUpdate = true;
+	_needRefresh = true;
 }
 
 float Camera::getNearZ() const
@@ -277,37 +304,6 @@ const Frustum& Camera::getViewFrustum() const
 	return _viewArea;
 }
 
-void Camera::updateViewTransform()
-{
-	Vector3df yaxis = _up;
-	Vector3df zaxis = _look;
-	zaxis.invert();
-	zaxis.normalize();
-	Vector3df xaxis = yaxis.crossProduct(zaxis);
-	xaxis.normalize();
-	yaxis = zaxis.crossProduct(xaxis);
-
-	_view(0, 0) = xaxis._x;
-	_view(1, 0) = yaxis._x;
-	_view(2, 0) = zaxis._x;
-	_view(3, 0) = 0;
-
-	_view(0, 1) = xaxis._y;
-	_view(1, 1) = yaxis._y;
-	_view(2, 1) = zaxis._y;
-	_view(3, 1) = 0;
-
-	_view(0, 2) = xaxis._z;
-	_view(1, 2) = yaxis._z;
-	_view(2, 2) = zaxis._z;
-	_view(3, 2) = 0;
-
-	_view(0, 3) = -xaxis.dotProduct(_position);
-	_view(1, 3) = -yaxis.dotProduct(_position);
-	_view(2, 3) = -zaxis.dotProduct(_position);
-	_view(3, 3) = 1.0f;
-}
-
 bool Camera::setViewMemento(const wstring& name)
 {
 	if (name == L"")
@@ -327,7 +323,7 @@ bool Camera::getViewMemento(const wstring& name)
 	ViewMementoPtr viewPtr = it->second;
 	viewPtr->recover(this);
 	_viewMementoPool.erase(it);
-	_needUpdate = true;
+	_needRefresh = true;
 	return true;
 }
 
@@ -339,7 +335,11 @@ bool Camera::hasViewMemento(const wstring& name)
 
 void Camera::regenerateViewArea()
 {
-	_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _affector;
+	SceneNode* pParent = getParentNode();
+	if (pParent)
+		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * pParent->getAbsTransform() * _affector;
+	else
+		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _affector;
 }
 
 void Camera::recalculateViewArea()
@@ -420,8 +420,8 @@ bool Camera::deserialize(XMLElement* inXml)
 
 //////////////////////////////////////////////////////////////////////////
 Reflex<FPSCamera, const wstring&, SceneManager*> FPSCamera::_dynReflex;
-FPSCamera::FPSCamera(const wstring& name, SceneManager* originSceneMgr)
-	: Camera(name, originSceneMgr)
+FPSCamera::FPSCamera(const wstring& name, SceneManager* oriSceneMgr)
+	: Camera(name, oriSceneMgr)
 {
 	_moveSpeed[0] = _moveSpeed[1] = 20.0f;
 }
@@ -493,15 +493,6 @@ bool FPSCamera::keyClicked(const tagKeyInput& keyInput)
 	return ret;
 }
 
-void FPSCamera::regenerateViewArea()
-{
-	SceneNode* pParent = getParentNode();
-	if (pParent)
-		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * pParent->getAbsTransform() * _affector;
-	else
-		Camera::regenerateViewArea();
-}
-
 ViewMementoPtr FPSCamera::createViewMemento()
 {
 	return ViewMementoPtr(new ViewMementoFPS());
@@ -523,8 +514,8 @@ bool FPSCamera::deserialize(XMLElement* inXml)
 
 //////////////////////////////////////////////////////////////////////////
 Reflex<OrbitCamera, const wstring&, SceneManager*> OrbitCamera::_dynReflex;
-OrbitCamera::OrbitCamera(const wstring& name, SceneManager* originSceneMgr)
-	: Camera(name, originSceneMgr)
+OrbitCamera::OrbitCamera(const wstring& name, SceneManager* oriSceneMgr)
+	: Camera(name, oriSceneMgr)
 	, _arcball(0, 0)
 {
 	_moveSpeed[0] = _moveSpeed[1] = _zoomSpeed[0] = _zoomSpeed[1] = 5.0f;
@@ -575,7 +566,7 @@ void OrbitCamera::lookAt(const Vector3df& pos, const Vector3df& target /*= Vecto
 	_position.set(0, 0, zpos);
 	_affector.buildCameraLookAtMatrixRH(pos, target, worldUp);
 	_affector.setTranslation(Vector3df::Origin);
-	_needUpdate = true;
+	_needRefresh = true;
 }
 
 bool OrbitCamera::touchBegan(const Touch& touch, EMouseKeys key)
@@ -625,7 +616,7 @@ bool OrbitCamera::touchWheel(const Touch& touch, float wheel)
 	float factor = wheel*_zoomSpeed[0];
 	rayDir *= factor;
 	_position += rayDir;
-	_needUpdate = true;
+	_needRefresh = true;
 
 	return true;
 }
@@ -677,8 +668,8 @@ bool OrbitCamera::deserialize(XMLElement* inXml)
 
 //////////////////////////////////////////////////////////////////////////
 Reflex<EagleEyeCamera, const wstring&, SceneManager*> EagleEyeCamera::_dynReflex;
-EagleEyeCamera::EagleEyeCamera(const wstring& name, SceneManager* originSceneMgr)
-	: OrbitCamera(name, originSceneMgr)
+EagleEyeCamera::EagleEyeCamera(const wstring& name, SceneManager* oriSceneMgr)
+	: OrbitCamera(name, oriSceneMgr)
 	, _zoomFactor(1.0f)
 {
 	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();

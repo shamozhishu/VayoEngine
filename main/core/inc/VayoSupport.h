@@ -46,21 +46,23 @@ extern "C"
 #include "VayoCommon.h"
 using namespace std;
 
-namespace Vayo
-{
-	class Language;
-	class DatabaseCSV;
-	class ScriptSystem;
-	class ConfigManager;
-	class Device;
-	class Plugin;
-	class DynLib;
-	class DynLibManager;
-	class TouchDispatcher;
-	class KeypadDispatcher;
+NS_VAYO_BEGIN
 
-	template<typename T> class SharedPtr;
-	template<typename ...Args> class ReflexFactory;
-}
+class App;
+class Language;
+class DatabaseCSV;
+class ScriptSystem;
+class ConfigManager;
+class Device;
+class Plugin;
+class DynLib;
+class DynLibManager;
+class TouchDispatcher;
+class KeypadDispatcher;
+
+template<typename T> class SharedPtr;
+template<typename ...Args> class ReflexFactory;
+
+NS_VAYO_END
 
 #endif // __VAYO_SUPPORT_H__

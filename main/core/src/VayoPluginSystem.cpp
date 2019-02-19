@@ -26,12 +26,12 @@ PluginSystem::~PluginSystem()
 
 void PluginSystem::loadPlugins()
 {
-	const vector<tagPluginConfig>& pluginList = ConfigManager::getSingleton().getPluginConfig();
+	const vector<wstring>& pluginList = ConfigManager::getSingleton().getConfig().plugins;
 	wstring pluginName;
-	vector<tagPluginConfig>::const_iterator it = pluginList.cbegin();
+	vector<wstring>::const_iterator it = pluginList.cbegin();
 	for (; it != pluginList.cend(); ++it)
 	{
-		pluginName = (*it).PluginName;
+		pluginName = *it;
 #ifdef _DEBUG
 		pluginName += L"_d";
 #endif

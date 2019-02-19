@@ -17,7 +17,7 @@ class Win32Device : public Device
 {
 	DISALLOW_COPY_AND_ASSIGN(Win32Device)
 public:
-	Win32Device(int deviceID, const Attrib& attrib);
+	Win32Device(EDeviceID deviceID, const Attrib& attrib);
 	~Win32Device();
 	bool    init();
 	void*   getWndHandle() const;

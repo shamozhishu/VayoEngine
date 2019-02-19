@@ -50,10 +50,9 @@ bool Core::launch(Config* config)
 	do 
 	{
 		IF_FALSE_BREAK(config);
-		IF_FALSE_BREAK(ConfigManager::getSingleton().init(config->RootDirectory));
 		IF_FALSE_BREAK(DatabaseCSV::getSingleton().init());
 		IF_FALSE_BREAK(Language::getSingleton().init());
-		_activeDevice = _mainDevice = new Win32Device(_maxSupportDevCnt, config->MainDeviceAttrib);
+		_activeDevice = _mainDevice = new Win32Device(EDID_MAIN_DEVICE, config->MainDeviceAttrib);
 		IF_FALSE_BREAK(_mainDevice && _mainDevice->init());
 		_isLaunched = true;
 		return true;
@@ -84,14 +83,14 @@ Device* Core::createDevice(void* wndHandle /*= NULL*/, bool wndQuit /*= true*/,
 			devAttrib.BgClearColor = bgClearColor;
 			devAttrib.ScreenSize = screenSize;
 
-			Win32Device* dev = new Win32Device(i, devAttrib);
+			Win32Device* dev = new Win32Device((EDeviceID)i, devAttrib);
 			if (NULL == dev || !dev->init())
 			{
 				SAFE_DELETE(dev);
 				return NULL;
 			}
 
-			if (!setPixelFormat(dev))
+			if (!configDevice(dev))
 			{
 				SAFE_DELETE(dev);
 				return NULL;

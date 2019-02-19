@@ -1,7 +1,7 @@
 #include "Vayo3dTextObject.h"
 #include "Vayo3dRoot.h"
 #include "Vayo3dSceneManager.h"
-#include "Vayo3dCoreGUI.h"
+#include "Vayo3dGUI.h"
 #include "Vayo3dCollision.h"
 #include "Vayo3dSceneNode.h"
 #include "VayoUtils.h"
@@ -9,8 +9,8 @@
 NS_VAYO3D_BEGIN
 
 Reflex<TextObject, const wstring&, SceneManager*> TextObject::_dynReflex;
-TextObject::TextObject(const wstring& name, SceneManager* originSceneMgr)
-	: MovableObject(name, originSceneMgr)
+TextObject::TextObject(const wstring& name, SceneManager* oriSceneMgr)
+	: MovableObject(name, oriSceneMgr)
 	, _fontid(0)
 {
 }

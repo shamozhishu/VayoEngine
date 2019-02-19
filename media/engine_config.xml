@@ -1,4 +1,5 @@
-<engine_config rootpath="..\..\..\media\">
+<engine_config rootpath="..\..\..\media\" path2d="2d-part\" path3d="3d-part\">
+	<tablecsv filepath="tablecsv\"/>
 	<plugins>
 		<plugin name="RenderSystem_GL"/>
 	</plugins>
@@ -6,22 +7,25 @@
 		<language filepath="languagetxt\language_0_10000.txt"/>
 		<language filepath="languagetxt\language_10000_20000.txt"/>
 	</languages>
-	<scenes scenes="scene\" models="models\" materials="materials\scripts\" textures="materials\textures\" shaders="materials\programs\">
-		<scene id="1" mappath="map\map001.tmx"/>
-		<scene id="2" mappath="map\map002.tmx"/>
-	</scenes>
-	<ui imgsetpath="imageset\" dlgxmlpath="page\" mapimgpath="map\" tablecsv="tablecsv\">
-		<skin file="page\uiskin.xml"/>
-		<seqanim file="page\sequence_anim.xml"/>
-		<imagesetall>
-			<imageset id = "0" file="imageset\lixiaoyao.imageset"/>
-			<imageset id = "1" file="imageset\仙剑一.imageset"/>
-		</imagesetall>
-		<fonts>
-			<font size="12" bold="0" italic="0" file="fonts\simsun.ttc"/>
-			<font size="12" bold="0" italic="0" file="fonts\calibri.ttf"/>
-			<font size="16" bold="0" italic="0" file="fonts\simkai.ttf"/>
-			<font size="13" bold="0" italic="0" file="fonts\consola.ttf"/>
-		</fonts>
-	</ui>
+	<part_2d layerset="layerset\" features="features\" surfaces="surfaces\"/>
+	<part_3d>
+		<scenes scenes="scene\" models="models\" materials="materials\scripts\" textures="materials\textures\" shaders="materials\programs\">
+			<scene id="1" mappath="map\map001.tmx"/>
+			<scene id="2" mappath="map\map002.tmx"/>
+		</scenes>
+		<ui imgsetpath="imageset\" dlgxmlpath="page\" mapimgpath="map\">
+			<skin file="page\uiskin.xml"/>
+			<seqanim file="page\sequence_anim.xml"/>
+			<imagesetall>
+				<imageset id = "0" file="imageset\lixiaoyao.imageset"/>
+				<imageset id = "1" file="imageset\仙剑一.imageset"/>
+			</imagesetall>
+			<fonts>
+				<font size="12" bold="0" italic="0" file="fonts\simsun.ttc"/>
+				<font size="12" bold="0" italic="0" file="fonts\calibri.ttf"/>
+				<font size="16" bold="0" italic="0" file="fonts\simkai.ttf"/>
+				<font size="13" bold="0" italic="0" file="fonts\consola.ttf"/>
+			</fonts>
+		</ui>
+	</part_3d>
 </engine_config>

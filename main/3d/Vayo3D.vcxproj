@@ -20,13 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Vayo3d.h" />
-    <ClInclude Include="inc\Vayo3dApp.h" />
     <ClInclude Include="inc\Vayo3dArcball.h" />
-    <ClInclude Include="inc\Vayo3dBaseGUI.h" />
     <ClInclude Include="inc\Vayo3dCamera.h" />
     <ClInclude Include="inc\Vayo3dCollision.h" />
     <ClInclude Include="inc\Vayo3dColour.h" />
-    <ClInclude Include="inc\Vayo3dCoreGUI.h" />
+    <ClInclude Include="inc\Vayo3dGUI.h" />
     <ClInclude Include="inc\Vayo3dDisplayList.h" />
     <ClInclude Include="inc\Vayo3dEntity.h" />
     <ClInclude Include="inc\Vayo3dFrustum.h" />
@@ -79,12 +77,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Vayo3dApp.cpp" />
     <ClCompile Include="src\Vayo3dArcball.cpp" />
-    <ClCompile Include="src\Vayo3dBaseGUI.cpp" />
     <ClCompile Include="src\Vayo3dCamera.cpp" />
     <ClCompile Include="src\Vayo3dCollision.cpp" />
-    <ClCompile Include="src\Vayo3dCoreGUI.cpp" />
+    <ClCompile Include="src\Vayo3dGUI.cpp" />
     <ClCompile Include="src\Vayo3dEntity.cpp" />
     <ClCompile Include="src\Vayo3dFontManager.cpp" />
     <ClCompile Include="src\Vayo3dFrustum.cpp" />

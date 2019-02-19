@@ -17,13 +17,7 @@
     <ClInclude Include="inc\Vayo3d.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Vayo3dApp.h">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="inc\Vayo3dArcball.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Vayo3dBaseGUI.h">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\Vayo3dCamera.h">
@@ -33,9 +27,6 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\Vayo3dColour.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Vayo3dCoreGUI.h">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\Vayo3dDisplayList.h">
@@ -146,24 +137,18 @@
     <ClInclude Include="src\Vayo3dFontManager.h">
       <Filter>src\headers</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Vayo3dGUI.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Vayo3dApp.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Vayo3dArcball.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Vayo3dBaseGUI.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo3dCamera.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo3dCollision.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Vayo3dCoreGUI.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo3dEntity.cpp">
@@ -242,6 +227,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo3dViewMemento.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo3dGUI.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

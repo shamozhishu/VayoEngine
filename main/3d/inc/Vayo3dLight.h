@@ -24,7 +24,7 @@ class _Vayo3dExport DirectionalLight : public MovableObject, public Light
 {
 	static Reflex<DirectionalLight, const wstring&, SceneManager*> _dynReflex;
 public:
-	DirectionalLight(const wstring& name, SceneManager* originSceneMgr);
+	DirectionalLight(const wstring& name, SceneManager* oriSceneMgr);
 	void update(float dt);
 	void setDirection(float x, float y, float z);
 	void serialize(XMLElement* outXml);
@@ -35,7 +35,7 @@ class _Vayo3dExport PointLight : public MovableObject, public Light
 {
 	static Reflex<PointLight, const wstring&, SceneManager*> _dynReflex;
 public:
-	PointLight(const wstring& name, SceneManager* originSceneMgr);
+	PointLight(const wstring& name, SceneManager* oriSceneMgr);
 	void update(float dt);
 	void setPosition(float x, float y, float z);
 	void setRange(float range);
@@ -48,7 +48,7 @@ class _Vayo3dExport SpotLight : public PointLight
 {
 	static Reflex<SpotLight, const wstring&, SceneManager*> _dynReflex;
 public:
-	SpotLight(const wstring& name, SceneManager* originSceneMgr);
+	SpotLight(const wstring& name, SceneManager* oriSceneMgr);
 	void update(float dt);
 	void setDirection(float x, float y, float z);
 	void setExponent(float exponent);

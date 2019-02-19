@@ -19,7 +19,7 @@ class _Vayo3dExport ManualObject : public MovableObject, public Renderable
 {
 	static Reflex<ManualObject, const wstring&, SceneManager*> _dynReflex;
 public:
-	ManualObject(const wstring& name, SceneManager* originSceneMgr);
+	ManualObject(const wstring& name, SceneManager* oriSceneMgr);
 	~ManualObject();
 	void     update(float dt);
 	void     render();

@@ -35,7 +35,7 @@ public:
 	bool          openUI(Device* dev = NULL);
 	void          closeUI(Device* dev = NULL);
 	UIManager*    getUIManager(Device* dev = NULL) const;
-	bool          setPixelFormat(Device* dev = NULL);
+	bool          configDevice(Device* dev = NULL);
 	void          addRenderSystem(RenderSystem* newRenderer);
 
 	SceneManager* createSceneMgr(const wstring& sceneName = L"");
@@ -47,8 +47,8 @@ public:
 
 private:
 	UIManager* _uiManager[_maxSupportDevCnt+1];
-	map<wstring, SceneManager*> _sceneMgrPool;
 	map<wstring, RenderSystem*> _renderers;
+	map<wstring, SceneManager*> _sceneMgrPool;
 
 protected:
 	PROPERTY_R(SceneManager*,    _curSceneMgr,     CurSceneMgr)

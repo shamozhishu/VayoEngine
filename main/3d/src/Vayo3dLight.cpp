@@ -23,8 +23,8 @@ void Light::setSpecular(int r, int g, int b, int a)
 
 //////////////////////////////////////////////////////////////////////////
 Reflex<DirectionalLight, const wstring&, SceneManager*> DirectionalLight::_dynReflex;
-DirectionalLight::DirectionalLight(const wstring& name, SceneManager* originSceneMgr)
-	: MovableObject(name, originSceneMgr)
+DirectionalLight::DirectionalLight(const wstring& name, SceneManager* oriSceneMgr)
+	: MovableObject(name, oriSceneMgr)
 {
 	_lightData._lightType = ELT_DIRECTIONAL_LIGHT;
 }
@@ -86,8 +86,8 @@ bool DirectionalLight::deserialize(XMLElement* inXml)
 
 //////////////////////////////////////////////////////////////////////////
 Reflex<PointLight, const wstring&, SceneManager*> PointLight::_dynReflex;
-PointLight::PointLight(const wstring& name, SceneManager* originSceneMgr)
-	: MovableObject(name, originSceneMgr)
+PointLight::PointLight(const wstring& name, SceneManager* oriSceneMgr)
+	: MovableObject(name, oriSceneMgr)
 {
 	_lightData._lightType = ELT_POINT_LIGHT;
 }
@@ -163,8 +163,8 @@ bool PointLight::deserialize(XMLElement* inXml)
 
 //////////////////////////////////////////////////////////////////////////
 Reflex<SpotLight, const wstring&, SceneManager*> SpotLight::_dynReflex;
-SpotLight::SpotLight(const wstring& name, SceneManager* originSceneMgr)
-	: PointLight(name, originSceneMgr)
+SpotLight::SpotLight(const wstring& name, SceneManager* oriSceneMgr)
+	: PointLight(name, oriSceneMgr)
 {
 	_lightData._lightType = ELT_SPOT_LIGHT;
 }

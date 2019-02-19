@@ -143,6 +143,9 @@
     <ClInclude Include="inc\math\VayoMatrix3x3.h">
       <Filter>inc\math</Filter>
     </ClInclude>
+    <ClInclude Include="inc\VayoApp.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\VayoConfigManager.cpp">

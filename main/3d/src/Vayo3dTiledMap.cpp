@@ -59,7 +59,6 @@ bool TMXXMLParser::parseMapInfo(const wstring& strMapPath)
 		return false;
 
 	destroyMapInfo();
-	const tagUIConfig& filePaths = ConfigManager::getSingleton().getUIConfig();
 	string curTag;
 
 	XMLElement* pRoot = doc.RootElement();
@@ -95,7 +94,7 @@ bool TMXXMLParser::parseMapInfo(const wstring& strMapPath)
 					break;
 
 				tagTileset& tileSet = _tilesets.back();
-				tileSet.Img.Source = filePaths.MapImgPath;
+				tileSet.Img.Source = ConfigManager::getSingleton().getConfig()._3d.mapImgPath;
 				tileSet.Img.Source += utf8ToUnicode(pImg->Attribute("source"));
 				tileSet.Img.Width = pImg->IntAttribute("width");
 				tileSet.Img.Height = pImg->IntAttribute("height");

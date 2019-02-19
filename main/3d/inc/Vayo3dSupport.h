@@ -48,7 +48,6 @@ enum EBufferType
 	EBT_VERTEX_AND_INDEX
 };
 
-class App;
 class Camera;
 class ViewMemento;
 class SpriteBox;

@@ -189,6 +189,7 @@
     <ClInclude Include="inc\math\VayoVector3d.h" />
     <ClInclude Include="inc\Vayo.h" />
     <ClInclude Include="inc\VayoAny.h" />
+    <ClInclude Include="inc\VayoApp.h" />
     <ClInclude Include="inc\VayoAttribSerializer.h" />
     <ClInclude Include="inc\VayoBitState.h" />
     <ClInclude Include="inc\VayoCommon.h" />

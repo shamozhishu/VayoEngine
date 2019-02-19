@@ -59,7 +59,7 @@ void SceneManager::setActiveCamera(Camera* pActiveCamera)
 	{
 		_activeCamera->enableTouch(true);
 		_activeCamera->enableKeypad(true);
-		_activeCamera->setNeedUpdate(true);
+		_activeCamera->setNeedRefresh(true);
 	}
 }
 
@@ -122,8 +122,7 @@ bool SceneManager::loadScene(const wstring& sceneFile)
 		return false;
 	}
 
-	const tagSceneConfig& sceneConfig = ConfigManager::getSingleton().getSceneConfig();
-	wstring filename = sceneConfig.ScenePath + sceneFile;
+	wstring filename = ConfigManager::getSingleton().getConfig()._3d.scenePath + sceneFile;
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(w2a_(filename).c_str()) != tinyxml2::XML_SUCCESS)
 	{
@@ -248,8 +247,7 @@ bool SceneManager::loadScene(const wstring& sceneFile)
 
 bool SceneManager::saveScene(const wstring& sceneFile)
 {
-	const tagSceneConfig& sceneConfig = ConfigManager::getSingleton().getSceneConfig();
-	wstring filename = sceneConfig.ScenePath + sceneFile;
+	wstring filename = ConfigManager::getSingleton().getConfig()._3d.scenePath + sceneFile;
 	tinyxml2::XMLDocument doc;
 	doc.InsertFirstChild(doc.NewDeclaration());
 	XMLElement* root = doc.NewElement("Scene");

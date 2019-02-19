@@ -2,9 +2,8 @@
 #include "pages.h"
 #include "models.h"
 
-ModelViewer::ModelViewer(Root::Config* config)
-	: App(config)
-	, m_cameraFPS(NULL)
+ModelViewer::ModelViewer()
+	: m_cameraFPS(NULL)
 	, m_cameraOrbit(NULL)
 	, m_testModel(NULL)
 	, m_boxModel(NULL)

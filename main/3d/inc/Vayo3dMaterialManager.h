@@ -60,7 +60,7 @@ material examples/test
 		tex_address_mode mirror
 	}
 }
-** ----------end----------可嵎重云----------
+** ----------end------------可嵎重云----------
 */
 
 #include "Vayo3dSupport.h"

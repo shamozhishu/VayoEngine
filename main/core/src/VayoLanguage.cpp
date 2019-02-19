@@ -99,11 +99,11 @@ bool Language::init()
 	wstring strFileName;
 	wstring strBuff;
 	strBuff.resize(MAX_BUFF_SIZE);
-	const vector<tagLanguageConfig>& languageConfig = ConfigManager::getSingleton().getLanguageConfig();
+	const vector<wstring>& languageConfig = ConfigManager::getSingleton().getConfig().languages;
 
 	for (size_t i = 0; i < languageConfig.size(); ++i)
 	{
-		strFileName = languageConfig[i].FilePath;
+		strFileName = languageConfig[i];
 		wifstream fin(strFileName);
 		fin.imbue(locale("chs"));
 		if (fin)

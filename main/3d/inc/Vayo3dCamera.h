@@ -23,10 +23,10 @@ class _Vayo3dExport Camera : public MovableObject, public TouchDelegate, public 
 {
 	friend class ViewMemento;
 public:
-	Camera(const wstring& name, SceneManager* originSceneMgr);
+	Camera(const wstring& name, SceneManager* oriSceneMgr);
 	virtual ~Camera();
 	virtual void  refresh();
-	virtual void  setNeedUpdate(bool isUpdate);
+	virtual void  setNeedRefresh(bool isRefresh);
 	virtual bool  isOrthogonal() { return false; }
 	virtual bool  getWorldPos(Vector3df& outWorldPos) const;
 	virtual bool  getWorldLook(Vector3df& outWorldLook) const;
@@ -81,12 +81,11 @@ public:
 protected:
 	virtual void regenerateViewArea();
 	virtual void recalculateViewArea();
-	virtual void updateViewTransform();
 	virtual ViewMementoPtr createViewMemento() = 0;
 	map<wstring, ViewMementoPtr> _viewMementoPool;
 
 protected:
-	bool      _needUpdate;
+	bool      _needRefresh;
 	Vector3df _position;
 	Vector3df _right;
 	Vector3df _up;
@@ -108,7 +107,7 @@ class _Vayo3dExport FPSCamera : public Camera
 	friend class ViewMementoFPS;
 	static Reflex<FPSCamera, const wstring&, SceneManager*> _dynReflex;
 public:
-	FPSCamera(const wstring& name, SceneManager* originSceneMgr);
+	FPSCamera(const wstring& name, SceneManager* oriSceneMgr);
 	~FPSCamera();
 	void update(float dt);
 	void setMoveSpeed(float speed);
@@ -118,7 +117,6 @@ public:
 	bool deserialize(XMLElement* inXml);
 
 protected:
-	void regenerateViewArea();
 	ViewMementoPtr createViewMemento();
 
 protected:
@@ -132,7 +130,7 @@ class _Vayo3dExport OrbitCamera : public Camera
 	friend class ViewMementoOrbit;
 	static Reflex<OrbitCamera, const wstring&, SceneManager*> _dynReflex;
 public:
-	OrbitCamera(const wstring& name, SceneManager* originSceneMgr);
+	OrbitCamera(const wstring& name, SceneManager* oriSceneMgr);
 	~OrbitCamera();
 	void update(float dt);
 	void resetArcball();
@@ -164,7 +162,7 @@ class _Vayo3dExport EagleEyeCamera : public OrbitCamera
 	friend class ViewMementoEagleEye;
 	static Reflex<EagleEyeCamera, const wstring&, SceneManager*> _dynReflex;
 public:
-	EagleEyeCamera(const wstring& name, SceneManager* originSceneMgr);
+	EagleEyeCamera(const wstring& name, SceneManager* oriSceneMgr);
 	~EagleEyeCamera();
 	void  update(float dt);
 	bool  isOrthogonal() { return true; }

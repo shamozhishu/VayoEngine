@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "TessgridApp.h"
 
-TessgridApp::TessgridApp(Root::Config* config)
-	: App(config)
-	, m_cam(NULL)
+TessgridApp::TessgridApp()
+	: m_cam(NULL)
 {
 }
 

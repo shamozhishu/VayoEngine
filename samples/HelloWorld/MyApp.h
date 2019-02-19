@@ -10,7 +10,7 @@ using namespace Vayo::_3d;
 class ModelViewer : public App, public Singleton<ModelViewer>
 {
 public:
-	ModelViewer(Root::Config* config);
+	ModelViewer();
 	bool startup();
 	void cleanup();
 	bool keyClicked(const tagKeyInput& keyInput);

@@ -22,13 +22,28 @@ public:
 	void resize(Device* dev = NULL);
 	void activate(Device* dev = NULL);
 	bool renderOneFrame(Device* renderWnd = NULL);
-	void bootFrame(Device* dev, const wstring& scenename = L"", const wstring& userEvtID = L"");
+	void bootFrame(Device* dev, const wstring& layermgrname = L"", const wstring& userEvtID = L"");
 	bool openUI(Device* dev = NULL);
 	void closeUI(Device* dev = NULL);
-	bool setPixelFormat(Device* dev = NULL);
+	bool configDevice(Device* dev = NULL);
+	void addRenderer(Renderer* newRenderer);
+
+	LayerManager* createLayerMgr(const wstring& layermgrName = L"");
+	LayerManager* findLayerMgr(const wstring& layermgrName);
+	void          destroyLayerMgr(const wstring& layermgrName);
+	void          destroyLayerMgr(LayerManager* layermgr);
+	void          destroyAllLayerMgrs();
+	void          setNullCurLayerMgr();
+
+private:
+	map<wstring, Renderer*> _renderers;
+	map<wstring, LayerManager*> _layerMgrPool;
 
 protected:
-	PROPERTY_RW(Renderer*, _renderer, Renderer)
+	PROPERTY_R(LayerManager*, _curLayerMgr, CurLayerMgr)
+	PROPERTY_R(Renderer*, _activeRenderer, ActiveRenderer)
+	PROPERTY_R(SurfaceManager*, _surfaceManager, SurfaceManager)
+	PROPERTY_R(FeatureManager*, _featureManager, FeatureManager)
 };
 
 NS_VAYO2D_END

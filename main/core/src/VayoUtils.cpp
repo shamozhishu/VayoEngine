@@ -179,6 +179,16 @@ wstring getWorkingDirectory()
 	return workDir;
 }
 
+wstring getExeFileDirectory()
+{
+	wchar_t exeFullPath[MAX_PATH];
+	wstring strPath;
+	GetModuleFileName(NULL, exeFullPath, MAX_PATH);
+	strPath = (wstring)exeFullPath;
+	size_t pos = strPath.find_last_of(L'\\', strPath.length());
+	return strPath.substr(0, pos);
+}
+
 bool findFileDir(vector<wstring>& arrFilePath, const wstring& strCurPath, const wstring& fileFormat)
 {
 	wstring searchPath = strCurPath + L"*";

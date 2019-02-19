@@ -40,7 +40,7 @@ public:
 	virtual void bootFrame(Device* dev, const wstring& scenename = L"", const wstring& userEvtID = L"") = 0;
 	virtual bool openUI(Device* dev = NULL) = 0;
 	virtual void closeUI(Device* dev = NULL) = 0;
-	virtual bool setPixelFormat(Device* dev = NULL) = 0;
+	virtual bool configDevice(Device* dev = NULL) = 0;
 
 	virtual Device* createDevice(void* wndHandle = NULL, bool wndQuit = true, bool wndPaint = false,
 		wstring wndCaption = L"Vayo Engine", bool turnOnUI = true, bool fullScreen = false,

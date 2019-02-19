@@ -3,7 +3,7 @@
 class TessgridApp : public App, public Singleton<TessgridApp>
 {
 public:
-	TessgridApp(Root::Config* config);
+	TessgridApp();
 	bool startup();
 	void cleanup();
 	bool keyClicked(const tagKeyInput& keyInput);

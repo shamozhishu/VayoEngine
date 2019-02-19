@@ -13,9 +13,11 @@ NS_VAYO2D_BEGIN
 class Surface
 {
 public:
+	Surface(const wstring& name) : _name(name) {}
 	virtual ~Surface() {}
 
 protected:
+	PROPERTY_R_REF(wstring, _name, Name)
 	PROPERTY_RW_REF(Dimension2df, _size, Size)
 };
 

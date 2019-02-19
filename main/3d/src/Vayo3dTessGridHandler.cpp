@@ -70,7 +70,7 @@ bool TessGridHandler::parseTessgridFile(const wstring& filename, bool fullPath /
 		if (fullPath)
 			filePath = fileName;
 		else
-			filePath = ConfigManager::getSingleton().getSceneConfig().ModelsPath + fileName;
+			filePath = ConfigManager::getSingleton().getConfig()._3d.modelsPath + fileName;
 
 		std::wifstream fin(filePath);
 		if (!fin)

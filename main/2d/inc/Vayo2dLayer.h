@@ -42,7 +42,7 @@ private:
 private:
 	map<wstring, Body*> _bodies;
 	Rectf               _worldArea;
-	Shape*              _wireBoundingArea;
+	Graphics*           _wireBoundingArea;
 	bool                _showBoundingArea;
 	bool                _isAutomaticCulling;
 };

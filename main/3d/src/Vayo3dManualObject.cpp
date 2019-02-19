@@ -12,8 +12,8 @@
 NS_VAYO3D_BEGIN
 
 Reflex<ManualObject, const wstring&, SceneManager*> ManualObject::_dynReflex;
-ManualObject::ManualObject(const wstring& name, SceneManager* originSceneMgr)
-	: MovableObject(name, originSceneMgr)
+ManualObject::ManualObject(const wstring& name, SceneManager* oriSceneMgr)
+	: MovableObject(name, oriSceneMgr)
 	, _needSubmit(true)
 	, _opSubMesh(NULL)
 	, _displayList(NULL)

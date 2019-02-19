@@ -166,11 +166,20 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\D2DGeometry.h" />
+    <ClInclude Include="inc\D2DPaintbrush.h" />
+    <ClInclude Include="inc\D2DPlugin.h" />
     <ClInclude Include="inc\D2DRenderer.h" />
     <ClInclude Include="inc\D2DSupport.h" />
+    <ClInclude Include="inc\D2DSurface.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\D2DDll.cpp" />
+    <ClCompile Include="src\D2DGeometry.cpp" />
+    <ClCompile Include="src\D2DPaintbrush.cpp" />
+    <ClCompile Include="src\D2DPlugin.cpp" />
     <ClCompile Include="src\D2DRenderer.cpp" />
+    <ClCompile Include="src\D2DSurface.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

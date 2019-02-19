@@ -53,5 +53,7 @@
 #include "math/VayoTriangle3d.h"
 #include "math/VayoMatrix4x4.h"
 #include "math/VayoQuaternion.h"
+// 应用程序基类
+#include "VayoApp.h"
 
 #endif // __VAYO_H__

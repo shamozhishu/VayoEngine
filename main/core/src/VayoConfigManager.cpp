@@ -7,10 +7,23 @@ using tinyxml2::XMLElement;
 
 NS_VAYO_BEGIN
 
-bool ConfigManager::init(wstring rootDirectory)
+const Config& ConfigManager::getConfig() const
+{
+	return _configData;
+}
+
+const wstring& ConfigManager::getRootResourcePath() const
+{
+	return _rootResourcePath;
+}
+
+ConfigManager::ConfigManager()
+{
+}
+
+bool ConfigManager::init(wstring rootDirectory, EDimension dimension /*= _3D*/)
 {
 	tinyxml2::XMLDocument doc;
-
 	if (rootDirectory == L"")
 	{
 		rootDirectory = getWorkingDirectory();
@@ -35,21 +48,29 @@ bool ConfigManager::init(wstring rootDirectory)
 		return false;
 	}
 
-	string curTag;
 	_rootResourcePath = rootDirectory + L"\\" + utf8ToUnicode(pRoot->Attribute("rootpath"));
+
+	wstring dimensionPath;
+	if (dimension == _2D)
+		dimensionPath = _rootResourcePath + utf8ToUnicode(pRoot->Attribute("path2d"));
+	else
+		dimensionPath = _rootResourcePath + utf8ToUnicode(pRoot->Attribute("path3d"));
+
+	string curTag;
 	XMLElement* pElem = pRoot->FirstChildElement();
 	while (pElem)
 	{
 		curTag = pElem->Name();
-
-		if (0 == curTag.compare("plugins"))
+		if (0 == curTag.compare("tablecsv"))
+		{
+			_configData.csvtables = _rootResourcePath + utf8ToUnicode(pElem->Attribute("filepath"));
+		}
+		else  if (0 == curTag.compare("plugins"))
 		{
 			XMLElement* plugin = pElem->FirstChildElement();
 			while (plugin)
 			{
-				tagPluginConfig pluginConfig;
-				pluginConfig.PluginName = utf8ToUnicode(plugin->Attribute("name"));
-				_pluginConfig.push_back(pluginConfig);
+				_configData.plugins.push_back(utf8ToUnicode(plugin->Attribute("name")));
 				plugin = plugin->NextSiblingElement();
 			}
 		}
@@ -58,83 +79,112 @@ bool ConfigManager::init(wstring rootDirectory)
 			XMLElement* language = pElem->FirstChildElement();
 			while (language)
 			{
-				tagLanguageConfig lanConfig;
-				lanConfig.FilePath = _rootResourcePath + utf8ToUnicode(language->Attribute("filepath"));
-				_languageConfig.push_back(lanConfig);
+				_configData.languages.push_back(_rootResourcePath + utf8ToUnicode(language->Attribute("filepath")));
 				language = language->NextSiblingElement();
 			}
 		}
-		else if (0 == curTag.compare("scenes"))
+		else if (0 == curTag.compare("part_2d"))
 		{
-			_sceneConfig.ScenePath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("scenes"));
-			_sceneConfig.ModelsPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("models"));
-			_sceneConfig.MaterialsPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("materials"));
-			_sceneConfig.TexturesPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("textures"));
-			_sceneConfig.ShadersPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("shaders"));
-			XMLElement* scene = pElem->FirstChildElement();
-			while (scene)
+			if (dimension == _2D)
 			{
-				int mapID = scene->IntAttribute("id");
-				wstring mapPath = _rootResourcePath + utf8ToUnicode(scene->Attribute("mappath"));
-				_sceneConfig.MapPaths.insert(make_pair(mapID, mapPath));
-				scene = scene->NextSiblingElement();
+				_configData._2d.layersetPath = dimensionPath + utf8ToUnicode(pElem->Attribute("layerset"));
+				_configData._2d.featuresPath = dimensionPath + utf8ToUnicode(pElem->Attribute("features"));
+				_configData._2d.surfacesPath = dimensionPath + utf8ToUnicode(pElem->Attribute("surfaces"));
 			}
 		}
-		else if (0 == curTag.compare("ui"))
+		else if (0 == curTag.compare("part_3d"))
 		{
-			_uiConfig.ImgsetPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("imgsetpath"));
-			_uiConfig.DlgXmlPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("dlgxmlpath"));
-			_uiConfig.MapImgPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("mapimgpath"));
-			_uiConfig.TableCSVPath = _rootResourcePath + utf8ToUnicode(pElem->Attribute("tablecsv"));
-			XMLElement* skin = pElem->FirstChildElement("skin");
-			if (!skin)
+			if (dimension == _3D)
 			{
-				Log::wprint(ELL_ERROR, L"<skin>±Í«©»± ß");
-				return false;
-			}
+				XMLElement* p3dElem = pElem->FirstChildElement();
+				while (p3dElem)
+				{
+					curTag = p3dElem->Name();
+					if (0 == curTag.compare("scenes"))
+					{
+						_configData._3d.scenePath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("scenes"));
+						_configData._3d.modelsPath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("models"));
+						_configData._3d.materialsPath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("materials"));
+						_configData._3d.texturesPath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("textures"));
+						_configData._3d.shadersPath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("shaders"));
+						XMLElement* scene = p3dElem->FirstChildElement();
+						while (scene)
+						{
+							int mapID = scene->IntAttribute("id");
+							wstring mapPath = dimensionPath + utf8ToUnicode(scene->Attribute("mappath"));
+							_configData._3d.mapPaths.insert(make_pair(mapID, mapPath));
+							scene = scene->NextSiblingElement();
+						}
+					}
+					else if (0 == curTag.compare("ui"))
+					{
+						_configData._3d.imgsetPath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("imgsetpath"));
+						_configData._3d.dlgXmlPath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("dlgxmlpath"));
+						_configData._3d.mapImgPath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("mapimgpath"));
+						XMLElement* skin = p3dElem->FirstChildElement("skin");
+						if (!skin)
+						{
+							Log::wprint(ELL_ERROR, L"<skin>±Í«©»± ß");
+							return false;
+						}
 
-			_uiConfig.SkinFilePath = _rootResourcePath + utf8ToUnicode(skin->Attribute("file"));
-			XMLElement* seqanim = pElem->FirstChildElement("seqanim");
-			if (!seqanim)
-			{
-				Log::wprint(ELL_ERROR, L"<seqanim>±Í«©»± ß");
-				return false;
-			}
+						_configData._3d.skinFilePath = dimensionPath + utf8ToUnicode(skin->Attribute("file"));
+						XMLElement* seqanim = p3dElem->FirstChildElement("seqanim");
+						if (!seqanim)
+						{
+							Log::wprint(ELL_ERROR, L"<seqanim>±Í«©»± ß");
+							return false;
+						}
 
-			_uiConfig.SeqAnimPath = _rootResourcePath + utf8ToUnicode(seqanim->Attribute("file"));
-			XMLElement* imagesetall = pElem->FirstChildElement("imagesetall");
-			if (!imagesetall)
-			{
-				Log::wprint(ELL_ERROR, L"<imagesetall>±Í«©»± ß");
-				return false;
-			}
+						_configData._3d.seqAnimPath = dimensionPath + utf8ToUnicode(seqanim->Attribute("file"));
+						XMLElement* imagesetall = p3dElem->FirstChildElement("imagesetall");
+						if (!imagesetall)
+						{
+							Log::wprint(ELL_ERROR, L"<imagesetall>±Í«©»± ß");
+							return false;
+						}
 
-			XMLElement* imageset = imagesetall->FirstChildElement();
-			while (imageset)
-			{
-				_uiConfig.ImgsetAll.insert(make_pair(imageset->IntAttribute("id"),
-					_rootResourcePath + utf8ToUnicode(imageset->Attribute("file"))));
-				imageset = imageset->NextSiblingElement();
-			}
+						XMLElement* imageset = imagesetall->FirstChildElement();
+						while (imageset)
+						{
+							_configData._3d.imgsets.insert(make_pair(imageset->IntAttribute("id"),
+								dimensionPath + utf8ToUnicode(imageset->Attribute("file"))));
+							imageset = imageset->NextSiblingElement();
+						}
 
-			XMLElement* fontall = pElem->FirstChildElement("fonts");
-			if (!fontall)
-			{
-				Log::wprint(ELL_ERROR, L"<fonts>±Í«©»± ß");
-				return false;
-			}
+						XMLElement* fontall = p3dElem->FirstChildElement("fonts");
+						if (!fontall)
+						{
+							Log::wprint(ELL_ERROR, L"<fonts>±Í«©»± ß");
+							return false;
+						}
 
-			tagFontConfig fontAttrib;
-			XMLElement* font = fontall->FirstChildElement();
-			while (font)
-			{
-				fontAttrib.FontSize = font->IntAttribute("size");
-				fontAttrib.FontBold = font->BoolAttribute("bold");
-				fontAttrib.FontItalic = font->BoolAttribute("italic");
-				fontAttrib.FontFilePath = _rootResourcePath + utf8ToUnicode(font->Attribute("file"));
-				_fontConfig.push_back(fontAttrib);
-				font = font->NextSiblingElement();
+						Config::Font fontAttrib;
+						XMLElement* font = fontall->FirstChildElement();
+						while (font)
+						{
+							fontAttrib.size = font->IntAttribute("size");
+							fontAttrib.bold = font->BoolAttribute("bold");
+							fontAttrib.italic = font->BoolAttribute("italic");
+							fontAttrib.filePath = dimensionPath + utf8ToUnicode(font->Attribute("file"));
+							_configData._3d.fontset.push_back(fontAttrib);
+							font = font->NextSiblingElement();
+						}
+					}
+					else
+					{
+						Log::wprint(ELL_ERROR, L"¥ÌŒÛ±Í«©<%s>", curTag.c_str());
+						return false;
+					}
+
+					p3dElem = p3dElem->NextSiblingElement();
+				}
 			}
+		}
+		else
+		{
+			Log::wprint(ELL_ERROR, L"¥ÌŒÛ±Í«©<%s>", curTag.c_str());
+			return false;
 		}
 
 		pElem = pElem->NextSiblingElement();
@@ -142,36 +192,6 @@ bool ConfigManager::init(wstring rootDirectory)
 
 	Log::wprint(ELL_INFORMATION, L"“˝«Ê≈‰÷√Œƒº˛[%s\\engine_config.xml]º”‘ÿ≥…π¶", rootDirectory.c_str());
 	return true;
-}
-
-const tagUIConfig& ConfigManager::getUIConfig() const
-{
-	return _uiConfig;
-}
-
-const tagSceneConfig& ConfigManager::getSceneConfig() const
-{
-	return _sceneConfig;
-}
-
-const vector<tagFontConfig>& ConfigManager::getFontConfig() const
-{
-	return _fontConfig;
-}
-
-const vector<tagPluginConfig>& ConfigManager::getPluginConfig() const
-{
-	return _pluginConfig;
-}
-
-const vector<tagLanguageConfig>& ConfigManager::getLanguageConfig() const
-{
-	return _languageConfig;
-}
-
-const wstring& ConfigManager::getRootResourcePath() const
-{
-	return _rootResourcePath;
 }
 
 NS_VAYO_END

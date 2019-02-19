@@ -25,10 +25,8 @@
 #pragma comment(lib, "windowscodecs.lib")
 #pragma comment(lib, "Winmm.lib")
 
-using namespace Vayo::_2d;
-
-template<class Interface>
-inline void safeRelease(Interface* &pInterfaceToRelease)
+template<typename Interface>
+inline void SAFE_RELEASE(Interface* &pInterfaceToRelease)
 {
 	if (pInterfaceToRelease != nullptr)
 	{
@@ -36,5 +34,9 @@ inline void safeRelease(Interface* &pInterfaceToRelease)
 		pInterfaceToRelease = nullptr;
 	}
 }
+
+using namespace Vayo::_2d;
+class D2DRenderer;
+class D2DPaintbrush;
 
 #endif // __D2D_SUPPORT_H__

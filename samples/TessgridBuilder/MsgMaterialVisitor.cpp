@@ -35,7 +35,7 @@ void CMsgMaterialVisitor::OnNewBuild()
 
 void CMsgMaterialVisitor::OnOpenFile()
 {
-	CString strTmp = ConfigManager::getSingleton().getSceneConfig().MaterialsPath.c_str();
+	CString strTmp = ConfigManager::getSingleton().getConfig()._3d.materialsPath.c_str();
 	CFileDialog dlg(TRUE, strTmp, _T(""), OFN_HIDEREADONLY | OFN_READONLY, _T("нд╪Ч (*.material)|*.material||"), NULL);
 	if (IDOK == dlg.DoModal())
 	{

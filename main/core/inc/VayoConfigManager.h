@@ -10,65 +10,59 @@
 #include "VayoSingleton.h"
 NS_VAYO_BEGIN
 
-struct tagPluginConfig
+struct Config
 {
-	wstring PluginName;
-};
+	wstring csvtables;
+	vector<wstring> plugins;
+	vector<wstring> languages;
 
-struct tagLanguageConfig
-{
-	wstring FilePath;
-};
+	struct
+	{
+		wstring layersetPath;
+		wstring surfacesPath;
+		wstring featuresPath;
+	} _2d;
 
-struct tagSceneConfig
-{
-	wstring ScenePath;
-	wstring ModelsPath;
-	wstring MaterialsPath;
-	wstring TexturesPath;
-	wstring ShadersPath;
-	unordered_map<int, wstring> MapPaths;
-};
+	struct Font
+	{
+		int     size;
+		bool    bold;
+		bool    italic;
+		wstring filePath;
+	};
 
-struct tagUIConfig
-{
-	wstring ImgsetPath;
-	wstring DlgXmlPath;
-	wstring MapImgPath;
-	wstring SkinFilePath;
-	wstring SeqAnimPath;
-	wstring TableCSVPath;
-	unordered_map<int, wstring> ImgsetAll;
-};
-
-struct tagFontConfig
-{
-	int     FontSize;
-	bool    FontBold;
-	bool    FontItalic;
-	wstring FontFilePath;
+	struct
+	{
+		wstring scenePath;
+		wstring modelsPath;
+		wstring shadersPath;
+		wstring texturesPath;
+		wstring materialsPath;
+		wstring imgsetPath;
+		wstring dlgXmlPath;
+		wstring mapImgPath;
+		wstring seqAnimPath;
+		wstring skinFilePath;
+		vector<Font> fontset;
+		unordered_map<int, wstring> imgsets;
+		unordered_map<int, wstring> mapPaths;
+	} _3d;
 };
 
 class _VayoExport ConfigManager : public Singleton<ConfigManager>
 {
 	DISALLOW_COPY_AND_ASSIGN(ConfigManager)
 public:
-	ConfigManager() {}
-	bool                             init(wstring rootDirectory);
-	const tagUIConfig&               getUIConfig() const;
-	const tagSceneConfig&            getSceneConfig() const;
-	const vector<tagFontConfig>&     getFontConfig() const;
-	const vector<tagPluginConfig>&   getPluginConfig() const;
-	const vector<tagLanguageConfig>& getLanguageConfig() const;
-	const wstring&                   getRootResourcePath() const;
+	enum EDimension { _2D, _3D };
+public:
+	ConfigManager();
+	bool init(wstring rootDirectory, EDimension dimension = _3D);
+	const Config& getConfig() const;
+	const wstring& getRootResourcePath() const;
 
 private:
-	tagUIConfig               _uiConfig;
-	tagSceneConfig            _sceneConfig;
-	vector<tagFontConfig>     _fontConfig;
-	vector<tagPluginConfig>   _pluginConfig;
-	vector<tagLanguageConfig> _languageConfig;
-	wstring                   _rootResourcePath;
+	Config  _configData;
+	wstring _rootResourcePath;
 };
 
 NS_VAYO_END

@@ -124,27 +124,30 @@ static inline wstring& trim(wstring& str)
 _VayoExport unsigned long printLastError(wstring hint = L"");
 
 /* 宽字符与多字节字符串之间的转换 */
-_VayoExport string   w2a_(const wstring& wideStr);
-_VayoExport wstring  a2w_(const string& ansiStr);
-_VayoExport string   unicodeToUtf8(const wstring& wstr);
-_VayoExport wstring  utf8ToUnicode(const string& str);
-_VayoExport string   ansiToUtf8(const string& str);
-_VayoExport string   utf8ToAnsi(const string& str);
+_VayoExport string  w2a_(const wstring& wideStr);
+_VayoExport wstring a2w_(const string& ansiStr);
+_VayoExport string  unicodeToUtf8(const wstring& wstr);
+_VayoExport wstring utf8ToUnicode(const string& str);
+_VayoExport string  ansiToUtf8(const string& str);
+_VayoExport string  utf8ToAnsi(const string& str);
 
 /* 字符串转换为小写 */
-_VayoExport string   strToLower(string str);
-_VayoExport wstring  strToLower(wstring str);
+_VayoExport string  strToLower(string str);
+_VayoExport wstring strToLower(wstring str);
 
 /* 字符串比较 */
-_VayoExport bool     compareNoCase(string strA, const string strB);
-_VayoExport bool     compareNoCase(wstring strA, const wstring strB);
+_VayoExport bool    compareNoCase(string strA, const string strB);
+_VayoExport bool    compareNoCase(wstring strA, const wstring strB);
 
 /* 加密解密 */
-_VayoExport string   encrypt(string str, unsigned short key);
-_VayoExport string   decrypt(string str, unsigned short key);
+_VayoExport string  encrypt(string str, unsigned short key);
+_VayoExport string  decrypt(string str, unsigned short key);
 
 /* 得到工作目录 */
-_VayoExport wstring  getWorkingDirectory();
+_VayoExport wstring getWorkingDirectory();
+
+/* 得到可执行文件目录 */
+_VayoExport wstring getExeFileDirectory();
 
 /* 在指定文件夹下寻找所有指定格式的文件路径名 */
 _VayoExport bool findFileDir(vector<wstring>& arrFilePath, const wstring& strCurPath, const wstring& fileFormat);

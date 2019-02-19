@@ -13,6 +13,20 @@
 #include "math/VayoRectangle.h"
 NS_VAYO_BEGIN
 
+enum EDeviceID
+{
+	EDID_AUX_DEVICE0 = 0,
+	EDID_AUX_DEVICE1,
+	EDID_AUX_DEVICE2,
+	EDID_AUX_DEVICE3,
+	EDID_AUX_DEVICE4,
+	EDID_AUX_DEVICE5,
+	EDID_AUX_DEVICE6,
+	EDID_AUX_DEVICE7,
+	EDID_MAIN_DEVICE,
+	EDID_DEVICE_COUNT
+};
+
 class _VayoExport Device
 {
 public:
@@ -39,7 +53,7 @@ public:
 	} Attrib;
 
 public:
-	Device(int deviceID, const Attrib& attrib);
+	Device(EDeviceID deviceID, const Attrib& attrib);
 	virtual ~Device();
 	virtual bool  init() = 0;
 	virtual void* getWndHandle() const = 0;
@@ -72,13 +86,13 @@ public:
 	virtual void  injectInputLanguageChange();
 
 protected:
-	PROPERTY_R(int,      _deviceID,    DeviceID)
-	PROPERTY_R(bool,     _appPaused,   AppPaused)
-	PROPERTY_R(bool,     _minimized,   Minimized)
-	PROPERTY_R(bool,     _maximized,   Maximized)
-	PROPERTY_R(bool,     _resizing,    Resizing)
-	PROPERTY_R(BitState, _mouseIsDown, MouseIsDown)
-	PROPERTY_R_REF(Attrib, _attribute, Attrib)
+	PROPERTY_R(EDeviceID,  _deviceID,    DeviceID)
+	PROPERTY_R(bool,       _appPaused,   AppPaused)
+	PROPERTY_R(bool,       _minimized,   Minimized)
+	PROPERTY_R(bool,       _maximized,   Maximized)
+	PROPERTY_R(bool,       _resizing,    Resizing)
+	PROPERTY_R(BitState,   _mouseIsDown, MouseIsDown)
+	PROPERTY_R_REF(Attrib, _attribute,   Attrib)
 };
 
 NS_VAYO_END

@@ -51,8 +51,8 @@ SubMesh* SubEntity::getSubMesh() const
 
 //////////////////////////////////////////////////////////////////////////
 Reflex<Entity, const wstring&, SceneManager*> Entity::_dynReflex;
-Entity::Entity(const wstring& name, SceneManager* originSceneMgr)
-	: MovableObject(name, originSceneMgr)
+Entity::Entity(const wstring& name, SceneManager* oriSceneMgr)
+	: MovableObject(name, oriSceneMgr)
 	, _changedMeshID(0)
 {
 }

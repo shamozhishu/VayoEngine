@@ -29,7 +29,7 @@ bool MaterialManager::init()
 	MaterialPtr defaultMaterialPtr(new Material());
 	_defaultMaterial = defaultMaterialPtr;
 	vector<wstring> allFilePath;
-	findFileDir(allFilePath, ConfigManager::getSingleton().getSceneConfig().MaterialsPath, L"material");
+	findFileDir(allFilePath, ConfigManager::getSingleton().getConfig()._3d.materialsPath, L"material");
 	unsigned len = allFilePath.size();
 
 	for (unsigned i = 0; i < len; i++)
@@ -54,7 +54,7 @@ bool MaterialManager::parseMaterial(const wstring& filename, bool fullPath /*= f
 	if (fullPath)
 		filePath = fileName;
 	else
-		filePath = ConfigManager::getSingleton().getSceneConfig().MaterialsPath + fileName;
+		filePath = ConfigManager::getSingleton().getConfig()._3d.materialsPath + fileName;
 
 	std::ifstream fin(filePath);
 	if (!fin)
@@ -84,8 +84,8 @@ bool MaterialManager::parseMaterial(stringstream& filestream)
 	vector<string> container;
 	int            curSelTexLayer = -1;
 	int            singleMaterialParseEndMark = 0;
-	wstring        texturePath = ConfigManager::getSingleton().getSceneConfig().TexturesPath;
-	wstring        shadersPath = ConfigManager::getSingleton().getSceneConfig().ShadersPath;
+	wstring        texturePath = ConfigManager::getSingleton().getConfig()._3d.texturesPath;
+	wstring        shadersPath = ConfigManager::getSingleton().getConfig()._3d.shadersPath;
 
 	do
 	{

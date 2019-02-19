@@ -317,7 +317,7 @@ LRESULT Win32Device::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 }
 
 //////////////////////////////////////////////////////////////////////////
-Win32Device::Win32Device(int deviceID, const Attrib& attrib)
+Win32Device::Win32Device(EDeviceID deviceID, const Attrib& attrib)
 	: Device(deviceID, attrib)
 	, _wndHandle(NULL)
 	, _externalWindow(false)

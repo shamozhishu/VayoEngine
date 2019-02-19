@@ -117,7 +117,7 @@ bool DatabaseCSV::init()
 	if (_canInit)
 	{
 		destroy();
-		wstring csvTablePath = ConfigManager::getSingleton().getUIConfig().TableCSVPath;
+		wstring csvTablePath = ConfigManager::getSingleton().getConfig().csvtables;
 		vector<wstring> allFilePath;
 		findFileDir(allFilePath, csvTablePath, L"csv");
 
@@ -137,7 +137,7 @@ bool DatabaseCSV::init()
 
 bool DatabaseCSV::loadTable(const wstring& fileName, wstring& tableDataBuff)
 {
-	wstring csvTablePath = ConfigManager::getSingleton().getUIConfig().TableCSVPath;
+	wstring csvTablePath = ConfigManager::getSingleton().getConfig().csvtables;
 	wstring fileFullName = csvTablePath + fileName;
 	fileFullName = wstrReplaceAll(fileFullName, L"/", L"\\");
 	if (fileName.rfind(L".csv") == wstring::npos)

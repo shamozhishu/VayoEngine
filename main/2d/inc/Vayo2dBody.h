@@ -1,7 +1,7 @@
 /*************************************************************************\
 * 望友引擎1.0
 * Copyright (c) 2018-2019 authored by 朱加浩
-* 物体基类
+* 对象基类
 \*************************************************************************/
 #ifndef __VAYO2D_BODY_H__
 #define __VAYO2D_BODY_H__
@@ -9,11 +9,11 @@
 #include "Vayo2dSupport.h"
 #include "VayoBitState.h"
 #include "VayoUserDataBind.h"
-#include "math\VayoRectangle.h"
+#include "math/VayoRectangle.h"
 #include "VayoAttribSerializer.h"
 NS_VAYO2D_BEGIN
 
-class Body : public AttribSerializer
+class _Vayo2dExport Body : public AttribSerializer
 {
 	friend class Layer;
 public:
@@ -35,7 +35,7 @@ public:
 
 protected:
 	DISALLOW_COPY_AND_ASSIGN(Body)
-	PROPERTY_RW(unsigned int, _zOrder, ZOrder)
+	PROPERTY_RW(unsigned int, _queueID, QueueID)
 	PROPERTY_R(LayerManager*, _oriLayerMgr, OriLayerMgr)
 protected:
 	wstring      _name;

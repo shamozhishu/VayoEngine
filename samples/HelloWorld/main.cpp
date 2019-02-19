@@ -12,7 +12,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	configData.MainDeviceAttrib.WndCaption = L"Ä£ÐÍ²âÊÔ";
 	configData.RendererName = L"RenderSystem_GL";
 	configData.MainDeviceAttrib.BgClearColor = 0xff0f0f0f;
-	ModelViewer viewer(&configData);
+	ModelViewer viewer;
+	viewer.init<Root>(&configData);
 	viewer.run();
 	return 0;
 }

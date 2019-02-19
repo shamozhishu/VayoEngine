@@ -11,8 +11,7 @@
 // 引擎入口
 #include "Vayo3dRoot.h"
 // 图形用户界面
-#include "Vayo3dBaseGUI.h"
-#include "Vayo3dCoreGUI.h"
+#include "Vayo3dGUI.h"
 // 窗口设备
 #include "VayoDevice.h"
 // 渲染系统
@@ -52,7 +51,5 @@
 #include "Vayo3dMaterialManager.h"
 #include "Vayo3dTessGridBuilder.h"
 #include "Vayo3dTessGridHandler.h"
-// 应用程序基类
-#include "Vayo3dApp.h"
 
 #endif // __VAYO3D_H__

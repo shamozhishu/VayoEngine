@@ -3,10 +3,11 @@
 #include "Vayo3dSceneManager.h"
 #include "Vayo3dSceneNode.h"
 #include "Vayo3dCamera.h"
-#include "Vayo3dCoreGUI.h"
+#include "Vayo3dGUI.h"
 #include "Vayo3dTextureManager.h"
 #include "Vayo3dMaterialManager.h"
 #include "Vayo3dMeshManager.h"
+#include "VayoConfigManager.h"
 
 NS_VAYO3D_BEGIN
 
@@ -44,6 +45,8 @@ bool Root::launch(Core::Config* config)
 {
 	do
 	{
+		IF_FALSE_BREAK(config);
+		IF_FALSE_BREAK(ConfigManager::getSingleton().init(config->RootDirectory, ConfigManager::_3D));
 		IF_FALSE_BREAK(Core::launch(config));
 		Root::Config* rootConfig = dynamic_cast<Root::Config*>(config);
 		IF_FALSE_BREAK(rootConfig);
@@ -204,7 +207,7 @@ UIManager* Root::getUIManager(Device* dev /*= NULL*/) const
 	return _uiManager[dev->getDeviceID()];
 }
 
-bool Root::setPixelFormat(Device* dev /*= NULL*/)
+bool Root::configDevice(Device* dev /*= NULL*/)
 {
 	if (!dev)
 		dev = _activeDevice;
