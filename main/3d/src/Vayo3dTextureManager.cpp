@@ -39,12 +39,6 @@ TexturePtr TextureManager::getTexture(const wstring& filePath)
 	}
 
 	TexturePtr pTex = Root::getSingleton().getActiveRenderer()->createTexture(filePath, &image, true);
-	if (!pTex)
-	{
-		Log::wprint(ELL_ERROR, L"Could not create OpenGL texture: %s", filePath.c_str());
-		return NULL;
-	}
-
 	_texturePool.insert(make_pair(pTex->getName(), pTex));
 	return pTex;
 }

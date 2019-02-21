@@ -100,11 +100,8 @@ void Root::activate(Device* dev /*= NULL*/)
 		_activeRenderer->restoreContext();
 }
 
-bool Root::renderOneFrame(Device* renderWnd /*= NULL*/)
+bool Root::fireFrameRendering(Device* renderWnd /*= NULL*/)
 {
-	_timer.tick();
-	updateFrameStats();
-
 	if (!renderWnd)
 		renderWnd = _activeDevice;
 
@@ -121,6 +118,9 @@ bool Root::renderOneFrame(Device* renderWnd /*= NULL*/)
 		_curSceneMgr->getRootSceneNode()->visit(_timer.deltaTime());
 		_curSceneMgr->updateRenderQueue();
 	}
+
+	if (!Core::fireFrameRendering(renderWnd))
+		return false;
 
 	UIManager* uiMgr = getUIManager(renderWnd);
 	if (uiMgr)

@@ -98,11 +98,11 @@ void GraphicQueueGroup::update()
 {
 	_currentTransform.makeIdentity();
 
-	for (unsigned int queueID = 0; queueID < EZQ_COUNT; ++queueID)
+	for (unsigned int queueID = 0; queueID < EGQ_COUNT; ++queueID)
 	{
 		bool exeTransform = true;
 
-		if (queueID == EZQ_WIRE_BOUNDING_AREA)
+		if (queueID == EGQ_WIRE_BOUNDING_AREA)
 		{
 			_currentTransform.makeIdentity();
 			_renderer->setTransform(ETK_WORLD, _currentTransform);
@@ -115,14 +115,14 @@ void GraphicQueueGroup::update()
 
 void GraphicQueueGroup::clear(unsigned int queueID)
 {
-	if (queueID >= EZQ_COUNT)
+	if (queueID >= EGQ_COUNT)
 		return;
 	_groups[queueID].clear();
 }
 
 void GraphicQueueGroup::addGraphics(Graphics* pGraph)
 {
-	_groups[EZQ_MAIN_BODY].addGraphics(pGraph);
+	_groups[EGQ_MAIN_BODY].addGraphics(pGraph);
 }
 
 void GraphicQueueGroup::addGraphics(Graphics* pGraph, unsigned int queueID)
@@ -133,8 +133,8 @@ void GraphicQueueGroup::addGraphics(Graphics* pGraph, unsigned int queueID)
 
 GraphicQueue& GraphicQueueGroup::getQueue(unsigned int queueID)
 {
-	if (queueID >= EZQ_COUNT)
-		queueID = EZQ_MAIN_BODY;
+	if (queueID >= EGQ_COUNT)
+		queueID = EGQ_MAIN_BODY;
 	return _groups[queueID];
 }
 

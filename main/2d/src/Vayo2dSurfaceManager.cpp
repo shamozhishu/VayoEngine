@@ -31,12 +31,6 @@ SurfacePtr SurfaceManager::getSurface(const wstring& filePath)
 		return it->second;
 
 	SurfacePtr surface = Pivot::getSingleton().getActiveRenderer()->createSurface(filePath);
-	if (!surface)
-	{
-		Log::wprint(ELL_ERROR, L"Could not create Direct2D surface: %s", filePath.c_str());
-		return NULL;
-	}
-
 	_surfacePool.insert(make_pair(surface->getName(), surface));
 	return surface;
 }

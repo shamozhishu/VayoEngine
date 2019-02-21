@@ -200,6 +200,7 @@
     <ClInclude Include="inc\VayoDynLib.h" />
     <ClInclude Include="inc\VayoDynLibManager.h" />
     <ClInclude Include="inc\VayoFileIO.h" />
+    <ClInclude Include="inc\VayoFrameListener.h" />
     <ClInclude Include="inc\VayoInput.h" />
     <ClInclude Include="inc\VayoLanguage.h" />
     <ClInclude Include="inc\VayoLog.h" />

@@ -671,10 +671,10 @@ void MaterialManager::destroyMaterial(const wstring& name)
 		_materialPool.erase(it);
 }
 
-void MaterialManager::destroyMaterial(const MaterialPtr& ptr)
+void MaterialManager::destroyMaterial(MaterialPtr material)
 {
-	if (ptr)
-		destroyMaterial(ptr->_materialName);
+	if (material)
+		destroyMaterial(material->_materialName);
 }
 
 void MaterialManager::clearAllMaterials()

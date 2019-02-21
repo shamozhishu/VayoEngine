@@ -19,13 +19,13 @@ public:
 	Pivot();
 	~Pivot();
 	bool launch(Core::Config* config);
-	void resize(Device* dev = NULL);
-	void activate(Device* dev = NULL);
-	bool renderOneFrame(Device* renderWnd = NULL);
+	void resize(Device* dev = nullptr);
+	void activate(Device* dev = nullptr);
+	bool fireFrameRendering(Device* renderWnd = nullptr);
 	void bootFrame(Device* dev, const wstring& layermgrname = L"", const wstring& userEvtID = L"");
-	bool openUI(Device* dev = NULL);
-	void closeUI(Device* dev = NULL);
-	bool configDevice(Device* dev = NULL);
+	bool openUI(Device* dev = nullptr);
+	void closeUI(Device* dev = nullptr);
+	bool configDevice(Device* dev = nullptr);
 	void addRenderer(Renderer* newRenderer);
 
 	LayerManager* createLayerMgr(const wstring& layermgrName = L"");
@@ -40,8 +40,8 @@ private:
 	map<wstring, LayerManager*> _layerMgrPool;
 
 protected:
-	PROPERTY_R(LayerManager*, _curLayerMgr, CurLayerMgr)
-	PROPERTY_R(Renderer*, _activeRenderer, ActiveRenderer)
+	PROPERTY_R(LayerManager*,   _curLayerMgr,    CurLayerMgr)
+	PROPERTY_R(Renderer*,       _activeRenderer, ActiveRenderer)
 	PROPERTY_R(SurfaceManager*, _surfaceManager, SurfaceManager)
 	PROPERTY_R(FeatureManager*, _featureManager, FeatureManager)
 };

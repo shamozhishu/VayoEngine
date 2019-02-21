@@ -14,7 +14,7 @@ Body::Body(const wstring& name, LayerManager* oriLayerMgr)
 	: _name(name)
 	, _parentLayer(NULL)
 	, _visible(true)
-	, _queueID(EZQ_MAIN_BODY)
+	, _queueID(EGQ_MAIN_BODY)
 	, _collideMask(0)
 	, _oriLayerMgr(oriLayerMgr)
 {
@@ -90,7 +90,7 @@ void Body::serialize(XMLElement* outXml)
 	outXml->SetAttribute("name", unicodeToUtf8(_name).c_str());
 	if (!_visible)
 		outXml->SetAttribute("visible", _visible);
-	if (_queueID != EZQ_MAIN_BODY)
+	if (_queueID != EGQ_MAIN_BODY)
 		outXml->SetAttribute("queueid", _queueID);
 	if (!_collideMask.isEmptyState())
 		outXml->SetAttribute("collideMask", _collideMask());

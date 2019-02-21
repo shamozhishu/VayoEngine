@@ -10,15 +10,15 @@
 #include "math/VayoMatrix3x3.h"
 NS_VAYO2D_BEGIN
 
-enum EZOrderQueueID
+enum EGraphicQueueID
 {
-	EZQ_BACKGROUND = 0,
-	EZQ_MAP_EARLY = 5,
-	EZQ_MAIN_BODY = 50,
-	EZQ_MAP_LATE = 80,
-	EZQ_WIRE_BOUNDING_AREA = 90,
-	EZQ_OVERLAY = 95,
-	EZQ_COUNT = 100
+	EGQ_BACKGROUND = 0,
+	EGQ_MAP_EARLY = 5,
+	EGQ_MAIN_BODY = 50,
+	EGQ_MAP_LATE = 80,
+	EGQ_WIRE_BOUNDING_AREA = 90,
+	EGQ_OVERLAY = 95,
+	EGQ_COUNT = 100
 };
 
 class _Vayo2dExport GraphicQueue
@@ -66,7 +66,7 @@ private:
 	Renderer*     _renderer;
 	LayerManager* _relatedLayerMgr;
 	Matrix3x3     _currentTransform;
-	GraphicQueue   _groups[EZQ_COUNT];
+	GraphicQueue  _groups[EGQ_COUNT];
 };
 
 NS_VAYO2D_END

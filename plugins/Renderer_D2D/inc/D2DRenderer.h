@@ -29,6 +29,8 @@ public:
 	void drawRect(float x, float y, float w, float h);
 	void drawEllipse(const Vector2df& center, const Vector2df& radius);
 	void drawGeometry(Geometry* geometry);
+	void drawBitmap(const Position2df& pos);
+	void drawBitmap(const Rectf& dstRect, const Rectf& srcRect);
 	bool setRenderTarget(ERenderTarget rt);
 	const Matrix3x3& getTransform(ETransformKind kind) const;
 	void setTransform(ETransformKind kind, const Matrix3x3& mat);

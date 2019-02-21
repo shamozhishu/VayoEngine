@@ -38,7 +38,7 @@ void Layer::visit(float dt)
 		if (!_oriLayerMgr->isCulled(this))
 		{
 			if (_showBoundingArea)
-				_oriLayerMgr->registerForRendering(_wireBoundingArea, EZQ_WIRE_BOUNDING_AREA);
+				_oriLayerMgr->registerForRendering(_wireBoundingArea, EGQ_WIRE_BOUNDING_AREA);
 
 			Body* pBody;
 			map<wstring, Body*>::iterator it = _bodies.begin();

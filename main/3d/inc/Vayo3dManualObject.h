@@ -24,7 +24,7 @@ public:
 	void     update(float dt);
 	void     render();
 	void     setMaterial(const wstring& name);
-	void     setMaterial(const MaterialPtr& material);
+	void     setMaterial(MaterialPtr material);
 	void     getWorldTransform(Matrix4x4& mat) const;
 	void     begin(EPrimitiveType primType, const wstring& materialName = L"");
 	void     beginUpdate(unsigned int idx);

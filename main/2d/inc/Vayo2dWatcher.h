@@ -20,7 +20,6 @@ public:
 	virtual ~Watcher();
 	virtual void  refresh();
 	virtual void  update(float dt);
-	virtual void  setNeedRefresh(bool isRefresh);
 	virtual void  moveTo(const Vector2df& pos);
 	virtual void  moveBy(const Vector2df& pos);
 	virtual void  scaleTo(const Vector2df& scale);
@@ -41,7 +40,6 @@ protected:
 	Matrix3x3 _affector;
 	float     _rotation;
 	float     _zoomFactor;
-	bool      _needRefresh;
 	bool      _enableMoved;
 };
 

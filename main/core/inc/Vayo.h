@@ -39,6 +39,7 @@
 #include "VayoSingleton.h"
 #include "VayoReflection.h"
 #include "VayoUserDataBind.h"
+#include "VayoFrameListener.h"
 #include "VayoAttribSerializer.h"
 // ÊýÑ§¿â
 #include "math/VayoMath.h"

@@ -232,6 +232,36 @@ void D2DRenderer::drawGeometry(Geometry* geometry)
 	}
 }
 
+void D2DRenderer::drawBitmap(const Position2df& pos)
+{
+	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT && _bitmapRT[_activateRTID])
+	{
+		ID2D1Bitmap* pBitmap = nullptr;
+		_bitmapRT[_activateRTID]->GetBitmap(&pBitmap);
+		if (pBitmap)
+		{
+			D2D1_SIZE_F size = pBitmap->GetSize();
+			_activateRT->DrawBitmap(pBitmap, D2D1::RectF(pos._x, pos._y, size.width, size.height));
+		}
+	}
+}
+
+void D2DRenderer::drawBitmap(const Rectf& dstRect, const Rectf& srcRect)
+{
+	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT && _bitmapRT[_activateRTID])
+	{
+		ID2D1Bitmap* pBitmap = nullptr;
+		_bitmapRT[_activateRTID]->GetBitmap(&pBitmap);
+		if (pBitmap)
+			_activateRT->DrawBitmap(pBitmap,
+				D2D1::RectF(dstRect._upperLeftCorner._x, dstRect._upperLeftCorner._y,
+					dstRect._lowerRightCorner._x, dstRect._lowerRightCorner._y),
+				1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+				D2D1::RectF(srcRect._upperLeftCorner._x, srcRect._upperLeftCorner._y,
+					srcRect._lowerRightCorner._x, srcRect._lowerRightCorner._y));
+	}
+}
+
 bool D2DRenderer::setRenderTarget(ERenderTarget rt)
 {
 	Renderer::setRenderTarget(rt);
@@ -267,7 +297,7 @@ bool D2DRenderer::setRenderTarget(ERenderTarget rt)
 		if (pDev)
 		{
 			int devid = pDev->getDeviceID();
-			if (_bitmapRT)
+			if (_bitmapRT[devid])
 			{
 				_activateRT = _bitmapRT[devid];
 			}
@@ -327,6 +357,8 @@ void D2DRenderer::discardDeviceResources()
 	destroyAllGeometries();
 	for (int i = 0; i < EDID_DEVICE_COUNT; ++i)
 	{
+		_bitmapPaintbrushs[i] = nullptr;
+		_hwndPaintbrushs[i] = nullptr;
 		SAFE_RELEASE(_bitmapRT[i]);
 		SAFE_RELEASE(_hwndRT[i]);
 	}

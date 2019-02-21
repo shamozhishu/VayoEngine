@@ -34,15 +34,20 @@ public:
 	float        getMsOneFrame() const { return _msOneFrame; }
 	bool         isLaunched() const { return _isLaunched; }
 
-	virtual void resize(Device* dev = NULL) = 0;
-	virtual void activate(Device* dev = NULL) = 0;
-	virtual bool renderOneFrame(Device* renderWnd = NULL) = 0;
+	virtual void resize(Device* dev = nullptr) = 0;
+	virtual void activate(Device* dev = nullptr) = 0;
+	virtual bool renderOneFrame(Device* renderWnd = nullptr);
+	virtual bool fireFrameStarted();
+	virtual bool fireFrameRendering(Device* renderWnd = nullptr);
+	virtual bool fireFrameEnded();
+	virtual void addFrameListener(FrameListener* newListener);
+	virtual void removeFrameListener(FrameListener* oldListener);
 	virtual void bootFrame(Device* dev, const wstring& scenename = L"", const wstring& userEvtID = L"") = 0;
-	virtual bool openUI(Device* dev = NULL) = 0;
-	virtual void closeUI(Device* dev = NULL) = 0;
-	virtual bool configDevice(Device* dev = NULL) = 0;
+	virtual bool openUI(Device* dev = nullptr) = 0;
+	virtual void closeUI(Device* dev = nullptr) = 0;
+	virtual bool configDevice(Device* dev = nullptr) = 0;
 
-	virtual Device* createDevice(void* wndHandle = NULL, bool wndQuit = true, bool wndPaint = false,
+	virtual Device* createDevice(void* wndHandle = nullptr, bool wndQuit = true, bool wndPaint = false,
 		wstring wndCaption = L"Vayo Engine", bool turnOnUI = true, bool fullScreen = false,
 		unsigned bgClearColor = 0xff000000, Dimension2di screenSize = Dimension2di(1280, 720));
 	virtual Device* findDevice(unsigned int idx);
@@ -53,16 +58,20 @@ public:
 
 protected:
 	void updateFrameStats();
+	void syncAddedRemovedFrameListeners();
 	PROPERTY_R(Device*, _mainDevice,   MainDevice)
 	PROPERTY_R(Device*, _activeDevice, ActiveDevice)
 
 protected:
-	Timer            _timer;
-	int              _frameCnt;
-	float            _msOneFrame;
-	bool             _isLaunched;
-	static const int _maxSupportDevCnt = 8;
-	Device*          _multiDevices[_maxSupportDevCnt];
+	Timer               _timer;
+	int                 _frameCnt;
+	float               _msOneFrame;
+	bool                _isLaunched;
+	set<FrameListener*> _frameListeners;
+	set<FrameListener*> _addedFrameListeners;
+	set<FrameListener*> _removedFrameListeners;
+	static const int    _maxSupportDevCnt = 8;
+	Device*             _multiDevices[_maxSupportDevCnt];
 };
 
 NS_VAYO_END

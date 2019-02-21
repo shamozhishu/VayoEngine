@@ -146,6 +146,9 @@
     <ClInclude Include="inc\VayoApp.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\VayoFrameListener.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\VayoConfigManager.cpp">

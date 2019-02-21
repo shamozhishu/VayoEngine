@@ -15,27 +15,14 @@ Graphics::Graphics()
 	_feature = Pivot::getSingleton().getFeatureManager()->getDefaultFeature();
 }
 
-FeaturePtr& Graphics::getFeature()
+FeaturePtr Graphics::getFeature() const
 {
 	if (!_feature)
 		_feature = Pivot::getSingleton().getFeatureManager()->getDefaultFeature();
 	return _feature;
 }
 
-const FeaturePtr& Graphics::getFeature() const
-{
-	if (!_feature)
-		_feature = Pivot::getSingleton().getFeatureManager()->getDefaultFeature();
-	return _feature;
-}
-
-void Graphics::setFeature(const wstring& name)
-{
-	if (getFeature()->_featureName != name)
-		_feature = Pivot::getSingleton().getFeatureManager()->findFeature(name);
-}
-
-void Graphics::setFeature(const FeaturePtr& feature)
+void Graphics::setFeature(FeaturePtr feature)
 {
 	if (!feature)
 	{
@@ -45,6 +32,12 @@ void Graphics::setFeature(const FeaturePtr& feature)
 
 	if (getFeature().get() != feature.get())
 		_feature = feature;
+}
+
+void Graphics::setFeature(const wstring& name)
+{
+	if (getFeature()->_featureName != name)
+		_feature = Pivot::getSingleton().getFeatureManager()->findFeature(name);
 }
 
 NS_VAYO2D_END

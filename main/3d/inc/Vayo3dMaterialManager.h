@@ -139,7 +139,7 @@ public:
 	MaterialPtr createMaterial(const wstring& name = L"");
 	MaterialPtr findMaterial(const wstring& name);
 	void        destroyMaterial(const wstring& name);
-	void        destroyMaterial(const MaterialPtr& ptr);
+	void        destroyMaterial(MaterialPtr material);
 	void        clearAllMaterials();
 	MaterialPtr getDefaultMaterial() const;
 	void        registerCallback(unsigned int idx, ShaderConstantSetCallback callback);

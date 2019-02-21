@@ -1,0 +1,17 @@
+feature examples/test
+{
+	fill on
+	color 1 1 1 1
+	stroke_width 1.0
+	surface test0.png
+	stroke_style
+	{
+		start_cap flat
+		end_cap square
+		dash_cap round
+		line_join line_round
+		miter_limit 10.0
+		dash_style solid
+		dash_offset 0.0
+	}
+}

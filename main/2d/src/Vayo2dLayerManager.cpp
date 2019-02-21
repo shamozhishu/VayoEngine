@@ -47,7 +47,6 @@ void LayerManager::setActiveWatcher(Watcher* pActiveWatcher)
 	{
 		_activeWatcher->enableTouch(true);
 		_activeWatcher->enableKeypad(true);
-		_activeWatcher->setNeedRefresh(true);
 	}
 }
 
@@ -61,7 +60,7 @@ bool LayerManager::isCulled(Layer* layer) const
 	return result;
 }
 
-bool LayerManager::registerForRendering(Graphics* pGraph, unsigned int queueID /*= EZQ_MAIN_BODY*/)
+bool LayerManager::registerForRendering(Graphics* pGraph, unsigned int queueID /*= EGQ_MAIN_BODY*/)
 {
 	if (nullptr == pGraph)
 		return false;

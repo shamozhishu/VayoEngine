@@ -54,7 +54,7 @@ private:
 		Form(const Form& form) { *this = form; }
 		Form& operator=(const Form& form);
 	} _form;
-	Geometry* _geometry = nullptr;
+	Geometry* _geometry;
 };
 
 NS_VAYO2D_END

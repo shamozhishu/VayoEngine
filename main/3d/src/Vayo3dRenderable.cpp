@@ -15,14 +15,7 @@ Renderable::Renderable()
 	_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
 }
 
-MaterialPtr& Renderable::getMaterial()
-{
-	if (!_material)
-		_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
-	return _material;
-}
-
-const MaterialPtr& Renderable::getMaterial() const
+MaterialPtr Renderable::getMaterial() const
 {
 	if (!_material)
 		_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
@@ -35,7 +28,7 @@ void Renderable::setMaterial(const wstring& name)
 		_material = Root::getSingleton().getMaterialManager()->findMaterial(name);
 }
 
-void Renderable::setMaterial(const MaterialPtr& material)
+void Renderable::setMaterial(MaterialPtr material)
 {
 	if (!material)
 	{

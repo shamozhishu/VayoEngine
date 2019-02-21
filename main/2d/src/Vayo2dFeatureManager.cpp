@@ -42,9 +42,9 @@ bool FeatureManager::parseFeature(const wstring& filename, bool fullPath /*= fal
 {
 	wstring fileName = filename;
 	trim(fileName);
-	if (fileName == L"" || fileName.substr(fileName.rfind(L'.')) != L".feature")
+	if (fileName == L"" || fileName.substr(fileName.rfind(L'.')) != L".features")
 	{
-		Log::wprint(ELL_ERROR, L"特征脚本[%s]文件扩展名必须是[.feature]", fileName.c_str());
+		Log::wprint(ELL_ERROR, L"特征脚本[%s]文件扩展名必须是[.features]", fileName.c_str());
 		return false;
 	}
 
@@ -126,10 +126,10 @@ bool FeatureManager::parseFeature(stringstream& filestream)
 			stringtok(container, strTag, " ");
 			if (container.size() == 5)
 			{
-				int r = atof(container[1].c_str());
-				int g = atof(container[2].c_str());
-				int b = atof(container[3].c_str());
-				int a = atof(container[4].c_str());
+				float r = (float)atof(container[1].c_str());
+				float g = (float)atof(container[2].c_str());
+				float b = (float)atof(container[3].c_str());
+				float a = (float)atof(container[4].c_str());
 				featurePtr->_color = Color(r, g, b, a);
 				continue;
 			}
@@ -323,6 +323,12 @@ FeaturePtr FeatureManager::findFeature(const wstring& name)
 	return _defaultFeature;
 }
 
+void FeatureManager::destroyFeature(FeaturePtr feature)
+{
+	if (feature)
+		destroyFeature(feature->_featureName);
+}
+
 void FeatureManager::destroyFeature(const wstring& name)
 {
 	if (name == L"")
@@ -331,12 +337,6 @@ void FeatureManager::destroyFeature(const wstring& name)
 	map<wstring, FeaturePtr>::iterator it = _featurePool.find(name);
 	if (it != _featurePool.end())
 		_featurePool.erase(it);
-}
-
-void FeatureManager::destroyFeature(const FeaturePtr& ptr)
-{
-	if (ptr)
-		destroyFeature(ptr->_featureName);
 }
 
 void FeatureManager::clearAllFeatures()

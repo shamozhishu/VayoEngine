@@ -17,12 +17,11 @@ class _Vayo2dExport Graphics
 public:
 	Graphics();
 	virtual ~Graphics() {}
-	virtual void              render() = 0;
-	virtual FeaturePtr&       getFeature();
-	virtual const FeaturePtr& getFeature() const;
-	virtual void              setFeature(const wstring& name);
-	virtual void              setFeature(const FeaturePtr& feature);
-	virtual void              getWorldTransform(Matrix3x3& mat) const;
+	virtual void       render() = 0;
+	virtual FeaturePtr getFeature() const;
+	virtual void       setFeature(FeaturePtr feature);
+	virtual void       setFeature(const wstring& name);
+	virtual void       getWorldTransform(Matrix3x3& mat) const;
 
 protected:
 	mutable FeaturePtr _feature;

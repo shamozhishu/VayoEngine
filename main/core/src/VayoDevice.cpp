@@ -48,10 +48,10 @@ void Device::setBgClearColor(unsigned int bgClr)
 wstring Device::getDeviceCode() const
 {
 	wstringstream ss;
-	if (_deviceID == -1)
-		ss << L"[MAIN_DEVICE]";
+	if (_deviceID == EDID_MAIN_DEVICE)
+		ss << L"EDID_MAIN_DEVICE";
 	else
-		ss << L"[EXTRAS_DEVICE_" << _deviceID << L"]";
+		ss << L"EDID_AUX_DEVICE" << _deviceID;
 	return ss.str();
 }
 

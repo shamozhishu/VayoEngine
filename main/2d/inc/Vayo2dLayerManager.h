@@ -19,7 +19,7 @@ public:
 	void updateGraphicQueue();
 	void setActiveWatcher(Watcher* pActiveWatcher);
 	bool isCulled(Layer* layer) const;
-	bool registerForRendering(Graphics* pGraph, unsigned int queueID = EZQ_MAIN_BODY);
+	bool registerForRendering(Graphics* pGraph, unsigned int queueID = EGQ_MAIN_BODY);
 	void showAllWireBoundingAreas(bool bShow);
 
 	bool loadLayerset(const wstring& layersetFile);

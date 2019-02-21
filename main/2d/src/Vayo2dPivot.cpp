@@ -9,12 +9,12 @@
 
 NS_VAYO2D_BEGIN
 
-bool Pivot::openUI(Device* dev /*= NULL*/)
+bool Pivot::openUI(Device* dev /*= nullptr*/)
 {
 	return false;
 }
 
-void Pivot::closeUI(Device* dev /*= NULL*/)
+void Pivot::closeUI(Device* dev /*= nullptr*/)
 {
 }
 
@@ -58,21 +58,16 @@ bool Pivot::launch(Core::Config* config)
 	return false;
 }
 
-void Pivot::resize(Device* dev /*= NULL*/)
+void Pivot::resize(Device* dev /*= nullptr*/)
 {
-
 }
 
-void Pivot::activate(Device* dev /*= NULL*/)
+void Pivot::activate(Device* dev /*= nullptr*/)
 {
-
 }
 
-bool Pivot::renderOneFrame(Device* renderWnd /*= NULL*/)
+bool Pivot::fireFrameRendering(Device* renderWnd /*= nullptr*/)
 {
-	_timer.tick();
-	updateFrameStats();
-
 	if (!renderWnd)
 		renderWnd = _activeDevice;
 
@@ -88,6 +83,9 @@ bool Pivot::renderOneFrame(Device* renderWnd /*= NULL*/)
 		_curLayerMgr->getRootLayer()->visit(_timer.deltaTime());
 		_curLayerMgr->updateGraphicQueue();
 	}
+
+	if (!Core::fireFrameRendering(renderWnd))
+		return false;
 
 	return _activeRenderer->endDraw();
 }
@@ -128,7 +126,7 @@ void Pivot::bootFrame(Device* dev, const wstring& layermgrname /*= L""*/, const 
 	}
 }
 
-bool Pivot::configDevice(Device* dev /*= NULL*/)
+bool Pivot::configDevice(Device* dev /*= nullptr*/)
 {
 	return true;
 }

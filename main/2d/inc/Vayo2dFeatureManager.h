@@ -71,8 +71,8 @@ public:
 	bool       parseFeature(stringstream& filestream);
 	FeaturePtr createFeature(const wstring& name = L"");
 	FeaturePtr findFeature(const wstring& name);
+	void       destroyFeature(FeaturePtr feature);
 	void       destroyFeature(const wstring& name);
-	void       destroyFeature(const FeaturePtr& ptr);
 	void       clearAllFeatures();
 	FeaturePtr getDefaultFeature() const;
 

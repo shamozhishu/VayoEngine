@@ -57,7 +57,7 @@ void ManualObject::setMaterial(const wstring& name)
 	Renderable::setMaterial(name);
 }
 
-void ManualObject::setMaterial(const MaterialPtr& material)
+void ManualObject::setMaterial(MaterialPtr material)
 {
 	if (getMaterial().get() != material.get())
 		_needSubmit = true;

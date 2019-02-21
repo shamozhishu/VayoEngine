@@ -57,6 +57,7 @@ class Device;
 class Plugin;
 class DynLib;
 class DynLibManager;
+class FrameListener;
 class TouchDispatcher;
 class KeypadDispatcher;
 

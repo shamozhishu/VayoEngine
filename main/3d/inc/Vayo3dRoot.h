@@ -29,7 +29,7 @@ public:
 	bool          launch(Core::Config* config);
 	void          resize(Device* dev = NULL);
 	void          activate(Device* dev = NULL);
-	bool          renderOneFrame(Device* renderWnd = NULL);
+	bool          fireFrameRendering(Device* renderWnd = NULL);
 	void          bootFrame(Device* dev, const wstring& scenename = L"", const wstring& userEvtID = L"");
 	
 	bool          openUI(Device* dev = NULL);
