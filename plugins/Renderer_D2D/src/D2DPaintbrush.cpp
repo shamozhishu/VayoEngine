@@ -4,7 +4,7 @@
 D2DPaintbrush::D2DPaintbrush(ERenderTarget rt, unsigned int devid, D2DRenderer* renderer)
 	: _renderer(renderer)
 {
-	ID2D1RenderTarget* pRT = nullptr;
+	ComPtr<ID2D1RenderTarget> pRT;
 	switch (rt)
 	{
 	case ERT_WINDOW:
@@ -29,9 +29,6 @@ D2DPaintbrush::D2DPaintbrush(ERenderTarget rt, unsigned int devid, D2DRenderer* 
 
 D2DPaintbrush::~D2DPaintbrush()
 {
-	SAFE_RELEASE(_colorBrush);
-	SAFE_RELEASE(_textFormat);
-	SAFE_RELEASE(_strokeStyle);
 }
 
 void D2DPaintbrush::onSetFeature(Feature& feature, const Feature& lastFeature)
@@ -86,7 +83,7 @@ void D2DPaintbrush::onSetFeature(Feature& feature, const Feature& lastFeature)
 		case EDS_CUSTOM: dashStyle = D2D1_DASH_STYLE_CUSTOM; break;
 		}
 
-		SAFE_RELEASE(_strokeStyle);
+		_strokeStyle.Reset();
 		_renderer->getD2DFactory()->CreateStrokeStyle(D2D1::StrokeStyleProperties(
 			startCap, endCap, dashCap, lineJoin, feature._strokeStyle.miterLimit,
 			dashStyle, feature._strokeStyle.dashOffset), NULL, 0, &_strokeStyle);

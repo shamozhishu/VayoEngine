@@ -34,11 +34,11 @@ public:
 	template<typename T>
 	bool init(Core::Config* config)
 	{
-		T* ret = new T();
-		Core* pCore = dynamic_cast<Core*>(ret);
+		T* pSubclassObj = new T();
+		Core* pCore = dynamic_cast<Core*>(pSubclassObj);
 		if (nullptr == pCore)
 		{
-			SAFE_DELETE(ret);
+			SAFE_DELETE(pSubclassObj);
 			return false;
 		}
 
@@ -73,7 +73,7 @@ public:
 			return;
 
 		Device* pDevice = core.getActiveDevice();
-		core.getTimer().reset();
+		core.resetFrameStats();
 		bool idle;
 		while (pDevice->handleEvents(idle))
 		{

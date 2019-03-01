@@ -18,7 +18,7 @@ NS_VAYO3D_BEGIN
 /* 获取视图空间内的拾取射线方向(拾取射线的起点为(0,0,0)) */
 _Vayo3dExport Vector3df getRayInViewSpace(int xScreen, int yScreen);
 
-// 摄像机
+// 摄像机基类
 class _Vayo3dExport Camera : public MovableObject, public TouchDelegate, public KeypadDelegate
 {
 	friend class ViewMemento;

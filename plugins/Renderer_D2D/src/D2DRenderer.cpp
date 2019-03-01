@@ -13,16 +13,14 @@ D2DRenderer::D2DRenderer(const wstring& name)
 	, _dwriteFactory(nullptr)
 	, _activateRT(nullptr)
 {
-	memset(_hwndRT, 0, sizeof(_hwndRT));
-	memset(_bitmapRT, 0, sizeof(_bitmapRT));
 }
 
 D2DRenderer::~D2DRenderer()
 {
 	discardDeviceResources();
-	SAFE_RELEASE(_dwriteFactory);
-	SAFE_RELEASE(_wicFactory);
-	SAFE_RELEASE(_d2dFactory);
+	_dwriteFactory.Reset();
+	_wicFactory.Reset();
+	_d2dFactory.Reset();
 }
 
 SurfacePtr D2DRenderer::createSurface(const wstring& name)
@@ -50,8 +48,7 @@ PaintbrushPtr D2DRenderer::createPaintbrush(ERenderTarget rt, unsigned int devid
 
 bool D2DRenderer::init()
 {
-	HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory),
-		reinterpret_cast<void**>(&_d2dFactory));
+	HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory), &_d2dFactory);
 	if (FAILED(hr))
 	{
 		Log::wprint(ELL_ERROR, L"创建D2D工厂失败");
@@ -65,8 +62,7 @@ bool D2DRenderer::init()
 		return false;
 	}
 
-	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(_dwriteFactory),
-		reinterpret_cast<IUnknown **>(&_dwriteFactory));
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(_dwriteFactory), &_dwriteFactory);
 	if (FAILED(hr))
 	{
 		Log::wprint(ELL_ERROR, L"创建DirectWrite工厂失败");
@@ -101,6 +97,13 @@ bool D2DRenderer::endDraw()
 	return SUCCEEDED(hr);
 }
 
+void D2DRenderer::resize(unsigned int width, unsigned int height)
+{
+	ComPtr<ID2D1HwndRenderTarget> pHwndRT = getHwndRT(_activateRTID);
+	if (pHwndRT)
+		pHwndRT->Resize(D2D1::SizeU(width, height));
+}
+
 void D2DRenderer::drawPoint(const Vector2df& pt)
 {
 	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT)
@@ -118,7 +121,7 @@ void D2DRenderer::drawPoint(const Vector2df& pt)
 		{
 			setPaintbrushRenderState(pBrush);
 			_activateRT->DrawRectangle(D2D1::Rect(pt._x, pt._y, pt._x, pt._y),
-				pBrush->_colorBrush, _curFeature._strokeWidth, pBrush->_strokeStyle);
+				pBrush->_colorBrush.Get(), _curFeature._strokeWidth, pBrush->_strokeStyle.Get());
 		}
 	}
 }
@@ -140,7 +143,7 @@ void D2DRenderer::drawLine(const Vector2df& startPt, const Vector2df& endPt)
 		{
 			setPaintbrushRenderState(pBrush);
 			_activateRT->DrawLine(D2D1::Point2F(startPt._x, startPt._y), D2D1::Point2F(endPt._x, endPt._y),
-				pBrush->_colorBrush, _curFeature._strokeWidth, pBrush->_strokeStyle);
+				pBrush->_colorBrush.Get(), _curFeature._strokeWidth, pBrush->_strokeStyle.Get());
 		}
 	}
 }
@@ -163,11 +166,11 @@ void D2DRenderer::drawRect(const Rectf& rc)
 			setPaintbrushRenderState(pBrush);
 			if (_curFeature._fill)
 				_activateRT->FillRectangle(D2D1::Rect(rc._upperLeftCorner._x, rc._upperLeftCorner._y,
-					rc._lowerRightCorner._x, rc._lowerRightCorner._y), pBrush->_colorBrush);
+					rc._lowerRightCorner._x, rc._lowerRightCorner._y), pBrush->_colorBrush.Get());
 			else
 				_activateRT->DrawRectangle(D2D1::Rect(rc._upperLeftCorner._x, rc._upperLeftCorner._y,
 				rc._lowerRightCorner._x, rc._lowerRightCorner._y),
-				pBrush->_colorBrush, _curFeature._strokeWidth, pBrush->_strokeStyle);
+				pBrush->_colorBrush.Get(), _curFeature._strokeWidth, pBrush->_strokeStyle.Get());
 		}
 	}
 }
@@ -195,10 +198,10 @@ void D2DRenderer::drawEllipse(const Vector2df& center, const Vector2df& radius)
 			setPaintbrushRenderState(pBrush);
 			if (_curFeature._fill)
 				_activateRT->FillEllipse(D2D1::Ellipse(D2D1::Point2F(center._x, center._y), radius._x, radius._y),
-					pBrush->_colorBrush);
+					pBrush->_colorBrush.Get());
 			else
 				_activateRT->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(center._x, center._y), radius._x, radius._y),
-				pBrush->_colorBrush, _curFeature._strokeWidth, pBrush->_strokeStyle);
+				pBrush->_colorBrush.Get(), _curFeature._strokeWidth, pBrush->_strokeStyle.Get());
 		}
 	}
 }
@@ -224,10 +227,10 @@ void D2DRenderer::drawGeometry(Geometry* geometry)
 		{
 			setPaintbrushRenderState(pBrush);
 			if (_curFeature._fill)
-				_activateRT->FillGeometry(pD2DGeometry->getPathGeometry(), pBrush->_colorBrush);
+				_activateRT->FillGeometry(pD2DGeometry->getPathGeometry().Get(), pBrush->_colorBrush.Get());
 			else
-				_activateRT->DrawGeometry(pD2DGeometry->getPathGeometry(), pBrush->_colorBrush,
-					_curFeature._strokeWidth, pBrush->_strokeStyle);
+				_activateRT->DrawGeometry(pD2DGeometry->getPathGeometry().Get(), pBrush->_colorBrush.Get(),
+					_curFeature._strokeWidth, pBrush->_strokeStyle.Get());
 		}
 	}
 }
@@ -265,7 +268,7 @@ void D2DRenderer::drawBitmap(const Rectf& dstRect, const Rectf& srcRect)
 bool D2DRenderer::setRenderTarget(ERenderTarget rt)
 {
 	Renderer::setRenderTarget(rt);
-	_activateRT = nullptr;
+	_activateRT.Reset();
 	_activateRTID = EDID_MAIN_DEVICE;
 	Device* pDev = Pivot::getSingleton().getActiveDevice();
 
@@ -327,7 +330,7 @@ void D2DRenderer::setTransform(ETransformKind kind, const Matrix3x3& mat)
 	_matrizes[kind] = mat;
 	if (_activateRT)
 	{
-		Matrix3x3 matrix = _matrizes[ETK_WORLD] * _matrizes[ETK_VIEW];
+		Matrix3x3 matrix = _matrizes[ETK_PROJECTION] * _matrizes[ETK_WORLD] * _matrizes[ETK_VIEW];
 		const D2D1::Matrix3x2F transform(matrix[0], matrix[1], matrix[3], matrix[4], matrix[6], matrix[7]);
 		_activateRT->SetTransform(transform);
 	}
@@ -338,14 +341,14 @@ void D2DRenderer::setFeature(const Feature& feature)
 	_curFeature = feature;
 }
 
-ID2D1HwndRenderTarget* D2DRenderer::getHwndRT(int devid) const
+ComPtr<ID2D1HwndRenderTarget> D2DRenderer::getHwndRT(int devid) const
 {
 	if (devid < 0 || devid >= EDID_DEVICE_COUNT)
 		return nullptr;
 	return _hwndRT[devid];
 }
 
-ID2D1BitmapRenderTarget* D2DRenderer::getBitmapRT(int devid) const
+ComPtr<ID2D1BitmapRenderTarget> D2DRenderer::getBitmapRT(int devid) const
 {
 	if (devid < 0 || devid >= EDID_DEVICE_COUNT)
 		return nullptr;
@@ -359,8 +362,8 @@ void D2DRenderer::discardDeviceResources()
 	{
 		_bitmapPaintbrushs[i] = nullptr;
 		_hwndPaintbrushs[i] = nullptr;
-		SAFE_RELEASE(_bitmapRT[i]);
-		SAFE_RELEASE(_hwndRT[i]);
+		_bitmapRT[i].Reset();
+		_hwndRT[i].Reset();
 	}
 }
 

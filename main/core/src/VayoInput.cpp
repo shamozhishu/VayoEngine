@@ -14,7 +14,7 @@ TouchDelegate::TouchDelegate(const wstring& bindEvtID /*= L""*/)
 	, _touchEnabled(false)
 {
 	if (_bindTouchEvtID.empty())
-		_bindTouchEvtID = L"[MAIN_DEVICE]";
+		_bindTouchEvtID = L"EDID_MAIN_DEVICE";
 }
 
 TouchDelegate::~TouchDelegate()
@@ -39,7 +39,7 @@ KeypadDelegate::KeypadDelegate(const wstring& bindEvtID /*= L""*/)
 	, _keypadEnabled(false)
 {
 	if (_bindKeypadEvtID.empty())
-		_bindKeypadEvtID = L"[MAIN_DEVICE]";
+		_bindKeypadEvtID = L"EDID_MAIN_DEVICE";
 }
 
 KeypadDelegate::~KeypadDelegate()

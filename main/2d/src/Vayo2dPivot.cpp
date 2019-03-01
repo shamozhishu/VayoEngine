@@ -9,13 +9,10 @@
 
 NS_VAYO2D_BEGIN
 
-bool Pivot::openUI(Device* dev /*= nullptr*/)
+void Pivot::addRenderer(Renderer* newRenderer)
 {
-	return false;
-}
-
-void Pivot::closeUI(Device* dev /*= nullptr*/)
-{
+	if (newRenderer)
+		_renderers[newRenderer->getName()] = newRenderer;
 }
 
 Pivot::Pivot()
@@ -60,10 +57,28 @@ bool Pivot::launch(Core::Config* config)
 
 void Pivot::resize(Device* dev /*= nullptr*/)
 {
-}
+	if (!dev)
+		dev = _activeDevice;
+	if (!dev)
+		dev = _mainDevice;
 
-void Pivot::activate(Device* dev /*= nullptr*/)
-{
+	if (_activeRenderer)
+		_activeRenderer->resize(dev->getAttrib().ScreenSize._width, dev->getAttrib().ScreenSize._height);
+
+	if (_curLayerMgr)
+	{
+		Watcher* pActiveWatcher = _curLayerMgr->getActiveWatcher();
+		if (pActiveWatcher)
+		{
+			Position2df cecterPos = Position2df(dev->getScreenSize()._width / 2.0f, dev->getScreenSize()._height / 2.0f);
+			float aspect = pActiveWatcher->getWindow().getHeight() / pActiveWatcher->getWindow().getWidth();
+			float w = pActiveWatcher->getViewport().getWidth();
+			float h = w * aspect;
+			float halfW = w * 0.5f;
+			float halfH = h * 0.5f;
+			pActiveWatcher->setViewport(Rectf(cecterPos._x - halfW, cecterPos._y - halfH, cecterPos._x + halfW, cecterPos._y + halfH));
+		}
+	}
 }
 
 bool Pivot::fireFrameRendering(Device* renderWnd /*= nullptr*/)
@@ -124,17 +139,6 @@ void Pivot::bootFrame(Device* dev, const wstring& layermgrname /*= L""*/, const 
 		TouchDispatcher::getSingleton().dispatchTouchEvts(evtIds);
 		KeypadDispatcher::getSingleton().dispatchKeypadEvts(evtIds);
 	}
-}
-
-bool Pivot::configDevice(Device* dev /*= nullptr*/)
-{
-	return true;
-}
-
-void Pivot::addRenderer(Renderer* newRenderer)
-{
-	if (newRenderer)
-		_renderers[newRenderer->getName()] = newRenderer;
 }
 
 LayerManager* Pivot::createLayerMgr(const wstring& layermgrName /*= L""*/)

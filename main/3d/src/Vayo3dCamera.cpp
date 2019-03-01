@@ -32,11 +32,6 @@ Vector3df getRayInViewSpace(int xScreen, int yScreen)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void Camera::setNeedRefresh(bool isRefresh)
-{
-	_needRefresh = isRefresh;
-}
-
 Camera::Camera(const wstring& name, SceneManager* oriSceneMgr)
 	: MovableObject(name, oriSceneMgr)
 	, TouchDelegate(oriSceneMgr->getName())
@@ -95,6 +90,11 @@ void Camera::refresh()
 	recalculateViewArea();
 	Root::getSingleton().getActiveRenderer()->setTransform(ETS_VIEW, getView());
 	Root::getSingleton().getActiveRenderer()->setTransform(ETS_PROJECTION, getProj());
+}
+
+void Camera::setNeedRefresh(bool isRefresh)
+{
+	_needRefresh = isRefresh;
 }
 
 bool Camera::getWorldPos(Vector3df& outWorldPos) const

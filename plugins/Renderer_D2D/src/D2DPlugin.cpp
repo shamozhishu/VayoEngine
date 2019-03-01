@@ -15,21 +15,21 @@ const wstring& D2DPlugin::getName() const
 
 void D2DPlugin::install()
 {
+	CoInitialize(nullptr);
 	_renderer = new D2DRenderer(s_pluginName);
 	Pivot::getSingleton().addRenderer(_renderer);
 }
 
 void D2DPlugin::initialise()
 {
-	// nothing to do.
 }
 
 void D2DPlugin::shutdown()
 {
-	// nothing to do.
 }
 
 void D2DPlugin::uninstall()
 {
 	SAFE_DELETE(_renderer);
+	CoUninitialize();
 }

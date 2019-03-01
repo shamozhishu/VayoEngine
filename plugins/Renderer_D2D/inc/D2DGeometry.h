@@ -18,13 +18,13 @@ public:
 	void endFigure();
 	void addLine(const Vector2df& pt);
 	void addLines(const Vector2df* pt, unsigned int size);
-	ID2D1PathGeometry* getPathGeometry() const;
+	ComPtr<ID2D1PathGeometry> getPathGeometry() const;
 
 private:
 	D2DRenderer* _renderer;
 	vector<Vector2df> _path;
-	ID2D1GeometrySink* _geometrySink = nullptr;
-	ID2D1PathGeometry* _pathGeometry = nullptr;
+	ComPtr<ID2D1GeometrySink> _geometrySink;
+	ComPtr<ID2D1PathGeometry> _pathGeometry;
 };
 
 #endif // __D2D_GEOMETRY_H__

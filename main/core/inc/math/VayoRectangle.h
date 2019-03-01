@@ -59,7 +59,7 @@ namespace Vayo {
 			return _upperLeftCorner != other._upperLeftCorner || _lowerRightCorner != other._lowerRightCorner;
 		}
 
-		const Rectangle<T>& operator = (const Rectangle<T>& other)
+		const Rectangle<T>& operator=(const Rectangle<T>& other)
 		{
 			_upperLeftCorner = other._upperLeftCorner;
 			_lowerRightCorner = other._lowerRightCorner;

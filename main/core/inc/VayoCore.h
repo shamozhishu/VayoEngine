@@ -28,14 +28,15 @@ public:
 	static Core& getCore();
 
 	virtual bool launch(Config* config);
+	bool         isLaunched() const { return _isLaunched; }
 	Timer&       getTimer() { return _timer; }
 	const Timer& getTimer() const { return _timer; }
-	int          getFrameCnt() const { return _frameCnt; }
+	unsigned int getFrameCnt() const { return _frameCnt; }
 	float        getMsOneFrame() const { return _msOneFrame; }
-	bool         isLaunched() const { return _isLaunched; }
+	void         resetFrameStats();
 
-	virtual void resize(Device* dev = nullptr) = 0;
-	virtual void activate(Device* dev = nullptr) = 0;
+	virtual void resize(Device* dev = nullptr);
+	virtual void activate(Device* dev = nullptr);
 	virtual bool renderOneFrame(Device* renderWnd = nullptr);
 	virtual bool fireFrameStarted();
 	virtual bool fireFrameRendering(Device* renderWnd = nullptr);
@@ -43,9 +44,9 @@ public:
 	virtual void addFrameListener(FrameListener* newListener);
 	virtual void removeFrameListener(FrameListener* oldListener);
 	virtual void bootFrame(Device* dev, const wstring& scenename = L"", const wstring& userEvtID = L"") = 0;
-	virtual bool openUI(Device* dev = nullptr) = 0;
-	virtual void closeUI(Device* dev = nullptr) = 0;
-	virtual bool configDevice(Device* dev = nullptr) = 0;
+	virtual bool openUI(Device* dev = nullptr);
+	virtual void closeUI(Device* dev = nullptr);
+	virtual bool configDevice(Device* dev = nullptr);
 
 	virtual Device* createDevice(void* wndHandle = nullptr, bool wndQuit = true, bool wndPaint = false,
 		wstring wndCaption = L"Vayo Engine", bool turnOnUI = true, bool fullScreen = false,
@@ -64,9 +65,11 @@ protected:
 
 protected:
 	Timer               _timer;
-	int                 _frameCnt;
-	float               _msOneFrame;
 	bool                _isLaunched;
+	unsigned int        _frameCnt;
+	float               _msOneFrame;
+	float               _timeElapsed;
+	unsigned int        _curFrameCnt;
 	set<FrameListener*> _frameListeners;
 	set<FrameListener*> _addedFrameListeners;
 	set<FrameListener*> _removedFrameListeners;

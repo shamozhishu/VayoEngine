@@ -19,10 +19,10 @@ public:
 	void onUnsetFeature();
 
 private:
-	D2DRenderer*          _renderer;
-	ID2D1SolidColorBrush* _colorBrush;
-	IDWriteTextFormat*    _textFormat;
-	ID2D1StrokeStyle*     _strokeStyle;
+	D2DRenderer*                   _renderer;
+	ComPtr<ID2D1StrokeStyle>    _strokeStyle;
+	ComPtr<IDWriteTextFormat>    _textFormat;
+	ComPtr<ID2D1SolidColorBrush> _colorBrush;
 };
 
 #endif // __D2D_PAINTBRUSH_H__

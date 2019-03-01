@@ -13,8 +13,10 @@ Core::Core()
 	: _isLaunched(false)
 	, _mainDevice(nullptr)
 	, _activeDevice(nullptr)
-	, _frameCnt(0)
+	, _frameCnt(0u)
 	, _msOneFrame(0.0f)
+	, _timeElapsed(0.0f)
+	, _curFrameCnt(0u)
 {
 	s_core = this;
 	memset(_multiDevices, 0, sizeof(_multiDevices));
@@ -60,6 +62,23 @@ bool Core::launch(Config* config)
 	} while (0);
 	_isLaunched = false;
 	return false;
+}
+
+void Core::resetFrameStats()
+{
+	_timer.reset();
+	_frameCnt = 0u;
+	_msOneFrame = 0.0f;
+	_timeElapsed = 0.0f;
+	_curFrameCnt = 0u;
+}
+
+void Core::resize(Device* dev /*= nullptr*/)
+{
+}
+
+void Core::activate(Device* dev /*= nullptr*/)
+{
 }
 
 bool Core::renderOneFrame(Device* renderWnd /*= nullptr*/)
@@ -110,6 +129,20 @@ void Core::removeFrameListener(FrameListener* oldListener)
 {
 	_addedFrameListeners.erase(oldListener);
 	_removedFrameListeners.insert(oldListener);
+}
+
+bool Core::openUI(Device* dev /*= nullptr*/)
+{
+	return false;
+}
+
+void Core::closeUI(Device* dev /*= nullptr*/)
+{
+}
+
+bool Core::configDevice(Device* dev /*= nullptr*/)
+{
+	return true;
 }
 
 Device* Core::createDevice(void* wndHandle /*= nullptr*/, bool wndQuit /*= true*/,
@@ -210,15 +243,13 @@ int Core::getMaxSupportDevCnt()
 
 void Core::updateFrameStats()
 {
-	static float timeElapsed = 0.0f;
-	static int curFrameCnt = 0;
-	curFrameCnt++;
-	if ((_timer.totalTime() - timeElapsed) >= 1.0f)
+	++_curFrameCnt;
+	if ((_timer.totalTime() - _timeElapsed) >= 1.0f)
 	{
-		_msOneFrame = 1000.0f / (float)curFrameCnt;
-		_frameCnt = curFrameCnt;
-		curFrameCnt = 0;
-		timeElapsed += 1.0f;
+		_msOneFrame = 1000.0f / (float)_curFrameCnt;
+		_frameCnt = _curFrameCnt;
+		_curFrameCnt = 0;
+		_timeElapsed += 1.0f;
 	}
 }
 

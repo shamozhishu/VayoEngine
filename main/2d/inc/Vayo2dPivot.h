@@ -20,12 +20,8 @@ public:
 	~Pivot();
 	bool launch(Core::Config* config);
 	void resize(Device* dev = nullptr);
-	void activate(Device* dev = nullptr);
 	bool fireFrameRendering(Device* renderWnd = nullptr);
 	void bootFrame(Device* dev, const wstring& layermgrname = L"", const wstring& userEvtID = L"");
-	bool openUI(Device* dev = nullptr);
-	void closeUI(Device* dev = nullptr);
-	bool configDevice(Device* dev = nullptr);
 	void addRenderer(Renderer* newRenderer);
 
 	LayerManager* createLayerMgr(const wstring& layermgrName = L"");

@@ -18,6 +18,7 @@ enum ETransformKind
 {
 	ETK_VIEW = 0,
 	ETK_WORLD,
+	ETK_PROJECTION,
 	ETK_COUNT
 };
 
@@ -38,6 +39,7 @@ public:
 	virtual bool init() = 0;
 	virtual bool beginDraw(Device* drawWnd) = 0;
 	virtual bool endDraw() = 0;
+	virtual void resize(unsigned int width, unsigned int height) = 0;
 	virtual void drawPoint(const Vector2df& pt) = 0;
 	virtual void drawLine(const Vector2df& startPt, const Vector2df& endPt) = 0;
 	virtual void drawRect(const Rectf& rc) = 0;

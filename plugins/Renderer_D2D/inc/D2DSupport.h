@@ -13,6 +13,7 @@
 #include <dwrite.h>
 #include <wincodec.h>
 #include <dwmapi.h>
+#include <wrl.h>
 
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
@@ -25,15 +26,8 @@
 #pragma comment(lib, "windowscodecs.lib")
 #pragma comment(lib, "Winmm.lib")
 
-template<typename Interface>
-inline void SAFE_RELEASE(Interface* &pInterfaceToRelease)
-{
-	if (pInterfaceToRelease != nullptr)
-	{
-		pInterfaceToRelease->Release();
-		pInterfaceToRelease = nullptr;
-	}
-}
+template <class T>
+using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 using namespace Vayo::_2d;
 class D2DRenderer;

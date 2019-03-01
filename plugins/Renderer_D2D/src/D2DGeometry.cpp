@@ -19,8 +19,6 @@ D2DGeometry::D2DGeometry(const wstring& name, D2DRenderer* renderer)
 
 D2DGeometry::~D2DGeometry()
 {
-	SAFE_RELEASE(_geometrySink);
-	SAFE_RELEASE(_pathGeometry);
 }
 
 bool D2DGeometry::beginFigure()
@@ -52,7 +50,7 @@ void D2DGeometry::endFigure()
 	}
 
 	_geometrySink->Close();
-	SAFE_RELEASE(_geometrySink);
+	_geometrySink.Reset();
 }
 
 void D2DGeometry::addLine(const Vector2df& pt)
@@ -68,7 +66,7 @@ void D2DGeometry::addLines(const Vector2df* pt, unsigned int size)
 		_path.push_back(pt[i]);
 }
 
-ID2D1PathGeometry* D2DGeometry::getPathGeometry() const
+ComPtr<ID2D1PathGeometry> D2DGeometry::getPathGeometry() const
 {
 	return _pathGeometry;
 }
