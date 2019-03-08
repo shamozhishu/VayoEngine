@@ -171,7 +171,7 @@
     <ClInclude Include="inc\D2DPlugin.h" />
     <ClInclude Include="inc\D2DRenderer.h" />
     <ClInclude Include="inc\D2DSupport.h" />
-    <ClInclude Include="inc\D2DSurface.h" />
+    <ClInclude Include="inc\D2DBitmap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\D2DDll.cpp" />
@@ -179,7 +179,7 @@
     <ClCompile Include="src\D2DPaintbrush.cpp" />
     <ClCompile Include="src\D2DPlugin.cpp" />
     <ClCompile Include="src\D2DRenderer.cpp" />
-    <ClCompile Include="src\D2DSurface.cpp" />
+    <ClCompile Include="src\D2DBitmap.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

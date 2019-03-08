@@ -4,9 +4,10 @@
 
 NS_VAYO_BEGIN
 
-unsigned long printLastError(wstring hint /*= L""*/)
+void printLastError(wstring hint /*= L""*/, unsigned int errCode /*= -1*/)
 {
-	DWORD errCode = GetLastError();
+	if (errCode == -1)
+		errCode = GetLastError();
 	LPVOID lpMsgBuf = NULL;
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		NULL, errCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
@@ -20,7 +21,6 @@ unsigned long printLastError(wstring hint /*= L""*/)
 	hint += (LPCTSTR)lpMsgBuf;
 	LocalFree(lpMsgBuf);
 	MessageBox(0, hint.c_str(), 0, 0);
-	return errCode;
 }
 
 string w2a_(const wstring& wideStr)

@@ -29,13 +29,14 @@
     <ClInclude Include="inc\Vayo2dLayer.h" />
     <ClInclude Include="inc\Vayo2dLayerManager.h" />
     <ClInclude Include="inc\Vayo2dPaintbrush.h" />
+    <ClInclude Include="inc\Vayo2dPicture.h" />
     <ClInclude Include="inc\Vayo2dPivot.h" />
     <ClInclude Include="inc\Vayo2dRenderer.h" />
     <ClInclude Include="inc\Vayo2dSupport.h" />
     <ClInclude Include="inc\Vayo2dShape.h" />
     <ClInclude Include="inc\Vayo2dGraphics.h" />
     <ClInclude Include="inc\Vayo2dSurface.h" />
-    <ClInclude Include="inc\Vayo2dSurfaceManager.h" />
+    <ClInclude Include="inc\Vayo2dPictureManager.h" />
     <ClInclude Include="inc\Vayo2dWatcher.h" />
     <ClInclude Include="inc\Vayo2dGraphicQueue.h" />
   </ItemGroup>
@@ -49,7 +50,8 @@
     <ClCompile Include="src\Vayo2dRenderer.cpp" />
     <ClCompile Include="src\Vayo2dShape.cpp" />
     <ClCompile Include="src\Vayo2dGraphics.cpp" />
-    <ClCompile Include="src\Vayo2dSurfaceManager.cpp" />
+    <ClCompile Include="src\Vayo2dSurface.cpp" />
+    <ClCompile Include="src\Vayo2dPictureManager.cpp" />
     <ClCompile Include="src\Vayo2dWatcher.cpp" />
     <ClCompile Include="src\Vayo2dGraphicQueue.cpp" />
   </ItemGroup>

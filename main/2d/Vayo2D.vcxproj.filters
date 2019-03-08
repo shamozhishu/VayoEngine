@@ -50,9 +50,6 @@
     <ClInclude Include="inc\Vayo2dPaintbrush.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Vayo2dSurfaceManager.h">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="inc\Vayo2dGraphics.h">
       <Filter>inc</Filter>
     </ClInclude>
@@ -66,6 +63,12 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\Vayo2dGraphicQueue.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Vayo2dPicture.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Vayo2dPictureManager.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>
@@ -91,9 +94,6 @@
     <ClCompile Include="src\Vayo2dFeatureManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Vayo2dSurfaceManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Vayo2dGraphics.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -104,6 +104,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo2dGraphicQueue.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo2dSurface.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo2dPictureManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

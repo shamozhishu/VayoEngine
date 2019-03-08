@@ -3,7 +3,7 @@ feature examples/test
 	fill on
 	color 1 1 1 1
 	stroke_width 1.0
-	surface test0.png
+	picture test0.png
 	stroke_style
 	{
 		start_cap flat

@@ -7,18 +7,44 @@
 #define __VAYO2D_SURFACE_H__
 
 #include "Vayo2dSupport.h"
-#include "math/VayoDimension2d.h"
+#include "Vayo2dBody.h"
+#include "Vayo2dGraphics.h"
 NS_VAYO2D_BEGIN
 
-class Surface
+class Surface : public Body
 {
 public:
-	Surface(const wstring& name) : _name(name) {}
-	virtual ~Surface() {}
+	class Block
+	{
+		friend class Surface;
+		Block();
+		~Block();
+	};
 
-protected:
-	PROPERTY_R_REF(wstring, _name, Name)
-	PROPERTY_RW_REF(Dimension2df, _size, Size)
+	class Section : public Graphics
+	{
+		friend class Surface;
+	public:
+		void render();
+	private:
+		Section();
+		~Section();
+		wstring _name;
+	private:
+		PROPERTY_RW(Position2df, _pos, Pos)
+	};
+
+public:
+	Surface(const wstring& name, LayerManager* oriLayerMgr);
+	~Surface();
+	void update(float dt);
+	Section* getSection(const wstring& secName);
+	void eraseSection(const wstring& secName);
+	void eraseSection(Section* pSection);
+	void eraseSections();
+
+private:
+	map<wstring, Section*> _sections;
 };
 
 NS_VAYO2D_END

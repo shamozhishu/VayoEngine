@@ -3,20 +3,22 @@
 * Copyright (c) 2018-2019 authored by ÷Ïº”∫∆
 * Direct2DŒªÕº
 \*************************************************************************/
-#ifndef __D2D_SURFACE_H__
-#define __D2D_SURFACE_H__
+#ifndef __D2D_BITMAP_H__
+#define __D2D_BITMAP_H__
 
 #include "D2DSupport.h"
-#include "Vayo2dSurface.h"
+#include "Vayo2dPicture.h"
 
-class D2DSurface : public Surface
+class D2DBitmap : public Picture
 {
 public:
-	D2DSurface(const wstring& name, D2DRenderer* renderer);
-	~D2DSurface();
+	D2DBitmap(const wstring& name, D2DRenderer* renderer);
+	~D2DBitmap();
+	ComPtr<ID2D1Bitmap> getBitmap() const;
 
 private:
 	D2DRenderer* _renderer;
+	ComPtr<ID2D1Bitmap> _bitmap;
 };
 
-#endif // __D2D_SURFACE_H__
+#endif // __D2D_BITMAP_H__

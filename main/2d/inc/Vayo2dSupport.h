@@ -22,19 +22,20 @@ class Body;
 class Watcher;
 class Graphics;
 class Shape;
+class Surface;
 class Joint;
 class Layer;
 class LayerManager;
 class Pivot;
 class Renderer;
-class Surface;
-class SurfaceManager;
+class Picture;
+class PictureManager;
 class Feature;
 class FeatureManager;
 class Geometry;
 class Paintbrush;
 
-typedef SharedPtr<Surface> SurfacePtr;
+typedef SharedPtr<Picture> PicturePtr;
 typedef SharedPtr<Feature> FeaturePtr;
 typedef SharedPtr<Paintbrush> PaintbrushPtr;
 

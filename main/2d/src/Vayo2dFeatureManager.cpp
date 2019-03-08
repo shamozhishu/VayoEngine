@@ -1,5 +1,5 @@
 #include "Vayo2dFeatureManager.h"
-#include "Vayo2dSurfaceManager.h"
+#include "Vayo2dPictureManager.h"
 #include "VayoConfigManager.h"
 #include "Vayo2dPivot.h"
 #include "VayoUtils.h"
@@ -146,13 +146,13 @@ bool FeatureManager::parseFeature(stringstream& filestream)
 			}
 		}
 
-		if (0 == strTag.substr(0, 7).compare("surface"))
+		if (0 == strTag.substr(0, 7).compare("picture"))
 		{
 			container.clear();
 			stringtok(container, strTag, " ");
 			if (container.size() == 2)
 			{
-				featurePtr->_surface = Pivot::getSingleton().getSurfaceManager()->getSurface(surfacePath + utf8ToUnicode(container[1].c_str()));
+				featurePtr->_picture = Pivot::getSingleton().getPictureManager()->getPicture(surfacePath + utf8ToUnicode(container[1].c_str()));
 				continue;
 			}
 		}

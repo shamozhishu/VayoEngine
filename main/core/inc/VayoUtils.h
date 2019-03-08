@@ -121,7 +121,7 @@ static inline wstring& trim(wstring& str)
 }
 
 /* 打印系统错误 */
-_VayoExport unsigned long printLastError(wstring hint = L"");
+_VayoExport void printLastError(wstring hint = L"", unsigned int errCode = -1);
 
 /* 宽字符与多字节字符串之间的转换 */
 _VayoExport string  w2a_(const wstring& wideStr);

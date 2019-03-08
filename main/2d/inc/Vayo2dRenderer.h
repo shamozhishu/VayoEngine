@@ -28,7 +28,7 @@ public:
 	Renderer(const wstring& name);
 	virtual ~Renderer();
 
-	virtual SurfacePtr createSurface(const wstring& name) = 0;
+	virtual PicturePtr createPicture(const wstring& name) = 0;
 	virtual PaintbrushPtr createPaintbrush(ERenderTarget rt, unsigned int devid) = 0;
 
 	virtual Geometry* createGeometry(const wstring& name = L"") = 0;
@@ -46,16 +46,18 @@ public:
 	virtual void drawRect(float x, float y, float w, float h) = 0;
 	virtual void drawEllipse(const Vector2df& center, const Vector2df& radius) = 0;
 	virtual void drawGeometry(Geometry* geometry) = 0;
-	virtual void drawBitmap(const Position2df& pos) = 0;
-	virtual void drawBitmap(const Rectf& dstRect, const Rectf& srcRect) = 0;
-	virtual bool setRenderTarget(ERenderTarget rt);
+	virtual void drawBitmap(PicturePtr pic, const Position2df& pos) = 0;
+	virtual void drawBitmap(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect) = 0;
+	virtual bool setRenderTarget(ERenderTarget rt, const Dimension2di* pSize = nullptr);
 	virtual const Matrix3x3& getTransform(ETransformKind kind) const = 0;
 	virtual void setTransform(ETransformKind kind, const Matrix3x3& mat) = 0;
 	virtual void setFeature(const Feature& feature) = 0;
+	virtual bool isDeviceLost(unsigned int devid) const;
 	virtual Paintbrush* getPaintbrush(unsigned int devid);
 
 protected:
 	map<wstring, Geometry*> _geometries;
+	bool          _deviceLost[EDID_DEVICE_COUNT];
 	PaintbrushPtr _hwndPaintbrushs[EDID_DEVICE_COUNT];
 	PaintbrushPtr _bitmapPaintbrushs[EDID_DEVICE_COUNT];
 

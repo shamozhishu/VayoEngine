@@ -38,7 +38,7 @@ private:
 protected:
 	PROPERTY_R(LayerManager*,   _curLayerMgr,    CurLayerMgr)
 	PROPERTY_R(Renderer*,       _activeRenderer, ActiveRenderer)
-	PROPERTY_R(SurfaceManager*, _surfaceManager, SurfaceManager)
+	PROPERTY_R(PictureManager*, _pictureManager, PictureManager)
 	PROPERTY_R(FeatureManager*, _featureManager, FeatureManager)
 };
 

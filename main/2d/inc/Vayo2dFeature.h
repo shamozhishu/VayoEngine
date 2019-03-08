@@ -8,7 +8,7 @@
 
 #include "Vayo2dSupport.h"
 #include "Vayo2dColor.h"
-#include "Vayo2dSurface.h"
+#include "Vayo2dPicture.h"
 #include "VayoSharedPtr.h"
 NS_VAYO2D_BEGIN
 
@@ -75,7 +75,7 @@ public:
 public:
 	bool                  _fill;
 	Color                 _color;
-	SurfacePtr            _surface;
+	PicturePtr            _picture;
 	wstring               _featureName;
 	float                 _strokeWidth;
 	StrokeStyleProperties _strokeStyle;

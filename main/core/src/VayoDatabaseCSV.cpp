@@ -210,8 +210,11 @@ bool DatabaseCSV::loadTable(const wstring& fileName, wstring& tableDataBuff)
 		{
 			if (readCharOffset > 0)
 			{
+				if (readCharOffset < BUFFER_MAX_SIZE * 4)
+					buff[readCharOffset] = L'\0';
+				else
+					buff[BUFFER_MAX_SIZE * 4 - 1] = L'\0';
 				lineNum++;
-				buff[readCharOffset] = L'\0';
 				parseTextLine(pTable, buff, lineNum);
 				readCharOffset = 0;
 			}
@@ -276,7 +279,7 @@ void DatabaseCSV::lazyInit()
 
 void DatabaseCSV::parseTextLine(TableCSV* pTable, const wchar_t* pszLine, int lineNum)
 {
-	static wchar_t buff[BUFFER_MAX_SIZE];
+	static wchar_t buff[BUFFER_MAX_SIZE * 4];
 	if (lineNum < _startValidLine)
 		return;
 

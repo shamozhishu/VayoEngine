@@ -16,7 +16,7 @@ public:
 	D2DRenderer(const wstring& name);
 	~D2DRenderer();
 
-	SurfacePtr    createSurface(const wstring& name);
+	PicturePtr    createPicture(const wstring& name);
 	Geometry*     createGeometry(const wstring& name = L"");
 	PaintbrushPtr createPaintbrush(ERenderTarget rt, unsigned int devid);
 
@@ -30,9 +30,9 @@ public:
 	void drawRect(float x, float y, float w, float h);
 	void drawEllipse(const Vector2df& center, const Vector2df& radius);
 	void drawGeometry(Geometry* geometry);
-	void drawBitmap(const Position2df& pos);
-	void drawBitmap(const Rectf& dstRect, const Rectf& srcRect);
-	bool setRenderTarget(ERenderTarget rt);
+	void drawBitmap(PicturePtr pic, const Position2df& pos);
+	void drawBitmap(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect);
+	bool setRenderTarget(ERenderTarget rt, const Dimension2di* pSize = nullptr);
 	const Matrix3x3& getTransform(ETransformKind kind) const;
 	void setTransform(ETransformKind kind, const Matrix3x3& mat);
 	void setFeature(const Feature& feature);
@@ -40,7 +40,8 @@ public:
 	ComPtr<ID2D1BitmapRenderTarget> getBitmapRT(int devid) const;
 
 private:
-	void discardDeviceResources();
+	bool rebuildDeviceResources();
+	void discardDeviceResources(unsigned int rtid);
 	void setPaintbrushRenderState(D2DPaintbrush* pBrush);
 
 	Feature                         _curFeature;

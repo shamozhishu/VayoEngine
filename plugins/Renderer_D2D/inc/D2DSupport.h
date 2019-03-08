@@ -29,6 +29,7 @@
 template <class T>
 using ComPtr = Microsoft::WRL::ComPtr<T>;
 
+using namespace Vayo;
 using namespace Vayo::_2d;
 class D2DRenderer;
 class D2DPaintbrush;

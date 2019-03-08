@@ -4,7 +4,7 @@
 #include "Vayo2dRenderer.h"
 #include "VayoConfigManager.h"
 #include "Vayo2dLayerManager.h"
-#include "Vayo2dSurfaceManager.h"
+#include "Vayo2dPictureManager.h"
 #include "Vayo2dFeatureManager.h"
 
 NS_VAYO2D_BEGIN
@@ -19,7 +19,7 @@ Pivot::Pivot()
 	: _curLayerMgr(nullptr)
 	, _activeRenderer(nullptr)
 {
-	_surfaceManager = new SurfaceManager();
+	_pictureManager = new PictureManager();
 	_featureManager = new FeatureManager();
 }
 
@@ -27,7 +27,7 @@ Pivot::~Pivot()
 {
 	destroyAllLayerMgrs();
 	SAFE_DELETE(_featureManager);
-	SAFE_DELETE(_surfaceManager);
+	SAFE_DELETE(_pictureManager);
 	unloadPlugins();
 }
 
@@ -44,7 +44,7 @@ bool Pivot::launch(Core::Config* config)
 			_activeRenderer = it->second;
 		IF_FALSE_BREAK(_activeRenderer);
 		IF_FALSE_BREAK(_activeRenderer->init());
-		IF_FALSE_BREAK(_surfaceManager && _surfaceManager->init());
+		IF_FALSE_BREAK(_pictureManager && _pictureManager->init());
 		IF_FALSE_BREAK(_featureManager && _featureManager->init());
 		if (config->MainDeviceAttrib.TurnOnUI)
 			openUI(_mainDevice);

@@ -2,7 +2,7 @@
 
 NS_VAYO2D_BEGIN
 
-bool Renderer::setRenderTarget(ERenderTarget rt)
+bool Renderer::setRenderTarget(ERenderTarget rt, const Dimension2di* pSize /*= nullptr*/)
 {
 	_renderTarget = rt;
 	return true;
@@ -12,6 +12,8 @@ Renderer::Renderer(const wstring& name)
 	: _name(name)
 	, _renderTarget(ERT_WINDOW)
 {
+	for (unsigned int i = EDID_AUX_DEVICE0; i < EDID_DEVICE_COUNT; ++i)
+		_deviceLost[i] = false;
 }
 
 Renderer::~Renderer()
@@ -44,6 +46,13 @@ void Renderer::destroyAllGeometries()
 		SAFE_DELETE(it->second);
 	}
 	_geometries.clear();
+}
+
+bool Renderer::isDeviceLost(unsigned int devid) const
+{
+	if (devid >= EDID_DEVICE_COUNT)
+		return false;
+	return _deviceLost[devid];
 }
 
 Paintbrush* Renderer::getPaintbrush(unsigned int devid)
