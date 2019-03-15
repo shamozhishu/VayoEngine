@@ -8,8 +8,8 @@
 
 #include "Vayo2dSupport.h"
 #include "Vayo2dFeature.h"
-#include "math/VayoVector2d.h"
-#include "math/VayoMatrix3x3.h"
+#include "VayoVector2d.h"
+#include "VayoMatrix3x3.h"
 NS_VAYO2D_BEGIN
 
 class _Vayo2dExport Graphics

@@ -933,7 +933,7 @@ bool UIImageSet::init(const wstring& filepath)
 		pElem = pElem->NextSiblingElement();
 	}
 
-	_bindTexture = Root::getSingleton().getTextureManager()->getTexture(_imagePath);
+	_bindTexture = Root::getSingleton().getTextureManager()->getTexture(_imagePath, true);
 	if (!_bindTexture)
 	{
 		Log::wprint(ELL_ERROR, L"图集[%s]获取纹理[%s]失败", filepath.c_str(), _imagePath.c_str());

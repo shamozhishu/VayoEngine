@@ -10,7 +10,7 @@
 #include "Vayo3dMesh.h"
 #include "Vayo3dRenderable.h"
 #include "Vayo3dMovableObject.h"
-#include "math/VayoMatrix4x4.h"
+#include "VayoMatrix4x4.h"
 NS_VAYO3D_BEGIN
 
 class _Vayo3dExport SubEntity : public Renderable

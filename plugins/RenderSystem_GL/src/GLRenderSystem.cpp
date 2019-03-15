@@ -1686,11 +1686,11 @@ GLRenderSystem::HardwareBufferLinkItor GLRenderSystem::deleteHardwareBuffer(Hard
 	return RenderSystem::deleteHardwareBuffer(hwBuffer);
 }
 
-TexturePtr GLRenderSystem::createTexture(const wstring& name, Image* image, bool generateMipLevels)
+TexturePtr GLRenderSystem::createTexture(const wstring& filename, Image* image, bool generateMipLevels)
 {
 	if (GLVersion.major < 3)
 		generateMipLevels = false;
-	return new GLTexture(name, image, generateMipLevels, this);
+	return new GLTexture(filename, image, generateMipLevels, this);
 }
 
 DisplayList* GLRenderSystem::createDisplayList(const wstring& name /*= L""*/)

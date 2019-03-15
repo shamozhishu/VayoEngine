@@ -9,9 +9,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="inc\math">
-      <UniqueIdentifier>{bc12106a-4a89-4ad7-a911-720fbedf283d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\headers">
       <UniqueIdentifier>{68085d91-98ae-46e3-b3d3-fadadf1336f6}</UniqueIdentifier>
     </Filter>
@@ -92,42 +89,6 @@
     <ClInclude Include="inc\VayoSupport.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="inc\math\VayoAabbox3d.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoDimension2d.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoLine2d.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoLine3d.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoMath.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoMatrix4x4.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoPlane3d.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoQuaternion.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoRectangle.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoTriangle3d.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoVector2d.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\math\VayoVector3d.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
     <ClInclude Include="inc\VayoPluginSystem.h">
       <Filter>inc</Filter>
     </ClInclude>
@@ -140,13 +101,49 @@
     <ClInclude Include="src\VayoWin32Device.h">
       <Filter>src\headers</Filter>
     </ClInclude>
-    <ClInclude Include="inc\math\VayoMatrix3x3.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
     <ClInclude Include="inc\VayoApp.h">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\VayoFrameListener.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoAabbox3d.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoDimension2d.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoLine2d.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoLine3d.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoMath.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoMatrix3x3.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoMatrix4x4.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoPlane3d.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoQuaternion.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoRectangle.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoTriangle3d.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoVector2d.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VayoVector3d.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

@@ -31,7 +31,9 @@ using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 using namespace Vayo;
 using namespace Vayo::_2d;
+class D2DBitmap;
 class D2DRenderer;
 class D2DPaintbrush;
+class D2DPicProcessor;
 
 #endif // __D2D_SUPPORT_H__

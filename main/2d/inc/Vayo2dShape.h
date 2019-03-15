@@ -8,7 +8,7 @@
 
 #include "Vayo2dBody.h"
 #include "Vayo2dGraphics.h"
-#include "math/VayoLine2d.h"
+#include "VayoLine2d.h"
 NS_VAYO2D_BEGIN
 
 class _Vayo2dExport Shape : public Body, public Graphics

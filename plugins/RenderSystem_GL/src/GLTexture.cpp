@@ -2,6 +2,7 @@
 #include "VayoLog.h"
 #include "Vayo3dImage.h"
 #include "GLRenderSystem.h"
+#include "VayoConfigManager.h"
 
 void* GLTexture::lock(EColorFormat fmt, Recti rc)
 {
@@ -11,8 +12,8 @@ void* GLTexture::lock(EColorFormat fmt, Recti rc)
 	return _imageData->lock();
 }
 
-GLTexture::GLTexture(const wstring& name, Image* image, bool generateMipLevels, GLRenderSystem* renderSys)
-	: Texture(name)
+GLTexture::GLTexture(const wstring& filename, Image* image, bool generateMipLevels, GLRenderSystem* renderSys)
+	: Texture(filename)
 	, _imageData(NULL)
 	, _colorFormat(ECF_RGBA8888)
 	, _pixelFormat(GL_RGBA)
@@ -26,13 +27,10 @@ GLTexture::GLTexture(const wstring& name, Image* image, bool generateMipLevels, 
 	, _uploadArea(0, 0, 0, 0)
 	, _renderSystem(renderSys)
 {
-	static unsigned short idx = 0;
-	if (0 == _name.compare(L""))
+	if (0 == _filename.compare(L""))
 	{
-		std::wstringstream ss;
-		ss << L"OpenGL_Texture" << idx;
-		++idx;
-		_name = ss.str();
+		_filename = ConfigManager::getSingleton().getConfig()._3d.texturesPath;
+		_filename += L"default.png";
 	}
 
 	glGenTextures(1, &_textureName);

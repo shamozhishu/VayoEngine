@@ -1,5 +1,6 @@
 #include "D2DRenderer.h"
 #include "VayoLog.h"
+#include "Vayo2dPictureManager.h"
 #include "Vayo2dPivot.h"
 #include "D2DBitmap.h"
 #include "D2DPaintbrush.h"
@@ -7,6 +8,7 @@
 
 D2DRenderer::D2DRenderer(const wstring& name)
 	: Renderer(name)
+	, _picProcessor(this)
 	, _activateRTID(EDID_MAIN_DEVICE)
 	, _d2dFactory(nullptr)
 	, _wicFactory(nullptr)
@@ -25,9 +27,14 @@ D2DRenderer::~D2DRenderer()
 	_d2dFactory.Reset();
 }
 
-PicturePtr D2DRenderer::createPicture(const wstring& name)
+PicProcessor* D2DRenderer::getPicProcessor()
 {
-	return new D2DBitmap(name, this);
+	return &_picProcessor;
+}
+
+PicturePtr D2DRenderer::createPicture(const wstring& filename)
+{
+	return new D2DBitmap(filename, this);
 }
 
 Geometry* D2DRenderer::createGeometry(const wstring& name /*= L""*/)
@@ -43,7 +50,7 @@ Geometry* D2DRenderer::createGeometry(const wstring& name /*= L""*/)
 	return geom;
 }
 
-PaintbrushPtr D2DRenderer::createPaintbrush(ERenderTarget rt, unsigned int devid)
+PaintbrushPtr D2DRenderer::createPaintbrush(ERenderTarget rt, EDeviceID devid)
 {
 	return new D2DPaintbrush(rt, devid, this);
 }
@@ -71,15 +78,15 @@ bool D2DRenderer::init()
 		return false;
 	}
 
-	return setRenderTarget(ERT_WINDOW);
+	return setRenderTarget(ERT_WINDOW_DEFAULT);
 }
 
 bool D2DRenderer::beginDraw(Device* drawWnd)
 {
 	if (_deviceLost[_activateRTID] && drawWnd->getDeviceID() == _activateRTID)
 	{
-		if (rebuildDeviceResources())
-			_deviceLost[_activateRTID] = false;
+		if (!rebuildDeviceResources())
+			return false;
 	}
 
 	if (!_activateRT)
@@ -102,7 +109,6 @@ bool D2DRenderer::endDraw()
 	if (hr == D2DERR_RECREATE_TARGET)
 	{
 		hr = S_OK;
-		_deviceLost[_activateRTID] = true;
 		discardDeviceResources(_activateRTID);
 	}
 
@@ -118,15 +124,19 @@ void D2DRenderer::resize(unsigned int width, unsigned int height)
 
 void D2DRenderer::drawPoint(const Vector2df& pt)
 {
-	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT)
+	if (_activateRT)
 	{
 		D2DPaintbrush* pBrush = nullptr;
 		switch (_renderTarget)
 		{
-		case ERT_WINDOW:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get()); break;
+		case ERT_WINDOW_DEFAULT:
+		case ERT_WINDOW_SOFTWARE:
+		case ERT_WINDOW_HARDWARE:
+			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get());
+			break;
 		case ERT_MEMORY:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get()); break;
+			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get());
+			break;
 		}
 
 		if (pBrush)
@@ -140,15 +150,19 @@ void D2DRenderer::drawPoint(const Vector2df& pt)
 
 void D2DRenderer::drawLine(const Vector2df& startPt, const Vector2df& endPt)
 {
-	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT)
+	if (_activateRT)
 	{
 		D2DPaintbrush* pBrush = nullptr;
 		switch (_renderTarget)
 		{
-		case ERT_WINDOW:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get()); break;
+		case ERT_WINDOW_DEFAULT:
+		case ERT_WINDOW_SOFTWARE:
+		case ERT_WINDOW_HARDWARE:
+			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get());
+			break;
 		case ERT_MEMORY:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get()); break;
+			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get());
+			break;
 		}
 
 		if (pBrush)
@@ -162,15 +176,19 @@ void D2DRenderer::drawLine(const Vector2df& startPt, const Vector2df& endPt)
 
 void D2DRenderer::drawRect(const Rectf& rc)
 {
-	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT)
+	if (_activateRT)
 	{
 		D2DPaintbrush* pBrush = nullptr;
 		switch (_renderTarget)
 		{
-		case ERT_WINDOW:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get()); break;
+		case ERT_WINDOW_DEFAULT:
+		case ERT_WINDOW_SOFTWARE:
+		case ERT_WINDOW_HARDWARE:
+			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get());
+			break;
 		case ERT_MEMORY:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get()); break;
+			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get());
+			break;
 		}
 
 		if (pBrush)
@@ -194,15 +212,19 @@ void D2DRenderer::drawRect(float x, float y, float w, float h)
 
 void D2DRenderer::drawEllipse(const Vector2df& center, const Vector2df& radius)
 {
-	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT)
+	if (_activateRT)
 	{
 		D2DPaintbrush* pBrush = nullptr;
 		switch (_renderTarget)
 		{
-		case ERT_WINDOW:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get()); break;
+		case ERT_WINDOW_DEFAULT:
+		case ERT_WINDOW_SOFTWARE:
+		case ERT_WINDOW_HARDWARE:
+			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get());
+			break;
 		case ERT_MEMORY:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get()); break;
+			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get());
+			break;
 		}
 
 		if (pBrush)
@@ -224,15 +246,19 @@ void D2DRenderer::drawGeometry(Geometry* geometry)
 	if (nullptr == pD2DGeometry)
 		return;
 
-	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT)
+	if (_activateRT)
 	{
 		D2DPaintbrush* pBrush = nullptr;
 		switch (_renderTarget)
 		{
-		case ERT_WINDOW:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get()); break;
+		case ERT_WINDOW_DEFAULT:
+		case ERT_WINDOW_SOFTWARE:
+		case ERT_WINDOW_HARDWARE:
+			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get());
+			break;
 		case ERT_MEMORY:
-			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get()); break;
+			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get());
+			break;
 		}
 
 		if (pBrush)
@@ -249,12 +275,12 @@ void D2DRenderer::drawGeometry(Geometry* geometry)
 
 void D2DRenderer::drawBitmap(PicturePtr pic, const Position2df& pos)
 {
-	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT)
+	if (_activateRT)
 	{
 		D2DBitmap* pPic = nullptr;
 		ID2D1Bitmap* pBitmap = nullptr;
 		if (pic)
-			pBitmap = ((pPic = dynamic_cast<D2DBitmap*>(pic.get())) ? pPic->getBitmap().Get() : nullptr);
+			pBitmap = ((pPic = dynamic_cast<D2DBitmap*>(pic.get())) ? pPic->getBitmap(_activateRTID).Get() : nullptr);
 		else if (_bitmapRT[_activateRTID])
 			_bitmapRT[_activateRTID]->GetBitmap(&pBitmap);
 		
@@ -268,12 +294,12 @@ void D2DRenderer::drawBitmap(PicturePtr pic, const Position2df& pos)
 
 void D2DRenderer::drawBitmap(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect)
 {
-	if (_activateRT && _activateRTID < EDID_DEVICE_COUNT)
+	if (_activateRT)
 	{
 		D2DBitmap* pPic = nullptr;
 		ID2D1Bitmap* pBitmap = nullptr;
 		if (pic)
-			pBitmap = ((pPic = dynamic_cast<D2DBitmap*>(pic.get())) ? pPic->getBitmap().Get() : nullptr);
+			pBitmap = ((pPic = dynamic_cast<D2DBitmap*>(pic.get())) ? pPic->getBitmap(_activateRTID).Get() : nullptr);
 		else if (_bitmapRT[_activateRTID])
 			_bitmapRT[_activateRTID]->GetBitmap(&pBitmap);
 
@@ -289,71 +315,91 @@ void D2DRenderer::drawBitmap(PicturePtr pic, const Rectf& dstRect, const Rectf& 
 
 bool D2DRenderer::setRenderTarget(ERenderTarget rt, const Dimension2di* pSize /*= nullptr*/)
 {
-	Renderer::setRenderTarget(rt);
 	_activateRT.Reset();
 	_activateRTID = EDID_MAIN_DEVICE;
 	Device* pDev = Pivot::getSingleton().getActiveDevice();
+	if (!pDev)
+		return false;
+
+	EDeviceID devid = EDID_MAIN_DEVICE;
+	Paintbrush* pBrush = nullptr;
+	bool needRestBrush = false;
 	Dimension2di size;
+
 	switch (rt)
 	{
-	case ERT_WINDOW:
-		if (pDev)
-		{
-			EDeviceID devid = pDev->getDeviceID();
-			if (_hwndRT[devid])
-			{
-				_activateRT = _hwndRT[devid];
-			}
-			else
-			{
-				if (pSize)
-					size = *pSize;
-				else
-					size = pDev->getScreenSize();
-				_d2dFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
-					D2D1::HwndRenderTargetProperties((HWND)pDev->getWndHandle(), D2D1::SizeU(size._width, size._height), D2D1_PRESENT_OPTIONS_IMMEDIATELY),
-					&_hwndRT[devid]);
-				_activateRT = _hwndRT[devid];
-			}
-
-			_activateRTID = devid;
-			getPaintbrush(devid);
-		}
-		break;
 	case ERT_MEMORY:
-		if (pDev)
+		devid = pDev->getDeviceID();
+		if (_bitmapRT[devid] && _renderTarget == rt)
 		{
-			EDeviceID devid = pDev->getDeviceID();
-			if (_bitmapRT[devid])
-			{
-				_activateRT = _bitmapRT[devid];
-			}
-			else
-			{
-				if (!_hwndRT[devid])
-				{
-					size = pDev->getScreenSize();
-					_d2dFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
-						D2D1::HwndRenderTargetProperties((HWND)pDev->getWndHandle(), D2D1::SizeU(size._width, size._height), D2D1_PRESENT_OPTIONS_IMMEDIATELY),
-						&_hwndRT[devid]);
-				}
-
-				if (!_hwndRT[devid])
-					return false;
-
-				if (pSize)
-					size = *pSize;
-				else
-					size = pDev->getScreenSize();
-				_hwndRT[devid]->CreateCompatibleRenderTarget(D2D1::SizeF(size._width, size._height), &_bitmapRT[devid]);
-				_activateRT = _bitmapRT[devid];
-			}
-
-			_activateRTID = devid;
-			getPaintbrush(devid);
+			_activateRT = _bitmapRT[devid];
+			needRestBrush = false;
 		}
+		else
+		{
+			if (!_hwndRT[devid])
+			{
+				size = pDev->getScreenSize();
+				_d2dFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
+					D2D1::HwndRenderTargetProperties((HWND)pDev->getWndHandle(),
+						D2D1::SizeU(size._width, size._height), D2D1_PRESENT_OPTIONS_IMMEDIATELY),
+					&_hwndRT[devid]);
+			}
+
+			if (!_hwndRT[devid])
+				return false;
+
+			if (pSize)
+				size = *pSize;
+			else
+				size = pDev->getScreenSize();
+			_hwndRT[devid]->CreateCompatibleRenderTarget(D2D1::SizeF(size._width, size._height), &_bitmapRT[devid]);
+			_activateRT = _bitmapRT[devid];
+			needRestBrush = true;
+		}
+		_renderTarget = rt;
+		_activateRTID = devid;
+		pBrush = getPaintbrush(devid);
+		if (pBrush && needRestBrush)
+			pBrush->resetBrush(rt);
+		break;
+	case ERT_WINDOW_DEFAULT:
+	case ERT_WINDOW_SOFTWARE:
+	case ERT_WINDOW_HARDWARE:
+		devid = pDev->getDeviceID();
+		if (_hwndRT[devid] && (_renderTarget == rt || _renderTarget == ERT_MEMORY))
+		{
+			_activateRT = _hwndRT[devid];
+			needRestBrush = false;
+		}
+		else
+		{
+			if (pSize)
+				size = *pSize;
+			else
+				size = pDev->getScreenSize();
+			D2D1_RENDER_TARGET_TYPE rtType = D2D1_RENDER_TARGET_TYPE_DEFAULT;
+			if (rt == ERT_WINDOW_SOFTWARE)
+				rtType = D2D1_RENDER_TARGET_TYPE_SOFTWARE;
+			else if (rt == ERT_WINDOW_HARDWARE)
+				rtType = D2D1_RENDER_TARGET_TYPE_HARDWARE;
+			_d2dFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(rtType),
+				D2D1::HwndRenderTargetProperties((HWND)pDev->getWndHandle(),
+					D2D1::SizeU(size._width, size._height), D2D1_PRESENT_OPTIONS_IMMEDIATELY),
+				&_hwndRT[devid]);
+			_activateRT = _hwndRT[devid];
+			needRestBrush = true;
+		}
+		_renderTarget = rt;
+		_activateRTID = devid;
+		pBrush = getPaintbrush(devid);
+		if (pBrush && needRestBrush)
+			pBrush->resetBrush(rt);
 		break;
 	}
+
+	if (needRestBrush && Pivot::getSingleton().getPictureManager())
+		Pivot::getSingleton().getPictureManager()->cleanAllPictures();
 
 	return _activateRT != nullptr;
 }
@@ -379,31 +425,50 @@ void D2DRenderer::setFeature(const Feature& feature)
 	_curFeature = feature;
 }
 
-ComPtr<ID2D1HwndRenderTarget> D2DRenderer::getHwndRT(int devid) const
+ComPtr<ID2D1HwndRenderTarget> D2DRenderer::getHwndRT(EDeviceID devid /*= EDID_CURRENT_DEV*/) const
 {
-	if (devid < 0 || devid >= EDID_DEVICE_COUNT)
-		return nullptr;
+	if (devid == EDID_CURRENT_DEV)
+	{
+		Device* dev = Core::getCore().getActiveDevice();
+		if (dev)
+			devid = dev->getDeviceID();
+		else
+			devid = EDID_MAIN_DEVICE;
+	}
 	return _hwndRT[devid];
 }
 
-ComPtr<ID2D1BitmapRenderTarget> D2DRenderer::getBitmapRT(int devid) const
+ComPtr<ID2D1BitmapRenderTarget> D2DRenderer::getBitmapRT(EDeviceID devid /*= EDID_CURRENT_DEV*/) const
 {
-	if (devid < 0 || devid >= EDID_DEVICE_COUNT)
-		return nullptr;
+	if (devid == EDID_CURRENT_DEV)
+	{
+		Device* dev = Core::getCore().getActiveDevice();
+		if (dev)
+			devid = dev->getDeviceID();
+		else
+			devid = EDID_MAIN_DEVICE;
+	}
 	return _bitmapRT[devid];
 }
 
 bool D2DRenderer::rebuildDeviceResources()
 {
-	return setRenderTarget(_renderTarget);
+	bool bRet = setRenderTarget(_renderTarget);
+	if (bRet)
+		_deviceLost[_activateRTID] = false;
+	return bRet;
+	
 }
 
 void D2DRenderer::discardDeviceResources(unsigned int rtid)
 {
+	_deviceLost[_activateRTID] = true;
 	if (rtid < EDID_DEVICE_COUNT)
 	{
-		_bitmapPaintbrushs[rtid] = nullptr;
-		_hwndPaintbrushs[rtid] = nullptr;
+		if (_bitmapPaintbrushs[rtid])
+			_bitmapPaintbrushs[rtid]->resetBrush(ERT_NONE);
+		if (_hwndPaintbrushs[rtid])
+			_hwndPaintbrushs[rtid]->resetBrush(ERT_NONE);
 		if (_activateRT == _hwndRT[rtid] || _activateRT == _bitmapRT[rtid])
 			_activateRT.Reset();
 		_bitmapRT[rtid].Reset();
@@ -414,10 +479,6 @@ void D2DRenderer::discardDeviceResources(unsigned int rtid)
 void D2DRenderer::setPaintbrushRenderState(D2DPaintbrush* pBrush)
 {
 	if (pBrush)
-	{
-		pBrush->onUnsetFeature();
-		pBrush->onSetFeature(_curFeature, _lastFeature);
-	}
-
+		pBrush->onPainting(_curFeature, _lastFeature);
 	_lastFeature = _curFeature;
 }

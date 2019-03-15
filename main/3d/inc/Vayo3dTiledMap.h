@@ -9,7 +9,7 @@
 #include "Vayo3dSupport.h"
 #include "Vayo3dTexture.h"
 #include "VayoSharedPtr.h"
-#include "math/VayoVector2d.h"
+#include "VayoVector2d.h"
 
 NS_VAYO3D_BEGIN
 

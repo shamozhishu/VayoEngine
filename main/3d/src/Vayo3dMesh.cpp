@@ -1,6 +1,6 @@
 #include "Vayo3dMesh.h"
 #include "VayoLog.h"
-#include "math/VayoTriangle3d.h"
+#include "VayoTriangle3d.h"
 
 NS_VAYO3D_BEGIN
 

@@ -7,8 +7,8 @@
 #define __VAYO3D_ARCBALL_H__
 
 #include "Vayo3dSupport.h"
-#include "math/VayoVector2d.h"
-#include "math/VayoMatrix4x4.h"
+#include "VayoVector2d.h"
+#include "VayoMatrix4x4.h"
 NS_VAYO3D_BEGIN
 
 class _Vayo3dExport Arcball

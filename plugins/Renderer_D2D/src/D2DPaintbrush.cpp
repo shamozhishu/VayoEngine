@@ -1,27 +1,15 @@
 #include "D2DPaintbrush.h"
 #include "D2DRenderer.h"
 
-D2DPaintbrush::D2DPaintbrush(ERenderTarget rt, unsigned int devid, D2DRenderer* renderer)
+D2DPaintbrush::D2DPaintbrush(ERenderTarget rt, EDeviceID devid, D2DRenderer* renderer)
 	: _renderer(renderer)
+	, _linkRTID(devid)
+	, _brushReset(false)
 {
-	ComPtr<ID2D1RenderTarget> pRT;
-	switch (rt)
-	{
-	case ERT_WINDOW:
-		pRT = _renderer->getHwndRT(devid);
-		break;
-	case ERT_MEMORY:
-		pRT = _renderer->getBitmapRT(devid);
-		break;
-	}
-
-	if (pRT)
-		pRT->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &_colorBrush);
-
+	resetBrush(rt);
 	_renderer->getDWriteFactory()->CreateTextFormat(L"Arial", NULL,
 		DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
 		24, L"en-us", &_textFormat);
-
 	_renderer->getD2DFactory()->CreateStrokeStyle(D2D1::StrokeStyleProperties(
 		D2D1_CAP_STYLE_FLAT, D2D1_CAP_STYLE_FLAT, D2D1_CAP_STYLE_FLAT, D2D1_LINE_JOIN_MITER,
 		10.0f, D2D1_DASH_STYLE_SOLID, 0.0f), NULL, 0, &_strokeStyle);
@@ -31,9 +19,30 @@ D2DPaintbrush::~D2DPaintbrush()
 {
 }
 
-void D2DPaintbrush::onSetFeature(Feature& feature, const Feature& lastFeature)
+void D2DPaintbrush::resetBrush(ERenderTarget rt)
 {
-	if (feature._color != lastFeature._color)
+	_brushReset = true;
+	ComPtr<ID2D1RenderTarget> pRT;
+	switch (rt)
+	{
+	case ERT_WINDOW_DEFAULT:
+	case ERT_WINDOW_SOFTWARE:
+	case ERT_WINDOW_HARDWARE:
+		pRT = _renderer->getHwndRT(_linkRTID);
+		break;
+	case ERT_MEMORY:
+		pRT = _renderer->getBitmapRT(_linkRTID);
+		break;
+	}
+	if (pRT)
+		pRT->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &_colorBrush);
+	else
+		_colorBrush.Reset();
+}
+
+void D2DPaintbrush::onPainting(Feature& feature, const Feature& lastFeature)
+{
+	if (_colorBrush && (feature._color != lastFeature._color || _brushReset))
 		_colorBrush->SetColor(D2D1::ColorF(feature._color._r, feature._color._g, feature._color._b, feature._color._a));
 
 	if (feature._strokeStyle != lastFeature._strokeStyle)
@@ -88,8 +97,4 @@ void D2DPaintbrush::onSetFeature(Feature& feature, const Feature& lastFeature)
 			startCap, endCap, dashCap, lineJoin, feature._strokeStyle.miterLimit,
 			dashStyle, feature._strokeStyle.dashOffset), NULL, 0, &_strokeStyle);
 	}
-}
-
-void D2DPaintbrush::onUnsetFeature()
-{
 }

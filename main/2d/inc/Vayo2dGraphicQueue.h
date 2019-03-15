@@ -7,7 +7,7 @@
 #define __VAYO2D_GRAPHIC_QUEUE_H__
 
 #include "Vayo2dSupport.h"
-#include "math/VayoMatrix3x3.h"
+#include "VayoMatrix3x3.h"
 NS_VAYO2D_BEGIN
 
 enum EGraphicQueueID

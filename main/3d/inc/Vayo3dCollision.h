@@ -8,9 +8,9 @@
 
 #include "Vayo3dSupport.h"
 #include "VayoBitState.h"
-#include "math/VayoVector2d.h"
-#include "math/VayoTriangle3d.h"
-#include "math/VayoMatrix4x4.h"
+#include "VayoVector2d.h"
+#include "VayoTriangle3d.h"
+#include "VayoMatrix4x4.h"
 NS_VAYO3D_BEGIN
 
 // 三角形容器抽象类,用于实现与三角形相关的碰撞检测,目前只支持图元类型为三角形的网格

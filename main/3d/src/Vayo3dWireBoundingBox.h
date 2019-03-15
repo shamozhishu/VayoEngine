@@ -8,7 +8,7 @@
 
 #include "Vayo3dRoot.h"
 #include "Vayo3dRenderable.h"
-#include "math/VayoAabbox3d.h"
+#include "VayoAabbox3d.h"
 #include "Vayo3dRenderSystem.h"
 #include "Vayo3dMaterialManager.h"
 NS_VAYO3D_BEGIN

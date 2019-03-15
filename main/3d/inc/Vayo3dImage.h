@@ -8,7 +8,7 @@
 
 #include "Vayo3dSupport.h"
 #include "Vayo3dColour.h"
-#include "math/VayoDimension2d.h"
+#include "VayoDimension2d.h"
 NS_VAYO3D_BEGIN
 
 class _Vayo3dExport Image

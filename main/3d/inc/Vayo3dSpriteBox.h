@@ -8,7 +8,7 @@
 
 #include "Vayo3dSupport.h"
 #include "Vayo3dTexture.h"
-#include "math/VayoRectangle.h"
+#include "VayoRectangle.h"
 NS_VAYO3D_BEGIN
 
 struct tagSpriteFrame

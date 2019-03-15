@@ -10,8 +10,8 @@
 #include "Vayo3dColour.h"
 #include "Vayo3dRenderable.h"
 #include "Vayo3dMovableObject.h"
-#include "math/VayoVector2d.h"
-#include "math/VayoVector3d.h"
+#include "VayoVector2d.h"
+#include "VayoVector3d.h"
 
 NS_VAYO3D_BEGIN
 

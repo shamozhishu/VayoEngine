@@ -7,11 +7,10 @@
 #define __VAYO2D_RENDERER_H__
 
 #include "Vayo2dSupport.h"
-#include "VayoDevice.h"
 #include "VayoSharedPtr.h"
 #include "Vayo2dPaintbrush.h"
-#include "math/VayoRectangle.h"
-#include "math/VayoMatrix3x3.h"
+#include "VayoRectangle.h"
+#include "VayoMatrix3x3.h"
 NS_VAYO2D_BEGIN
 
 enum ETransformKind
@@ -28,8 +27,9 @@ public:
 	Renderer(const wstring& name);
 	virtual ~Renderer();
 
-	virtual PicturePtr createPicture(const wstring& name) = 0;
-	virtual PaintbrushPtr createPaintbrush(ERenderTarget rt, unsigned int devid) = 0;
+	virtual PicProcessor* getPicProcessor() = 0;
+	virtual PicturePtr    createPicture(const wstring& filename) = 0;
+	virtual PaintbrushPtr createPaintbrush(ERenderTarget rt, EDeviceID devid) = 0;
 
 	virtual Geometry* createGeometry(const wstring& name = L"") = 0;
 	virtual Geometry* findGeometry(const wstring& name);
@@ -48,12 +48,12 @@ public:
 	virtual void drawGeometry(Geometry* geometry) = 0;
 	virtual void drawBitmap(PicturePtr pic, const Position2df& pos) = 0;
 	virtual void drawBitmap(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect) = 0;
-	virtual bool setRenderTarget(ERenderTarget rt, const Dimension2di* pSize = nullptr);
+	virtual bool setRenderTarget(ERenderTarget rt, const Dimension2di* pSize = nullptr) = 0;
 	virtual const Matrix3x3& getTransform(ETransformKind kind) const = 0;
 	virtual void setTransform(ETransformKind kind, const Matrix3x3& mat) = 0;
 	virtual void setFeature(const Feature& feature) = 0;
-	virtual bool isDeviceLost(unsigned int devid) const;
-	virtual Paintbrush* getPaintbrush(unsigned int devid);
+	virtual bool isDeviceLost(EDeviceID devid = EDID_CURRENT_DEV) const;
+	virtual Paintbrush* getPaintbrush(EDeviceID devid = EDID_CURRENT_DEV);
 
 protected:
 	map<wstring, Geometry*> _geometries;

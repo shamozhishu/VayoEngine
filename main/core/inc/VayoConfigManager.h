@@ -19,7 +19,7 @@ struct Config
 	struct
 	{
 		wstring layersetPath;
-		wstring surfacesPath;
+		wstring picturesPath;
 		wstring featuresPath;
 	} _2d;
 

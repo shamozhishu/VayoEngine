@@ -12,7 +12,7 @@
 class GLTexture : public Texture
 {
 public:
-	GLTexture(const wstring& name, Image* image, bool generateMipLevels, GLRenderSystem* renderSys);
+	GLTexture(const wstring& filename, Image* image, bool generateMipLevels, GLRenderSystem* renderSys);
 	~GLTexture();
 	void*               lock(EColorFormat fmt, Recti rc);
 	void                unlock();

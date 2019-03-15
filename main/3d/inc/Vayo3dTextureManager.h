@@ -17,8 +17,8 @@ public:
 	TextureManager();
 	~TextureManager();
 	bool       init();
-	TexturePtr getTexture(const wstring& filePath);
-	void       removeTexture(const wstring& name);
+	TexturePtr getTexture(const wstring& filename, bool fullPath = false);
+	void       removeTexture(const wstring& filename, bool fullPath = false);
 	void       removeTexture(TexturePtr tex);
 
 private:

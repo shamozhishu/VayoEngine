@@ -84,7 +84,6 @@ bool MaterialManager::parseMaterial(stringstream& filestream)
 	vector<string> container;
 	int            curSelTexLayer = -1;
 	int            singleMaterialParseEndMark = 0;
-	wstring        texturePath = ConfigManager::getSingleton().getConfig()._3d.texturesPath;
 	wstring        shadersPath = ConfigManager::getSingleton().getConfig()._3d.shadersPath;
 
 	do
@@ -508,7 +507,7 @@ bool MaterialManager::parseMaterial(stringstream& filestream)
 			if (container.size() == 2)
 			{
 				materialPtr->_textureLayer[curSelTexLayer]._texture =
-					Root::getSingleton().getTextureManager()->getTexture(texturePath + utf8ToUnicode(container[1].c_str()));
+					Root::getSingleton().getTextureManager()->getTexture(utf8ToUnicode(container[1].c_str()));
 				continue;
 			}
 		}

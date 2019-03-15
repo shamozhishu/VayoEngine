@@ -22,10 +22,18 @@ bool TextureManager::init()
 	return true;
 }
 
-TexturePtr TextureManager::getTexture(const wstring& filePath)
+TexturePtr TextureManager::getTexture(const wstring& filename, bool fullPath /*= false*/)
 {
-	if (filePath == L"")
+	if (filename == L"")
 		return NULL;
+
+	wstring fileName = filename;
+	trim(fileName);
+	wstring filePath;
+	if (fullPath)
+		filePath = fileName;
+	else
+		filePath = ConfigManager::getSingleton().getConfig()._3d.texturesPath + fileName;
 
 	map<wstring, TexturePtr>::iterator it = _texturePool.find(filePath);
 	if (it != _texturePool.end())
@@ -39,23 +47,29 @@ TexturePtr TextureManager::getTexture(const wstring& filePath)
 	}
 
 	TexturePtr pTex = Root::getSingleton().getActiveRenderer()->createTexture(filePath, &image, true);
-	_texturePool.insert(make_pair(pTex->getName(), pTex));
+	_texturePool.insert(make_pair(pTex->getFileName(), pTex));
 	return pTex;
 }
 
-void TextureManager::removeTexture(const wstring& name)
+void TextureManager::removeTexture(const wstring& filename, bool fullPath /*= false*/)
 {
-	map<wstring, TexturePtr>::iterator it = _texturePool.find(name);
+	wstring fileName = filename;
+	trim(fileName);
+	wstring filePath;
+	if (fullPath)
+		filePath = fileName;
+	else
+		filePath = ConfigManager::getSingleton().getConfig()._3d.texturesPath + fileName;
+
+	map<wstring, TexturePtr>::iterator it = _texturePool.find(filePath);
 	if (it != _texturePool.end())
-	{
 		_texturePool.erase(it);
-	}
 }
 
 void TextureManager::removeTexture(TexturePtr tex)
 {
 	if (tex)
-		removeTexture(tex->getName());
+		removeTexture(tex->getFileName(), true);
 }
 
 NS_VAYO3D_END

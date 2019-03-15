@@ -7,18 +7,19 @@
 #define __VAYO2D_PICTURE_H__
 
 #include "Vayo2dSupport.h"
-#include "math/VayoDimension2d.h"
+#include "VayoDimension2d.h"
 NS_VAYO2D_BEGIN
 
 class Picture
 {
 public:
-	Picture(const wstring& name) : _name(name) {}
+	Picture(const wstring& filename) : _filename(filename) {}
 	virtual ~Picture() {}
-
+	virtual void destroy() = 0;
+	virtual void cleanPic() = 0;
+	virtual Dimension2df getPicSize() const = 0;
 protected:
-	PROPERTY_R_REF(wstring, _name, Name)
-	PROPERTY_RW_REF(Dimension2df, _size, Size)
+	PROPERTY_R_REF(wstring, _filename, FileName)
 };
 
 NS_VAYO2D_END

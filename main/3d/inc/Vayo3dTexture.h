@@ -8,13 +8,13 @@
 
 #include "Vayo3dSupport.h"
 #include "Vayo3dColour.h"
-#include "math/VayoRectangle.h"
+#include "VayoRectangle.h"
 NS_VAYO3D_BEGIN
 
 class Texture
 {
 public:
-	Texture(const wstring& name) : _name(name) {}
+	Texture(const wstring& filename) : _filename(filename) {}
 	virtual ~Texture() {}
 	virtual void*               lock(EColorFormat fmt, Recti rc) = 0;
 	virtual void                unlock() = 0;
@@ -26,7 +26,7 @@ public:
 	virtual bool                hasMipMaps() const { return false; }
 
 protected:
-	PROPERTY_R_REF(wstring, _name, Name)
+	PROPERTY_R_REF(wstring, _filename, FileName)
 };
 
 NS_VAYO3D_END

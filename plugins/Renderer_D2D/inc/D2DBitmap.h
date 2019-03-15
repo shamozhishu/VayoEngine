@@ -11,14 +11,19 @@
 
 class D2DBitmap : public Picture
 {
+	friend class D2DPicProcessor;
 public:
-	D2DBitmap(const wstring& name, D2DRenderer* renderer);
-	~D2DBitmap();
-	ComPtr<ID2D1Bitmap> getBitmap() const;
+	D2DBitmap(const wstring& filename, D2DRenderer* renderer);
+	void destroy();
+	void cleanPic();
+	Dimension2df getPicSize() const;
+	ComPtr<ID2D1Bitmap> getBitmap(EDeviceID devid = EDID_CURRENT_DEV);
 
 private:
 	D2DRenderer* _renderer;
-	ComPtr<ID2D1Bitmap> _bitmap;
+	ComPtr<IWICBitmapDecoder> _decoder;
+	ComPtr<IWICFormatConverter> _converter;
+	ComPtr<ID2D1Bitmap> _bitmap[EDID_DEVICE_COUNT];
 };
 
 #endif // __D2D_BITMAP_H__

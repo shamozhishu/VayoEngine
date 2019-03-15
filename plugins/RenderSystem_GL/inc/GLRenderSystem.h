@@ -16,7 +16,7 @@ public:
 	GLRenderSystem(const wstring& name);
 	~GLRenderSystem();
 
-	TexturePtr   createTexture(const wstring& name, Image* image, bool generateMipLevels);
+	TexturePtr   createTexture(const wstring& filename, Image* image, bool generateMipLevels);
 	DisplayList* createDisplayList(const wstring& name = L"");
 	Tesselator*  createTesselator(const wstring& name = L"");
 

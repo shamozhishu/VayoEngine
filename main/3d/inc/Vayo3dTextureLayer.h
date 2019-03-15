@@ -10,7 +10,7 @@
 
 #include "Vayo3dSupport.h"
 #include "VayoSharedPtr.h"
-#include "math/VayoMatrix4x4.h"
+#include "VayoMatrix4x4.h"
 NS_VAYO3D_BEGIN
 
 enum ETextureClamp

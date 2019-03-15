@@ -5,7 +5,7 @@
 #include "VayoConfigManager.h"
 #include "Vayo3dRenderSystem.h"
 #include "Vayo3dSceneManager.h"
-#include "math/VayoLine2d.h"
+#include "VayoLine2d.h"
 #include "Vayo3dRoot.h"
 #include "VayoUtils.h"
 #include "VayoLog.h"

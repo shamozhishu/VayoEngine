@@ -81,7 +81,6 @@ bool FeatureManager::parseFeature(stringstream& filestream)
 	string         strTag;
 	vector<string> container;
 	int            singleFeatureParseEndMark = 0;
-	wstring        surfacePath = ConfigManager::getSingleton().getConfig()._2d.surfacesPath;
 
 	do
 	{
@@ -152,7 +151,7 @@ bool FeatureManager::parseFeature(stringstream& filestream)
 			stringtok(container, strTag, " ");
 			if (container.size() == 2)
 			{
-				featurePtr->_picture = Pivot::getSingleton().getPictureManager()->getPicture(surfacePath + utf8ToUnicode(container[1].c_str()));
+				featurePtr->_picture = Pivot::getSingleton().getPictureManager()->getPicture(utf8ToUnicode(container[1].c_str()));
 				continue;
 			}
 		}

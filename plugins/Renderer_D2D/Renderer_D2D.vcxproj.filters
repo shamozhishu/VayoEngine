@@ -29,6 +29,9 @@
     <ClInclude Include="inc\D2DBitmap.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\D2DPicProcessor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\D2DRenderer.cpp">
@@ -47,6 +50,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\D2DBitmap.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D2DPicProcessor.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

@@ -8,7 +8,7 @@
 
 #include "Vayo2dSupport.h"
 #include "Vayo2dJoint.h"
-#include "math/VayoRectangle.h"
+#include "VayoRectangle.h"
 NS_VAYO2D_BEGIN
 
 class Layer : public Joint

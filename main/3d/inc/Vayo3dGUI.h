@@ -14,7 +14,7 @@
 #include "Vayo3dSupport.h"
 #include "Vayo3dColour.h"
 #include "Vayo3dTexture.h"
-#include "math/VayoRectangle.h"
+#include "VayoRectangle.h"
 #include "VayoAttribSerializer.h"
 
 #define VAYO_MAX_IMAGESET_NUM (500)

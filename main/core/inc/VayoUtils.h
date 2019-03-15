@@ -7,7 +7,7 @@
 #define __VAYO_UTILS_H__
 
 #include "VayoSupport.h"
-#include "math/VayoVector3d.h"
+#include "VayoVector3d.h"
 NS_VAYO_BEGIN
 
 /* 多字节字符串分割函数 */

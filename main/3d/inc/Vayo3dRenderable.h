@@ -7,7 +7,7 @@
 #define __VAYO3D_RENDERABLE_H__
 
 #include "Vayo3dMaterial.h"
-#include "math/VayoMatrix4x4.h"
+#include "VayoMatrix4x4.h"
 NS_VAYO3D_BEGIN
 
 class _Vayo3dExport Renderable

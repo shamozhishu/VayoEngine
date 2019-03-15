@@ -9,6 +9,7 @@
 #include "D2DSupport.h"
 #include "Vayo2dRenderer.h"
 #include "Vayo2dFeature.h"
+#include "D2DPicProcessor.h"
 
 class D2DRenderer : public Renderer
 {
@@ -16,9 +17,10 @@ public:
 	D2DRenderer(const wstring& name);
 	~D2DRenderer();
 
-	PicturePtr    createPicture(const wstring& name);
+	PicProcessor* getPicProcessor();
+	PicturePtr    createPicture(const wstring& filename);
 	Geometry*     createGeometry(const wstring& name = L"");
-	PaintbrushPtr createPaintbrush(ERenderTarget rt, unsigned int devid);
+	PaintbrushPtr createPaintbrush(ERenderTarget rt, EDeviceID devid);
 
 	bool init();
 	bool beginDraw(Device* drawWnd);
@@ -36,8 +38,8 @@ public:
 	const Matrix3x3& getTransform(ETransformKind kind) const;
 	void setTransform(ETransformKind kind, const Matrix3x3& mat);
 	void setFeature(const Feature& feature);
-	ComPtr<ID2D1HwndRenderTarget> getHwndRT(int devid) const;
-	ComPtr<ID2D1BitmapRenderTarget> getBitmapRT(int devid) const;
+	ComPtr<ID2D1HwndRenderTarget> getHwndRT(EDeviceID devid = EDID_CURRENT_DEV) const;
+	ComPtr<ID2D1BitmapRenderTarget> getBitmapRT(EDeviceID devid = EDID_CURRENT_DEV) const;
 
 private:
 	bool rebuildDeviceResources();
@@ -46,14 +48,15 @@ private:
 
 	Feature                         _curFeature;
 	Feature                         _lastFeature;
-	unsigned int                    _activateRTID;
+	D2DPicProcessor                 _picProcessor;
 	Matrix3x3                       _matrizes[ETK_COUNT];
 	ComPtr<ID2D1HwndRenderTarget>   _hwndRT[EDID_DEVICE_COUNT];
 	ComPtr<ID2D1BitmapRenderTarget> _bitmapRT[EDID_DEVICE_COUNT];
 private:
-	PROPERTY_R(ComPtr<ID2D1RenderTarget>,  _activateRT,    ActivateRT)
-	PROPERTY_R(ComPtr<ID2D1Factory>,       _d2dFactory,    D2DFactory)
-	PROPERTY_R(ComPtr<IWICImagingFactory>, _wicFactory,    WICFactory)
+	PROPERTY_R(EDeviceID,                  _activateRTID,   ActivateRTID)
+	PROPERTY_R(ComPtr<ID2D1RenderTarget>,  _activateRT,       ActivateRT)
+	PROPERTY_R(ComPtr<ID2D1Factory>,       _d2dFactory,       D2DFactory)
+	PROPERTY_R(ComPtr<IWICImagingFactory>, _wicFactory,       WICFactory)
 	PROPERTY_R(ComPtr<IDWriteFactory>,     _dwriteFactory, DWriteFactory)
 };
 

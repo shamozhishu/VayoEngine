@@ -8,7 +8,7 @@
 
 #include "VayoSupport.h"
 #include "VayoSingleton.h"
-#include "math/VayoVector2d.h"
+#include "VayoVector2d.h"
 NS_VAYO_BEGIN
 
 enum EKeyCode

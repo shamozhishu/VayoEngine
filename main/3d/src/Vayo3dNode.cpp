@@ -1,6 +1,6 @@
 #include "Vayo3dNode.h"
 #include "Vayo3dEntity.h"
-#include "math/VayoMath.h"
+#include "VayoMath.h"
 #include "Vayo3dNodeAnimator.h"
 
 NS_VAYO3D_BEGIN

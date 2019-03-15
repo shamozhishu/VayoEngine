@@ -8,9 +8,9 @@
 
 #include "Vayo3dSupport.h"
 #include "Vayo3dMaterial.h"
-#include "math/VayoVector2d.h"
-#include "math/VayoVector3d.h"
-#include "math/VayoMatrix4x4.h"
+#include "VayoVector2d.h"
+#include "VayoVector3d.h"
+#include "VayoMatrix4x4.h"
 NS_VAYO3D_BEGIN
 
 typedef void(*ShaderConstantSetCallback)(MaterialRendererServices* services);

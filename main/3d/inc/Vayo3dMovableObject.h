@@ -10,7 +10,7 @@
 #include "Vayo3dMaterial.h"
 #include "VayoBitState.h"
 #include "VayoUserDataBind.h"
-#include "math/VayoAabbox3d.h"
+#include "VayoAabbox3d.h"
 #include "VayoAttribSerializer.h"
 
 NS_VAYO3D_BEGIN

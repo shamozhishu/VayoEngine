@@ -14,9 +14,7 @@ class Paintbrush
 {
 public:
 	virtual ~Paintbrush() {}
-	virtual void onSetFeature(Feature& feature, const Feature& lastFeature) {}
-	virtual void onUnsetFeature() {}
-	virtual bool isTransparent() const { return false; }
+	virtual void onPainting(Feature& feature, const Feature& lastFeature) = 0;
 };
 
 NS_VAYO2D_END

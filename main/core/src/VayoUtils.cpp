@@ -1,4 +1,5 @@
 #include "VayoUtils.h"
+#include "VayoLog.h"
 #include <Windows.h>
 #include <io.h>
 
@@ -20,7 +21,8 @@ void printLastError(wstring hint /*= L""*/, unsigned int errCode /*= -1*/)
 	hint += L"£º";
 	hint += (LPCTSTR)lpMsgBuf;
 	LocalFree(lpMsgBuf);
-	MessageBox(0, hint.c_str(), 0, 0);
+	ELogLevel level = errCode == 0 ? ELL_DEBUG : ELL_ERROR;
+	Log::wprint(level, hint.c_str());
 }
 
 string w2a_(const wstring& wideStr)

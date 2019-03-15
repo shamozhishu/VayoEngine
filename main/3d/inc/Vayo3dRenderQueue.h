@@ -7,8 +7,8 @@
 #define __VAYO3D_RENDER_QUEUE_H__
 
 #include "Vayo3dSupport.h"
-#include "math/VayoVector3d.h"
-#include "math/VayoMatrix4x4.h"
+#include "VayoVector3d.h"
+#include "VayoMatrix4x4.h"
 NS_VAYO3D_BEGIN
 
 enum ERenderQueueID

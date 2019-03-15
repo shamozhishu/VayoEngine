@@ -5,7 +5,7 @@
 #include "VayoLog.h"
 #include "VayoConfigManager.h"
 #include "Vayo3dTextureManager.h"
-#include "math/VayoRectangle.h"
+#include "VayoRectangle.h"
 #include "tinyxml2/tinyxml2.h"
 
 #define _TAG_TILESET_     "tileset"
@@ -149,7 +149,7 @@ bool TMXXMLParser::parseMapInfo(const wstring& strMapPath)
 	unsigned int len = _tilesets.size();
 	for (unsigned i = 0; i < len; ++i)
 	{
-		_tilesets[i].BindTexture = Root::getSingleton().getTextureManager()->getTexture(_tilesets[i].Img.Source);
+		_tilesets[i].BindTexture = Root::getSingleton().getTextureManager()->getTexture(_tilesets[i].Img.Source, true);
 	}
 
 	return true;

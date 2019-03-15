@@ -7,7 +7,7 @@
 #define __VAYO3D_LIGHT_DATA_H__
 
 #include "Vayo3dColour.h"
-#include "math/VayoVector3d.h"
+#include "VayoVector3d.h"
 NS_VAYO3D_BEGIN
 
 enum ELightType

@@ -22,6 +22,7 @@
 #include "Vayo2dGeometry.h"
 #include "Vayo2dPicture.h"
 #include "Vayo2dPictureManager.h"
+#include "Vayo2dPicProcessor.h"
 #include "Vayo2dFeature.h"
 #include "Vayo2dFeatureManager.h"
 #include "Vayo2dPaintbrush.h"

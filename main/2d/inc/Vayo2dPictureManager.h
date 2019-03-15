@@ -16,12 +16,16 @@ class _Vayo2dExport PictureManager
 public:
 	PictureManager();
 	~PictureManager();
-	bool       init();
-	PicturePtr getPicture(const wstring& filePath);
-	void       removePicture(const wstring& name);
-	void       removePicture(PicturePtr picture);
+	bool          init();
+	PicProcessor& getPicProcessor();
+	PicturePtr    getPicture(const wstring& filename, bool fullPath = false);
+	void          removePicture(const wstring& filename, bool fullPath = false);
+	void          removePicture(PicturePtr picture);
+	void          cleanAllPictures();
+	Dimension2di  getPicOptimizedSize(Dimension2di size);
 
 private:
+	PicProcessor* _picProcessor;
 	map<wstring, PicturePtr> _picturePool;
 };
 

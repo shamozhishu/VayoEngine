@@ -1,6 +1,6 @@
 #include "VayoUserDataBind.h"
-#include "math/VayoVector2d.h"
-#include "math/VayoVector3d.h"
+#include "VayoVector2d.h"
+#include "VayoVector3d.h"
 
 NS_VAYO_BEGIN
 

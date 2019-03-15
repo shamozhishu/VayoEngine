@@ -89,7 +89,7 @@ bool ConfigManager::init(wstring rootDirectory, EDimension dimension /*= _3D*/)
 			{
 				_configData._2d.layersetPath = dimensionPath + utf8ToUnicode(pElem->Attribute("layerset"));
 				_configData._2d.featuresPath = dimensionPath + utf8ToUnicode(pElem->Attribute("features"));
-				_configData._2d.surfacesPath = dimensionPath + utf8ToUnicode(pElem->Attribute("surfaces"));
+				_configData._2d.picturesPath = dimensionPath + utf8ToUnicode(pElem->Attribute("pictures"));
 			}
 		}
 		else if (0 == curTag.compare("part_3d"))

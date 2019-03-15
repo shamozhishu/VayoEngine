@@ -13,10 +13,10 @@
 #include "Vayo3dLightData.h"
 #include "Vayo3dTexture.h"
 #include "Vayo3dMaterial.h"
-#include "math/VayoVector2d.h"
-#include "math/VayoRectangle.h"
-#include "math/VayoMatrix4x4.h"
-#include "math/VayoTriangle3d.h"
+#include "VayoVector2d.h"
+#include "VayoRectangle.h"
+#include "VayoMatrix4x4.h"
+#include "VayoTriangle3d.h"
 #include "Vayo3dMaterialRenderer.h"
 
 NS_VAYO3D_BEGIN
@@ -50,7 +50,7 @@ class _Vayo3dExport RenderSystem
 public:
 	RenderSystem(const wstring& name);
 	virtual ~RenderSystem();
-	virtual TexturePtr   createTexture(const wstring& name, Image* image, bool generateMipLevels) = 0;
+	virtual TexturePtr   createTexture(const wstring& filename, Image* image, bool generateMipLevels) = 0;
 
 	virtual DisplayList* createDisplayList(const wstring& name = L"") = 0;
 	virtual DisplayList* findDisplayList(const wstring& name);

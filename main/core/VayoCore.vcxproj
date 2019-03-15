@@ -71,27 +71,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>inc;$(SolutionDir)thirdparty;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>inc;$(SolutionDir)thirdparty;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>inc;$(SolutionDir)thirdparty;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>inc;$(SolutionDir)thirdparty;$(IncludePath)</IncludePath>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -100,15 +96,23 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VAYO_NONCLIENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>inc;$(SolutionDir)thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(SolutionDir)lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>copy /y $(SolutionDir)media\engine_config.xml $(SolutionDir)bin\$(Platform)\$(Configuration)\engine_config.xml</Command>
+      <Command>mkdir ..\..\VayoEngineSDK\include
+xcopy /DY inc\*.h ..\..\VayoEngineSDK\include
+mkdir ..\..\VayoEngineSDK\include\tinyxml2
+xcopy /DY $(SolutionDir)thirdparty\tinyxml2\tinyxml2.h ..\..\VayoEngineSDK\include\tinyxml2
+mkdir "..\..\VayoEngineSDK\bin\$(Platform)\$(Configuration)"
+xcopy /DY "$(TargetPath)" "..\..\VayoEngineSDK\bin\$(Platform)\$(Configuration)"
+mkdir "..\..\VayoEngineSDK\lib\$(Platform)\$(Configuration)"
+xcopy /DY "$(Platform)\$(Configuration)\$(TargetName).lib" "..\..\VayoEngineSDK\lib\$(Platform)\$(Configuration)"
+copy /y $(SolutionDir)media\engine_config.xml $(SolutionDir)VayoEngineSDK\bin\$(Platform)\$(Configuration)\engine_config.xml</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,15 +122,23 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;VAYOCORE_EXPORTS;VAYO_NONCLIENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>inc;$(SolutionDir)thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(SolutionDir)lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>copy /y $(SolutionDir)media\engine_config.xml $(SolutionDir)bin\$(Platform)\$(Configuration)\engine_config.xml</Command>
+      <Command>mkdir ..\..\VayoEngineSDK\include
+xcopy /DY inc\*.h ..\..\VayoEngineSDK\include
+mkdir ..\..\VayoEngineSDK\include\tinyxml2
+xcopy /DY $(SolutionDir)thirdparty\tinyxml2\tinyxml2.h ..\..\VayoEngineSDK\include\tinyxml2
+mkdir "..\..\VayoEngineSDK\bin\$(Platform)\$(Configuration)"
+xcopy /DY "$(TargetPath)" "..\..\VayoEngineSDK\bin\$(Platform)\$(Configuration)"
+mkdir "..\..\VayoEngineSDK\lib\$(Platform)\$(Configuration)"
+xcopy /DY "$(Platform)\$(Configuration)\$(TargetName).lib" "..\..\VayoEngineSDK\lib\$(Platform)\$(Configuration)"
+copy /y $(SolutionDir)media\engine_config.xml $(SolutionDir)VayoEngineSDK\bin\$(Platform)\$(Configuration)\engine_config.xml</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,17 +150,25 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VAYOCORE_EXPORTS;VAYO_NONCLIENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>inc;$(SolutionDir)thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(SolutionDir)lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>copy /y $(SolutionDir)media\engine_config.xml $(SolutionDir)bin\$(Platform)\$(Configuration)\engine_config.xml</Command>
+      <Command>mkdir ..\..\VayoEngineSDK\include
+xcopy /DY inc\*.h ..\..\VayoEngineSDK\include
+mkdir ..\..\VayoEngineSDK\include\tinyxml2
+xcopy /DY $(SolutionDir)thirdparty\tinyxml2\tinyxml2.h ..\..\VayoEngineSDK\include\tinyxml2
+mkdir "..\..\VayoEngineSDK\bin\$(Platform)\$(Configuration)"
+xcopy /DY "$(TargetPath)" "..\..\VayoEngineSDK\bin\$(Platform)\$(Configuration)"
+mkdir "..\..\VayoEngineSDK\lib\$(Platform)\$(Configuration)"
+xcopy /DY "$(Platform)\$(Configuration)\$(TargetName).lib" "..\..\VayoEngineSDK\lib\$(Platform)\$(Configuration)"
+copy /y $(SolutionDir)media\engine_config.xml $(SolutionDir)VayoEngineSDK\bin\$(Platform)\$(Configuration)\engine_config.xml</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -160,34 +180,30 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;VAYOCORE_EXPORTS;VAYO_NONCLIENT_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>inc;$(SolutionDir)thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(SolutionDir)lib\$(Platform)\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>copy /y $(SolutionDir)media\engine_config.xml $(SolutionDir)bin\$(Platform)\$(Configuration)\engine_config.xml</Command>
+      <Command>mkdir ..\..\VayoEngineSDK\include
+xcopy /DY inc\*.h ..\..\VayoEngineSDK\include
+mkdir ..\..\VayoEngineSDK\include\tinyxml2
+xcopy /DY $(SolutionDir)thirdparty\tinyxml2\tinyxml2.h ..\..\VayoEngineSDK\include\tinyxml2
+mkdir "..\..\VayoEngineSDK\bin\$(Platform)\$(Configuration)"
+xcopy /DY "$(TargetPath)" "..\..\VayoEngineSDK\bin\$(Platform)\$(Configuration)"
+mkdir "..\..\VayoEngineSDK\lib\$(Platform)\$(Configuration)"
+xcopy /DY "$(Platform)\$(Configuration)\$(TargetName).lib" "..\..\VayoEngineSDK\lib\$(Platform)\$(Configuration)"
+copy /y $(SolutionDir)media\engine_config.xml $(SolutionDir)VayoEngineSDK\bin\$(Platform)\$(Configuration)\engine_config.xml</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="inc\math\VayoAabbox3d.h" />
-    <ClInclude Include="inc\math\VayoDimension2d.h" />
-    <ClInclude Include="inc\math\VayoLine2d.h" />
-    <ClInclude Include="inc\math\VayoLine3d.h" />
-    <ClInclude Include="inc\math\VayoMath.h" />
-    <ClInclude Include="inc\math\VayoMatrix3x3.h" />
-    <ClInclude Include="inc\math\VayoMatrix4x4.h" />
-    <ClInclude Include="inc\math\VayoPlane3d.h" />
-    <ClInclude Include="inc\math\VayoQuaternion.h" />
-    <ClInclude Include="inc\math\VayoRectangle.h" />
-    <ClInclude Include="inc\math\VayoTriangle3d.h" />
-    <ClInclude Include="inc\math\VayoVector2d.h" />
-    <ClInclude Include="inc\math\VayoVector3d.h" />
     <ClInclude Include="inc\Vayo.h" />
+    <ClInclude Include="inc\VayoAabbox3d.h" />
     <ClInclude Include="inc\VayoAny.h" />
     <ClInclude Include="inc\VayoApp.h" />
     <ClInclude Include="inc\VayoAttribSerializer.h" />
@@ -197,15 +213,24 @@
     <ClInclude Include="inc\VayoCore.h" />
     <ClInclude Include="inc\VayoDatabaseCSV.h" />
     <ClInclude Include="inc\VayoDevice.h" />
+    <ClInclude Include="inc\VayoDimension2d.h" />
     <ClInclude Include="inc\VayoDynLib.h" />
     <ClInclude Include="inc\VayoDynLibManager.h" />
     <ClInclude Include="inc\VayoFileIO.h" />
     <ClInclude Include="inc\VayoFrameListener.h" />
     <ClInclude Include="inc\VayoInput.h" />
     <ClInclude Include="inc\VayoLanguage.h" />
+    <ClInclude Include="inc\VayoLine2d.h" />
+    <ClInclude Include="inc\VayoLine3d.h" />
     <ClInclude Include="inc\VayoLog.h" />
+    <ClInclude Include="inc\VayoMath.h" />
+    <ClInclude Include="inc\VayoMatrix3x3.h" />
+    <ClInclude Include="inc\VayoMatrix4x4.h" />
+    <ClInclude Include="inc\VayoPlane3d.h" />
     <ClInclude Include="inc\VayoPlugin.h" />
     <ClInclude Include="inc\VayoPluginSystem.h" />
+    <ClInclude Include="inc\VayoQuaternion.h" />
+    <ClInclude Include="inc\VayoRectangle.h" />
     <ClInclude Include="inc\VayoReflection.h" />
     <ClInclude Include="inc\VayoScriptSystem.h" />
     <ClInclude Include="inc\VayoSharedPtr.h" />
@@ -215,8 +240,11 @@
     <ClInclude Include="inc\VayoSupport.h" />
     <ClInclude Include="inc\VayoTable.h" />
     <ClInclude Include="inc\VayoTimer.h" />
+    <ClInclude Include="inc\VayoTriangle3d.h" />
     <ClInclude Include="inc\VayoUserDataBind.h" />
     <ClInclude Include="inc\VayoUtils.h" />
+    <ClInclude Include="inc\VayoVector2d.h" />
+    <ClInclude Include="inc\VayoVector3d.h" />
     <ClInclude Include="src\VayoWin32Device.h" />
   </ItemGroup>
   <ItemGroup>

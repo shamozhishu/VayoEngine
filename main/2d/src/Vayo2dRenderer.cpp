@@ -1,16 +1,24 @@
 #include "Vayo2dRenderer.h"
+#include "VayoCore.h"
 
 NS_VAYO2D_BEGIN
 
-bool Renderer::setRenderTarget(ERenderTarget rt, const Dimension2di* pSize /*= nullptr*/)
+bool Renderer::isDeviceLost(EDeviceID devid /*= EDID_CURRENT_DEV*/) const
 {
-	_renderTarget = rt;
-	return true;
+	if (devid == EDID_CURRENT_DEV)
+	{
+		Device* dev = Core::getCore().getActiveDevice();
+		if (dev)
+			devid = dev->getDeviceID();
+		else
+			devid = EDID_MAIN_DEVICE;
+	}
+	return _deviceLost[devid];
 }
 
 Renderer::Renderer(const wstring& name)
 	: _name(name)
-	, _renderTarget(ERT_WINDOW)
+	, _renderTarget(ERT_WINDOW_DEFAULT)
 {
 	for (unsigned int i = EDID_AUX_DEVICE0; i < EDID_DEVICE_COUNT; ++i)
 		_deviceLost[i] = false;
@@ -48,28 +56,29 @@ void Renderer::destroyAllGeometries()
 	_geometries.clear();
 }
 
-bool Renderer::isDeviceLost(unsigned int devid) const
+Paintbrush* Renderer::getPaintbrush(EDeviceID devid /*= EDID_CURRENT_DEV*/)
 {
-	if (devid >= EDID_DEVICE_COUNT)
-		return false;
-	return _deviceLost[devid];
-}
-
-Paintbrush* Renderer::getPaintbrush(unsigned int devid)
-{
-	if (devid >= EDID_DEVICE_COUNT)
-		return nullptr;
-
 	Paintbrush* pPaintbrush = nullptr;
+	if (devid == EDID_CURRENT_DEV)
+	{
+		Device* dev = Core::getCore().getActiveDevice();
+		if (dev)
+			devid = dev->getDeviceID();
+		else
+			devid = EDID_MAIN_DEVICE;
+	}
+
 	switch (_renderTarget)
 	{
 	case ERT_NONE:
 		return nullptr;
-	case ERT_WINDOW:
+	case ERT_WINDOW_DEFAULT:
+	case ERT_WINDOW_SOFTWARE:
+	case ERT_WINDOW_HARDWARE:
 		pPaintbrush = _hwndPaintbrushs[devid].get();
 		if (!pPaintbrush)
 		{
-			_hwndPaintbrushs[devid] = createPaintbrush(ERT_WINDOW, devid);
+			_hwndPaintbrushs[devid] = createPaintbrush(_renderTarget, devid);
 			pPaintbrush = _hwndPaintbrushs[devid].get();
 		}
 		break;

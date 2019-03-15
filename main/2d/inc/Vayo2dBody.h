@@ -9,7 +9,7 @@
 #include "Vayo2dSupport.h"
 #include "VayoBitState.h"
 #include "VayoUserDataBind.h"
-#include "math/VayoRectangle.h"
+#include "VayoRectangle.h"
 #include "VayoAttribSerializer.h"
 NS_VAYO2D_BEGIN
 

@@ -8,7 +8,7 @@
 
 #include "Vayo3dSupport.h"
 #include "VayoUserDataBind.h"
-#include "math/VayoMatrix4x4.h"
+#include "VayoMatrix4x4.h"
 #include "VayoAttribSerializer.h"
 
 NS_VAYO3D_BEGIN

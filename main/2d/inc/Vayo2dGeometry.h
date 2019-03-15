@@ -7,7 +7,7 @@
 #define __VAYO2D_GEOMETRY_H__
 
 #include "Vayo2dSupport.h"
-#include "math/VayoVector2d.h"
+#include "VayoVector2d.h"
 NS_VAYO2D_BEGIN
 
 class Geometry

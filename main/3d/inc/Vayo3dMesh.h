@@ -8,7 +8,7 @@
 
 #include "Vayo3dSupport.h"
 #include "Vayo3dVertex.h"
-#include "math/VayoAabbox3d.h"
+#include "VayoAabbox3d.h"
 NS_VAYO3D_BEGIN
 
 class _Vayo3dExport SubMesh

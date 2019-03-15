@@ -20,7 +20,7 @@ class Color
 public:
 	float _r, _g, _b, _a;
 
-	Color(const float r, const float g, const float b, const float a)
+	Color(const float r, const float g, const float b, const float a = 1.0f)
 	{
 		_r = r;
 		_g = g;

@@ -9,23 +9,9 @@
 #include "VayoSupport.h"
 #include "VayoInput.h"
 #include "VayoBitState.h"
-#include "math/VayoVector2d.h"
-#include "math/VayoRectangle.h"
+#include "VayoVector2d.h"
+#include "VayoRectangle.h"
 NS_VAYO_BEGIN
-
-enum EDeviceID
-{
-	EDID_AUX_DEVICE0 = 0,
-	EDID_AUX_DEVICE1,
-	EDID_AUX_DEVICE2,
-	EDID_AUX_DEVICE3,
-	EDID_AUX_DEVICE4,
-	EDID_AUX_DEVICE5,
-	EDID_AUX_DEVICE6,
-	EDID_AUX_DEVICE7,
-	EDID_MAIN_DEVICE,
-	EDID_DEVICE_COUNT
-};
 
 class _VayoExport Device
 {

@@ -14,8 +14,10 @@ NS_VAYO2D_BEGIN
 enum ERenderTarget
 {
 	ERT_NONE,
-	ERT_WINDOW,
-	ERT_MEMORY
+	ERT_MEMORY,
+	ERT_WINDOW_DEFAULT,
+	ERT_WINDOW_SOFTWARE,
+	ERT_WINDOW_HARDWARE
 };
 
 class Body;
@@ -30,6 +32,7 @@ class Pivot;
 class Renderer;
 class Picture;
 class PictureManager;
+class PicProcessor;
 class Feature;
 class FeatureManager;
 class Geometry;

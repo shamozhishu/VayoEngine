@@ -9,7 +9,7 @@
 #include "Vayo2dSupport.h"
 #include "Vayo2dBody.h"
 #include "VayoInput.h"
-#include "math/VayoMatrix3x3.h"
+#include "VayoMatrix3x3.h"
 NS_VAYO2D_BEGIN
 
 // ¹Û²ìÆ÷»ùÀà

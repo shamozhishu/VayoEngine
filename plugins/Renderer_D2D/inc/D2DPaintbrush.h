@@ -13,13 +13,15 @@ class D2DPaintbrush : public Paintbrush
 {
 	friend class D2DRenderer;
 public:
-	D2DPaintbrush(ERenderTarget rt, unsigned int devid, D2DRenderer* renderer);
+	D2DPaintbrush(ERenderTarget rt, EDeviceID devid, D2DRenderer* renderer);
 	~D2DPaintbrush();
-	void onSetFeature(Feature& feature, const Feature& lastFeature);
-	void onUnsetFeature();
+	void resetBrush(ERenderTarget rt);
+	void onPainting(Feature& feature, const Feature& lastFeature);
 
 private:
+	EDeviceID                      _linkRTID;
 	D2DRenderer*                   _renderer;
+	bool                         _brushReset;
 	ComPtr<ID2D1StrokeStyle>    _strokeStyle;
 	ComPtr<IDWriteTextFormat>    _textFormat;
 	ComPtr<ID2D1SolidColorBrush> _colorBrush;
