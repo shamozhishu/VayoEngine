@@ -65,15 +65,6 @@ bool ConfigManager::init(wstring rootDirectory, EDimension dimension /*= _3D*/)
 		{
 			_configData.csvtables = _rootResourcePath + utf8ToUnicode(pElem->Attribute("filepath"));
 		}
-		else  if (0 == curTag.compare("plugins"))
-		{
-			XMLElement* plugin = pElem->FirstChildElement();
-			while (plugin)
-			{
-				_configData.plugins.push_back(utf8ToUnicode(plugin->Attribute("name")));
-				plugin = plugin->NextSiblingElement();
-			}
-		}
 		else if (0 == curTag.compare("languages"))
 		{
 			XMLElement* language = pElem->FirstChildElement();
@@ -90,6 +81,27 @@ bool ConfigManager::init(wstring rootDirectory, EDimension dimension /*= _3D*/)
 				_configData._2d.layersetPath = dimensionPath + utf8ToUnicode(pElem->Attribute("layerset"));
 				_configData._2d.featuresPath = dimensionPath + utf8ToUnicode(pElem->Attribute("features"));
 				_configData._2d.picturesPath = dimensionPath + utf8ToUnicode(pElem->Attribute("pictures"));
+				XMLElement* p2dElem = pElem->FirstChildElement();
+				while (p2dElem)
+				{
+					curTag = p2dElem->Name();
+					if (0 == curTag.compare("plugins"))
+					{
+						XMLElement* plugin = p2dElem->FirstChildElement();
+						while (plugin)
+						{
+							_configData._2d.plugins.push_back(utf8ToUnicode(plugin->Attribute("name")));
+							plugin = plugin->NextSiblingElement();
+						}
+					}
+					else
+					{
+						Log::wprint(ELL_ERROR, L"´íÎó±êÇ©<%s>", utf8ToUnicode(curTag).c_str());
+						return false;
+					}
+
+					p2dElem = p2dElem->NextSiblingElement();
+				}
 			}
 		}
 		else if (0 == curTag.compare("part_3d"))
@@ -100,7 +112,16 @@ bool ConfigManager::init(wstring rootDirectory, EDimension dimension /*= _3D*/)
 				while (p3dElem)
 				{
 					curTag = p3dElem->Name();
-					if (0 == curTag.compare("scenes"))
+					if (0 == curTag.compare("plugins"))
+					{
+						XMLElement* plugin = p3dElem->FirstChildElement();
+						while (plugin)
+						{
+							_configData._3d.plugins.push_back(utf8ToUnicode(plugin->Attribute("name")));
+							plugin = plugin->NextSiblingElement();
+						}
+					}
+					else if (0 == curTag.compare("scenes"))
 					{
 						_configData._3d.scenePath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("scenes"));
 						_configData._3d.modelsPath = dimensionPath + utf8ToUnicode(p3dElem->Attribute("models"));
@@ -173,7 +194,7 @@ bool ConfigManager::init(wstring rootDirectory, EDimension dimension /*= _3D*/)
 					}
 					else
 					{
-						Log::wprint(ELL_ERROR, L"´íÎó±êÇ©<%s>", curTag.c_str());
+						Log::wprint(ELL_ERROR, L"´íÎó±êÇ©<%s>", utf8ToUnicode(curTag).c_str());
 						return false;
 					}
 
@@ -183,7 +204,7 @@ bool ConfigManager::init(wstring rootDirectory, EDimension dimension /*= _3D*/)
 		}
 		else
 		{
-			Log::wprint(ELL_ERROR, L"´íÎó±êÇ©<%s>", curTag.c_str());
+			Log::wprint(ELL_ERROR, L"´íÎó±êÇ©<%s>", utf8ToUnicode(curTag).c_str());
 			return false;
 		}
 

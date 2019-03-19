@@ -16,13 +16,14 @@ public:
 	D2DBitmap(const wstring& filename, D2DRenderer* renderer);
 	void destroy();
 	void cleanPic();
+	bool isLoaded() const;
 	Dimension2df getPicSize() const;
 	ComPtr<ID2D1Bitmap> getBitmap(EDeviceID devid = EDID_CURRENT_DEV);
 
 private:
 	D2DRenderer* _renderer;
-	ComPtr<IWICBitmapDecoder> _decoder;
-	ComPtr<IWICFormatConverter> _converter;
+	ComPtr<IWICBitmap> _wicBitmap;
+	ComPtr<IWICFormatConverter> _wicConverter;
 	ComPtr<ID2D1Bitmap> _bitmap[EDID_DEVICE_COUNT];
 };
 

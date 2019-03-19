@@ -16,8 +16,8 @@ D2DBitmap::D2DBitmap(const wstring& filename, D2DRenderer* renderer)
 
 void D2DBitmap::destroy()
 {
-	_decoder.Reset();
-	_converter.Reset();
+	_wicBitmap.Reset();
+	_wicConverter.Reset();
 	for (int i = EDID_AUX_DEVICE0; i < EDID_DEVICE_COUNT; ++i)
 		_bitmap[i].Reset();
 }
@@ -27,11 +27,16 @@ void D2DBitmap::cleanPic()
 	_bitmap[_renderer->getActivateRTID()].Reset();
 }
 
+bool D2DBitmap::isLoaded() const
+{
+	return _wicBitmap != nullptr && _wicConverter != nullptr;
+}
+
 Dimension2df D2DBitmap::getPicSize() const
 {
 	UINT width = 0, height = 0;
-	if (_converter)
-		_converter->GetSize(&width, &height);
+	if (_wicConverter)
+		_wicConverter->GetSize(&width, &height);
 	return Dimension2df(width, height);
 }
 
@@ -48,17 +53,19 @@ ComPtr<ID2D1Bitmap> D2DBitmap::getBitmap(EDeviceID devid /*= EDID_CURRENT_DEV*/)
 
 	if (!_bitmap[devid])
 	{
-		ID2D1HwndRenderTarget* pRT = _renderer->getHwndRT(devid).Get();
+		ComPtr<ID2D1HwndRenderTarget> pRT = _renderer->getHwndRT(devid);
 		if (pRT)
 		{
-			if (_converter)
-				pRT->CreateBitmapFromWicBitmap(_converter.Get(), nullptr, &_bitmap[devid]);
+			HRESULT hr = S_OK;
+			if (_wicConverter)
+				hr = pRT->CreateBitmapFromWicBitmap(_wicConverter.Get(), nullptr, &_bitmap[devid]);
 			else
 			{
-				ID2D1BitmapRenderTarget* pBitmapRT = _renderer->getBitmapRT(devid).Get();
+				ComPtr<ID2D1BitmapRenderTarget> pBitmapRT = _renderer->getBitmapRT(devid);
 				if (pBitmapRT)
-					pBitmapRT->GetBitmap(&_bitmap[devid]);
+					hr = pBitmapRT->GetBitmap(&_bitmap[devid]);
 			}
+			printComError(hr);
 		}
 	}
 	return _bitmap[devid];

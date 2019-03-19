@@ -48,8 +48,10 @@ using namespace std;
 
 NS_VAYO_BEGIN
 
+enum EDimension { _2D, _3D };
 enum EDeviceID
 {
+	EDID_CURRENT_DEV = -1,
 	EDID_AUX_DEVICE0 = 0,
 	EDID_AUX_DEVICE1,
 	EDID_AUX_DEVICE2,

@@ -18,7 +18,7 @@ public:
 	bool save(PicturePtr picDst, const PicturePtr picSrc);
 	bool save(PicturePtr picDst, const PicturePtr picSrc, const Rectf& dstRect);
 	bool blend(PicturePtr picDst, const PicturePtr picSrc, Color clr);
-	bool blend(PicturePtr picDst, const PicturePtr picSrc1, const PicturePtr picSrc2, float proportion);
+	bool blend(PicturePtr picDst, const PicturePtr picBelow, const PicturePtr picAbove, float proportion);
 
 private:
 	D2DRenderer* _renderer;

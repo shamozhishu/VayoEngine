@@ -46,11 +46,11 @@ bool Root::launch(Core::Config* config)
 	do
 	{
 		IF_FALSE_BREAK(config);
-		IF_FALSE_BREAK(ConfigManager::getSingleton().init(config->RootDirectory, ConfigManager::_3D));
+		IF_FALSE_BREAK(ConfigManager::getSingleton().init(config->RootDirectory, _3D));
 		IF_FALSE_BREAK(Core::launch(config));
 		Root::Config* rootConfig = dynamic_cast<Root::Config*>(config);
 		IF_FALSE_BREAK(rootConfig);
-		loadPlugins();
+		loadPlugins(_3D);
 		map<wstring, RenderSystem*>::iterator it = _renderers.find(config->RendererName);
 		if (it != _renderers.end())
 			_activeRenderer = it->second;

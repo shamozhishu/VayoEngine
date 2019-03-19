@@ -8,7 +8,7 @@
 
 NS_VAYO_BEGIN
 
-EnableFileLogPrint(VayoLog.log)
+VayoLogPrint(VayoLog.log)
 static Log* s_pLog = NULL;
 
 void Log::print(ELogLevel level, const char* szFormat, ...)
@@ -18,10 +18,15 @@ void Log::print(ELogLevel level, const char* szFormat, ...)
 	va_start(args, szFormat);
 	vsprintf(szArgMessage, szFormat, args);
 	va_end(args);
+
 	if (s_pLog)
 	{
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), level | 8);
-		printf("%s\n", szArgMessage);
+		if (s_pLog->_hasConsole)
+		{
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), level | 8);
+			printf("%s\n", szArgMessage);
+		}
+
 		if (s_pLog->_fout)
 			s_pLog->_fout << ansiToUtf8(szArgMessage) << std::endl;
 	}
@@ -34,28 +39,39 @@ void Log::wprint(ELogLevel level, const wchar_t* szFormat, ...)
 	va_start(args, szFormat);
 	vswprintf(szArgMessage, 2048, szFormat, args);
 	va_end(args);
+
 	if (s_pLog)
 	{
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), level | 8);
-		wprintf(L"%s\n", szArgMessage);
+		if (s_pLog->_hasConsole)
+		{
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), level | 8);
+			wprintf(L"%s\n", szArgMessage);
+		}
+
 		if (s_pLog->_fout)
 			s_pLog->_fout << unicodeToUtf8(szArgMessage) << std::endl;
 	}
 }
 
-Log::Log(const string& logFileName)
+Log::Log(bool hasConsole /*= true*/, const string& logFileName /*= ""*/)
+	: _hasConsole(hasConsole)
 {
 	if (NULL == s_pLog)
 	{
 		s_pLog = this;
-		AllocConsole();
-		_tfreopen(_TEXT("CONOUT$"), _TEXT("w+t"), stdout);
-		TCHAR szProgramName[MAX_PATH];
-		HMODULE hModule(NULL);
-		GetModuleFileName(hModule, szProgramName, MAX_PATH);
-		SetConsoleTitle(szProgramName);
-		setlocale(LC_ALL, "chs");
-		DeleteMenu(GetSystemMenu(GetConsoleWindow(), FALSE), SC_CLOSE, MF_BYCOMMAND);
+
+		if (_hasConsole)
+		{
+			AllocConsole();
+			_tfreopen(_TEXT("CONOUT$"), _TEXT("w+t"), stdout);
+			TCHAR szProgramName[MAX_PATH];
+			HMODULE hModule(NULL);
+			GetModuleFileName(hModule, szProgramName, MAX_PATH);
+			SetConsoleTitle(szProgramName);
+			setlocale(LC_ALL, "chs");
+			DeleteMenu(GetSystemMenu(GetConsoleWindow(), FALSE), SC_CLOSE, MF_BYCOMMAND);
+		}
+
 		if (!logFileName.empty())
 		{
 			_fout.open(logFileName);
@@ -70,7 +86,8 @@ Log::~Log()
 	{
 		if (s_pLog->_fout)
 			_fout.close();
-		FreeConsole();
+		if (s_pLog->_hasConsole)
+			FreeConsole();
 		s_pLog = NULL;
 	}
 }

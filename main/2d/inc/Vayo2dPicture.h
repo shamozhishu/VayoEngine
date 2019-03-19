@@ -17,6 +17,7 @@ public:
 	virtual ~Picture() {}
 	virtual void destroy() = 0;
 	virtual void cleanPic() = 0;
+	virtual bool isLoaded() const = 0;
 	virtual Dimension2df getPicSize() const = 0;
 protected:
 	PROPERTY_R_REF(wstring, _filename, FileName)

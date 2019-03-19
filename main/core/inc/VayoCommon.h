@@ -24,11 +24,13 @@
 #endif
 
 #if defined(_DEBUG) || defined(VAYO_ENABLE_LOG_PRINT)
-#define EnableLogPrint() static Vayo::Log s_logger("");
-#define EnableFileLogPrint(FILENAME) static Vayo::Log s_logger(#FILENAME);
+#define VayoLogPrint(FILENAME) static Vayo::Log s_logger(true, #FILENAME);
+#define VayoLogPrintFile(FILENAME) static Vayo::Log s_logger(false, #FILENAME);
+#define VayoLogPrintConsole() static Vayo::Log s_logger;
 #else
-#define EnableLogPrint()
-#define EnableFileLogPrint(FILENAME)
+#define VayoLogPrint(FILENAME)
+#define VayoLogPrintFile(FILENAME)
+#define VayoLogPrintConsole()
 #endif
 
 #if defined(_DEBUG) && defined(VAYO_ENABLE_MEM_LEAK_CHECK)

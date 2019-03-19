@@ -22,11 +22,12 @@ class _VayoExport Log
 public:
 	static void print(ELogLevel level, const char* szFormat, ...);
 	static void wprint(ELogLevel level, const wchar_t* szFormat, ...);
-	Log(const string& logFileName);
+	Log(bool hasConsole = true, const string& logFileName = "");
 	~Log();
 
 private:
 	ofstream _fout;
+	bool     _hasConsole;
 };
 
 NS_VAYO_END

@@ -7,6 +7,7 @@
 #define __D2D_SUPPORT_H__
 
 #include "Vayo2dSupport.h"
+#include "VayoLog.h"
 
 #include <d2d1.h>
 #include <d2d1helper.h>
@@ -26,7 +27,7 @@
 #pragma comment(lib, "windowscodecs.lib")
 #pragma comment(lib, "Winmm.lib")
 
-template <class T>
+template<typename T>
 using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 using namespace Vayo;
@@ -35,5 +36,7 @@ class D2DBitmap;
 class D2DRenderer;
 class D2DPaintbrush;
 class D2DPicProcessor;
+
+extern void printComError(HRESULT hr);
 
 #endif // __D2D_SUPPORT_H__

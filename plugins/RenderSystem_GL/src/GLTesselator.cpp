@@ -17,6 +17,7 @@ const char* GLTesselator::getPrimitiveType(GLenum type)
 	case 0x0008: return "GL_QUAD_STRIP";
 	case 0x0009: return "GL_POLYGON";
 	}
+	return "";
 }
 
 GLTesselator::GLTesselator(const wstring& name)

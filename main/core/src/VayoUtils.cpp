@@ -12,17 +12,22 @@ void printLastError(wstring hint /*= L""*/, unsigned int errCode /*= -1*/)
 	LPVOID lpMsgBuf = NULL;
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		NULL, errCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
-	wchar_t buff[64];
-	wsprintf(buff, L"%d", errCode);
-	if (!hint.empty())
-		hint += L"\n";
-	hint += L"´íÎóÂë";
-	hint += buff;
-	hint += L"£º";
-	hint += (LPCTSTR)lpMsgBuf;
-	LocalFree(lpMsgBuf);
-	ELogLevel level = errCode == 0 ? ELL_DEBUG : ELL_ERROR;
-	Log::wprint(level, hint.c_str());
+	if (lpMsgBuf)
+	{
+		wchar_t buff[64];
+		wsprintf(buff, L"%d", errCode);
+		if (!hint.empty())
+			hint += L"\n";
+		hint += L"´íÎóÂë";
+		hint += buff;
+		hint += L"£º";
+		hint += (LPCTSTR)lpMsgBuf;
+		LocalFree(lpMsgBuf);
+		ELogLevel level = errCode == 0 ? ELL_DEBUG : ELL_ERROR;
+		Log::wprint(level, hint.c_str());
+	}
+	else if (!hint.empty())
+		Log::wprint(ELL_DEBUG, hint.c_str());
 }
 
 string w2a_(const wstring& wideStr)

@@ -36,9 +36,9 @@ bool Pivot::launch(Core::Config* config)
 	do 
 	{
 		IF_FALSE_BREAK(config);
-		IF_FALSE_BREAK(ConfigManager::getSingleton().init(config->RootDirectory, ConfigManager::_2D));
+		IF_FALSE_BREAK(ConfigManager::getSingleton().init(config->RootDirectory, _2D));
 		IF_FALSE_BREAK(Core::launch(config));
-		loadPlugins();
+		loadPlugins(_2D);
 		map<wstring, Renderer*>::iterator it = _renderers.find(config->RendererName);
 		if (it != _renderers.end())
 			_activeRenderer = it->second;

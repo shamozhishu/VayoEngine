@@ -46,8 +46,8 @@ public:
 	virtual void drawRect(float x, float y, float w, float h) = 0;
 	virtual void drawEllipse(const Vector2df& center, const Vector2df& radius) = 0;
 	virtual void drawGeometry(Geometry* geometry) = 0;
-	virtual void drawBitmap(PicturePtr pic, const Position2df& pos) = 0;
-	virtual void drawBitmap(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect) = 0;
+	virtual void drawPicture(PicturePtr pic, const Position2df& pos) = 0;
+	virtual void drawPicture(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect) = 0;
 	virtual bool setRenderTarget(ERenderTarget rt, const Dimension2di* pSize = nullptr) = 0;
 	virtual const Matrix3x3& getTransform(ETransformKind kind) const = 0;
 	virtual void setTransform(ETransformKind kind, const Matrix3x3& mat) = 0;

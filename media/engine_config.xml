@@ -1,15 +1,18 @@
 <engine_config rootpath="..\..\..\..\media\" path2d="2d-part\" path3d="3d-part\">
 	<tablecsv filepath="tablecsv\"/>
-	<plugins>
-		<plugin name="RenderSystem_GL"/>
-		<plugin name="Renderer_D2D"/>
-	</plugins>
 	<languages>
 		<language filepath="languagetxt\language_0_10000.txt"/>
 		<language filepath="languagetxt\language_10000_20000.txt"/>
 	</languages>
-	<part_2d layerset="layerset\" features="features\" pictures="pictures\"/>
+	<part_2d layerset="layerset\" features="features\" pictures="pictures\">
+		<plugins>
+			<plugin name="Renderer_D2D"/>
+		</plugins>
+	</part_2d>
 	<part_3d>
+		<plugins>
+			<plugin name="RenderSystem_GL"/>
+		</plugins>
 		<scenes scenes="scene\" models="models\" materials="materials\scripts\" textures="materials\textures\" shaders="materials\programs\">
 			<scene id="1" mappath="map\map001.tmx"/>
 			<scene id="2" mappath="map\map002.tmx"/>

@@ -61,6 +61,7 @@ bool D2DRenderer::init()
 	if (FAILED(hr))
 	{
 		Log::wprint(ELL_ERROR, L"创建D2D工厂失败");
+		printComError(hr);
 		return false;
 	}
 
@@ -68,6 +69,7 @@ bool D2DRenderer::init()
 	if (FAILED(hr))
 	{
 		Log::wprint(ELL_ERROR, L"创建WIC工厂失败");
+		printComError(hr);
 		return false;
 	}
 
@@ -75,6 +77,7 @@ bool D2DRenderer::init()
 	if (FAILED(hr))
 	{
 		Log::wprint(ELL_ERROR, L"创建DirectWrite工厂失败");
+		printComError(hr);
 		return false;
 	}
 
@@ -96,7 +99,7 @@ bool D2DRenderer::beginDraw(Device* drawWnd)
 		return false;
 
 	_activateRT->BeginDraw();
-	_activateRT->Clear(D2D1::ColorF(drawWnd->getAttrib().BgClearColor));
+	_activateRT->Clear(D2D1::ColorF(drawWnd->getAttrib().BgClearColor, 0.0f));
 	return true;
 }
 
@@ -112,6 +115,7 @@ bool D2DRenderer::endDraw()
 		discardDeviceResources(_activateRTID);
 	}
 
+	printComError(hr);
 	return SUCCEEDED(hr);
 }
 
@@ -273,17 +277,12 @@ void D2DRenderer::drawGeometry(Geometry* geometry)
 	}
 }
 
-void D2DRenderer::drawBitmap(PicturePtr pic, const Position2df& pos)
+void D2DRenderer::drawPicture(PicturePtr pic, const Position2df& pos)
 {
-	if (_activateRT)
+	D2DBitmap* pPic = dynamic_cast<D2DBitmap*>(pic.get());
+	if (_activateRT && pPic)
 	{
-		D2DBitmap* pPic = nullptr;
-		ID2D1Bitmap* pBitmap = nullptr;
-		if (pic)
-			pBitmap = ((pPic = dynamic_cast<D2DBitmap*>(pic.get())) ? pPic->getBitmap(_activateRTID).Get() : nullptr);
-		else if (_bitmapRT[_activateRTID])
-			_bitmapRT[_activateRTID]->GetBitmap(&pBitmap);
-		
+		ID2D1Bitmap* pBitmap = pPic->getBitmap(_activateRTID).Get();	
 		if (pBitmap)
 		{
 			D2D1_SIZE_F size = pBitmap->GetSize();
@@ -292,17 +291,12 @@ void D2DRenderer::drawBitmap(PicturePtr pic, const Position2df& pos)
 	}
 }
 
-void D2DRenderer::drawBitmap(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect)
+void D2DRenderer::drawPicture(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect)
 {
-	if (_activateRT)
+	D2DBitmap* pPic = dynamic_cast<D2DBitmap*>(pic.get());
+	if (_activateRT && pPic)
 	{
-		D2DBitmap* pPic = nullptr;
-		ID2D1Bitmap* pBitmap = nullptr;
-		if (pic)
-			pBitmap = ((pPic = dynamic_cast<D2DBitmap*>(pic.get())) ? pPic->getBitmap(_activateRTID).Get() : nullptr);
-		else if (_bitmapRT[_activateRTID])
-			_bitmapRT[_activateRTID]->GetBitmap(&pBitmap);
-
+		ID2D1Bitmap* pBitmap = pPic->getBitmap(_activateRTID).Get();
 		if (pBitmap)
 			_activateRT->DrawBitmap(pBitmap,
 				D2D1::RectF(dstRect._upperLeftCorner._x, dstRect._upperLeftCorner._y,

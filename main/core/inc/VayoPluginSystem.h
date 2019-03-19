@@ -14,7 +14,7 @@ class _VayoExport PluginSystem
 public:
 	PluginSystem();
 	virtual ~PluginSystem();
-	void loadPlugins();
+	void loadPlugins(EDimension dimension = _3D);
 	void initialisePlugins();
 	void shutdownPlugins();
 	void unloadPlugins();

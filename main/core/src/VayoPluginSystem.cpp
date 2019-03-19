@@ -24,10 +24,15 @@ PluginSystem::~PluginSystem()
 	SAFE_DELETE(_dynLibManager);
 }
 
-void PluginSystem::loadPlugins()
+void PluginSystem::loadPlugins(EDimension dimension /*= _3D*/)
 {
-	const vector<wstring>& pluginList = ConfigManager::getSingleton().getConfig().plugins;
 	wstring pluginName;
+	vector<wstring> pluginList;
+	if (dimension == _2D)
+		pluginList = ConfigManager::getSingleton().getConfig()._2d.plugins;
+	else
+		pluginList = ConfigManager::getSingleton().getConfig()._3d.plugins;
+
 	vector<wstring>::const_iterator it = pluginList.cbegin();
 	for (; it != pluginList.cend(); ++it)
 	{
