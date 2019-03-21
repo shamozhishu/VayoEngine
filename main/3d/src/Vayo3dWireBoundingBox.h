@@ -17,14 +17,13 @@ class WireBoundingBox : public Renderable
 {
 public:
 	WireBoundingBox() {
-		_material = Root::getSingleton().getMaterialManager()->createMaterial(L"Material_WireBoundingBox");
-		_material->_lighting = false;
+		getMaterial()->_lighting = false;
 	}
 
 	void render() {
 		if (!_aabb.isEmpty())
 		{
-			Root::getSingleton().getActiveRenderer()->setMaterial(*_material);
+			Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
 			Root::getSingleton().getActiveRenderer()->draw3DBox(_aabb, Colour(255, 0, 255, 0));
 		}
 	}

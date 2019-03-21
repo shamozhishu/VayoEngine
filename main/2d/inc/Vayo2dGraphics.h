@@ -16,15 +16,16 @@ class _Vayo2dExport Graphics
 {
 public:
 	Graphics();
-	virtual ~Graphics() {}
+	virtual ~Graphics();
 	virtual void       render() = 0;
 	virtual FeaturePtr getFeature() const;
 	virtual void       setFeature(FeaturePtr feature);
 	virtual void       setFeature(const wstring& name);
 	virtual void       getWorldTransform(Matrix3x3& mat) const;
 
-protected:
+private:
 	mutable FeaturePtr _feature;
+	const wstring _selfFeatureName;
 	PROPERTY_RW(unsigned int, _zorder, ZOrder)
 };
 

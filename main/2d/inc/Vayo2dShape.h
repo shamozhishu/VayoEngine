@@ -3,8 +3,8 @@
 * Copyright (c) 2018-2019 authored by Öì¼ÓºÆ
 * ÐÎ×´
 \*************************************************************************/
-#ifndef __VAYO2D_ROUND_H__
-#define __VAYO2D_ROUND_H__
+#ifndef __VAYO2D_SHAPE_H__
+#define __VAYO2D_SHAPE_H__
 
 #include "Vayo2dBody.h"
 #include "Vayo2dGraphics.h"
@@ -15,6 +15,17 @@ class _Vayo2dExport Shape : public Body, public Graphics
 {
 	static Reflex<Shape, const wstring&, LayerManager*> _dynReflex;
 public:
+	enum EKind
+	{
+		EK_POINT,
+		EK_LINE,
+		EK_RECT,
+		EK_ELLIPSE,
+		EK_ROUNDED_RECT,
+		EK_PATH
+	};
+
+public:
 	Shape(const wstring& name, LayerManager* oriLayerMgr);
 	~Shape();
 	virtual void update(float dt);
@@ -24,39 +35,39 @@ public:
 	virtual void setRect(const Rectf& rect);
 	virtual void setRound(const Vector2df& center, float radius);
 	virtual void setEllipse(const Vector2df& center, const Vector2df& radius);
+	virtual void setRoundedRect(const Rectf& rect, const Vector2df& radius);
+	virtual bool beginFigure();
+	virtual void endFigure();
+	virtual void addLine(const Vector2df& pt);
+	virtual void addLines(const Vector2df* pt, unsigned int size);
 	virtual Geometry* getGeometry();
+	virtual void resetGeometry();
 
 private:
-	struct Form
+	union Form
 	{
-		enum EKind
+		struct
 		{
-			EK_POINT,
-			EK_LINE,
-			EK_RECT,
-			EK_ELLIPSE,
-			EK_GEOMETRY
-		} kind;
-		union
+			Vector2df center;
+			Vector2df radius;
+		} ellipse;
+		struct
 		{
-			Vector2df pt;
-			Line2df line;
 			Rectf rect;
-			struct Ellipse
-			{
-				Vector2df center;
-				Vector2df radius;
-				Ellipse() : radius(1, 1) {}
-			} ellipse;
-		};
-		Form() : kind(EK_ELLIPSE) {}
-		~Form() {}
-		Form(const Form& form) { *this = form; }
-		Form& operator=(const Form& form);
+			Vector2df radius;
+		} roundedRect;
+		Vector2df  pt;
+		Line2df  line;
+		Rectf    rect;
+		Form() {}
 	} _form;
-	Geometry* _geometry;
+
+	EKind         _kind;
+	Geometry*     _geom;
+	bool          _changed;
+	PathGeometry* _opPathGeom;
 };
 
 NS_VAYO2D_END
 
-#endif // __VAYO2D_ROUND_H__
+#endif // __VAYO2D_SHAPE_H__

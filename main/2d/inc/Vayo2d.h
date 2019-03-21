@@ -15,6 +15,7 @@
 #include "Vayo2dLayerManager.h"
 #include "Vayo2dBody.h"
 #include "Vayo2dShape.h"
+#include "Vayo2dShapeGroup.h"
 #include "Vayo2dSurface.h"
 #include "Vayo2dWatcher.h"
 #include "Vayo2dColor.h"

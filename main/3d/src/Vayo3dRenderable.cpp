@@ -11,33 +11,36 @@ void Renderable::getWorldTransform(Matrix4x4& mat) const
 
 Renderable::Renderable()
 	: _renderPriority((unsigned int)-1)
+	, _material(Root::getSingleton().getMaterialManager()->createMaterial())
+	, _selfMaterialName(_material->_materialName)
 {
-	_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
+}
+
+Renderable::~Renderable()
+{
+	Root::getSingleton().getMaterialManager()->destroyMaterial(_selfMaterialName);
 }
 
 MaterialPtr Renderable::getMaterial() const
 {
-	if (!_material)
-		_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
 	return _material;
-}
-
-void Renderable::setMaterial(const wstring& name)
-{
-	if (getMaterial()->_materialName != name)
-		_material = Root::getSingleton().getMaterialManager()->findMaterial(name);
 }
 
 void Renderable::setMaterial(MaterialPtr material)
 {
 	if (!material)
 	{
-		_material = Root::getSingleton().getMaterialManager()->getDefaultMaterial();
+		_material = Root::getSingleton().getMaterialManager()->findMaterial(_selfMaterialName);
 		return;
 	}
 
-	if (getMaterial().get() != material.get())
+	if (_material.get() != material.get())
 		_material = material;
+}
+
+void Renderable::setMaterial(const wstring& name)
+{
+	setMaterial(Root::getSingleton().getMaterialManager()->findMaterial(name));
 }
 
 NS_VAYO3D_END

@@ -37,15 +37,40 @@ PicturePtr D2DRenderer::createPicture(const wstring& filename)
 	return new D2DBitmap(filename, this);
 }
 
-Geometry* D2DRenderer::createGeometry(const wstring& name /*= L""*/)
+Geometry* D2DRenderer::createGeometry(EGeometryType type, const wstring& name /*= L""*/)
 {
-	Geometry* geom = new D2DGeometry(name, this);
+	Geometry* geom = nullptr;
+	switch (type)
+	{
+	case EGT_RECT:
+		geom = new D2DRectGeometry(name, this);
+		break;
+	case EGT_ROUNDED_RECT:
+		geom = new D2DRoundedRectGeometry(name, this);
+		break;
+	case EGT_ELLIPSE:
+		geom = new D2DEllipseGeometry(name, this);
+		break;
+	case EGT_GROUP:
+		geom = new D2DGeometryGroup(name, this);
+		break;
+	case EGT_TRANSFORM:
+		geom = new D2DTransformedGeometry(name, this);
+		break;
+	case EGT_PATH:
+		geom = new D2DPathGeometry(name, this);
+		break;
+	default:
+		return nullptr;
+	}
+
 	map<wstring, Geometry*>::iterator it = _geometries.find(geom->getName());
 	if (it != _geometries.end())
 	{
 		SAFE_DELETE(it->second);
 		_geometries.erase(it);
 	}
+
 	_geometries[geom->getName()] = geom;
 	return geom;
 }
@@ -244,6 +269,42 @@ void D2DRenderer::drawEllipse(const Vector2df& center, const Vector2df& radius)
 	}
 }
 
+void D2DRenderer::drawRoundedRect(const Rectf& rect, const Vector2df& radius)
+{
+	if (_activateRT)
+	{
+		D2DPaintbrush* pBrush = nullptr;
+		switch (_renderTarget)
+		{
+		case ERT_WINDOW_DEFAULT:
+		case ERT_WINDOW_SOFTWARE:
+		case ERT_WINDOW_HARDWARE:
+			pBrush = dynamic_cast<D2DPaintbrush*>(_hwndPaintbrushs[_activateRTID].get());
+			break;
+		case ERT_MEMORY:
+			pBrush = dynamic_cast<D2DPaintbrush*>(_bitmapPaintbrushs[_activateRTID].get());
+			break;
+		}
+
+		if (pBrush)
+		{
+			setPaintbrushRenderState(pBrush);
+			if (_curFeature._fill)
+				_activateRT->FillRoundedRectangle(D2D1::RoundedRect(
+					D2D1::RectF(rect._upperLeftCorner._x, rect._upperLeftCorner._y,
+						rect._lowerRightCorner._x, rect._lowerRightCorner._y),
+					radius._x, radius._y),
+					pBrush->_colorBrush.Get());
+			else
+				_activateRT->DrawRoundedRectangle(D2D1::RoundedRect(
+					D2D1::RectF(rect._upperLeftCorner._x, rect._upperLeftCorner._y,
+						rect._lowerRightCorner._x, rect._lowerRightCorner._y),
+					radius._x, radius._y),
+					pBrush->_colorBrush.Get(), _curFeature._strokeWidth, pBrush->_strokeStyle.Get());
+		}
+	}
+}
+
 void D2DRenderer::drawGeometry(Geometry* geometry)
 {
 	D2DGeometry* pD2DGeometry = dynamic_cast<D2DGeometry*>(geometry);
@@ -265,13 +326,14 @@ void D2DRenderer::drawGeometry(Geometry* geometry)
 			break;
 		}
 
-		if (pBrush)
+		ID2D1Geometry* pD2DGeom = pD2DGeometry->getD2DGeometry().Get();
+		if (pBrush && pD2DGeom)
 		{
 			setPaintbrushRenderState(pBrush);
 			if (_curFeature._fill)
-				_activateRT->FillGeometry(pD2DGeometry->getPathGeometry().Get(), pBrush->_colorBrush.Get());
+				_activateRT->FillGeometry(pD2DGeom, pBrush->_colorBrush.Get());
 			else
-				_activateRT->DrawGeometry(pD2DGeometry->getPathGeometry().Get(), pBrush->_colorBrush.Get(),
+				_activateRT->DrawGeometry(pD2DGeom, pBrush->_colorBrush.Get(),
 					_curFeature._strokeWidth, pBrush->_strokeStyle.Get());
 		}
 	}

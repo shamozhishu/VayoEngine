@@ -19,7 +19,7 @@ public:
 
 	PicProcessor* getPicProcessor();
 	PicturePtr    createPicture(const wstring& filename);
-	Geometry*     createGeometry(const wstring& name = L"");
+	Geometry*     createGeometry(EGeometryType type, const wstring& name = L"");
 	PaintbrushPtr createPaintbrush(ERenderTarget rt, EDeviceID devid);
 
 	bool init();
@@ -31,6 +31,7 @@ public:
 	void drawRect(const Rectf& rc);
 	void drawRect(float x, float y, float w, float h);
 	void drawEllipse(const Vector2df& center, const Vector2df& radius);
+	void drawRoundedRect(const Rectf& rect, const Vector2df& radius);
 	void drawGeometry(Geometry* geometry);
 	void drawPicture(PicturePtr pic, const Position2df& pos);
 	void drawPicture(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect);

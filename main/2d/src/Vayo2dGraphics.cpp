@@ -11,14 +11,18 @@ void Graphics::getWorldTransform(Matrix3x3& mat) const
 
 Graphics::Graphics()
 	: _zorder((unsigned int)-1)
+	, _feature(Pivot::getSingleton().getFeatureManager()->createFeature())
+	, _selfFeatureName(_feature->_featureName)
 {
-	_feature = Pivot::getSingleton().getFeatureManager()->getDefaultFeature();
+}
+
+Graphics::~Graphics()
+{
+	Pivot::getSingleton().getFeatureManager()->destroyFeature(_selfFeatureName);
 }
 
 FeaturePtr Graphics::getFeature() const
 {
-	if (!_feature)
-		_feature = Pivot::getSingleton().getFeatureManager()->getDefaultFeature();
 	return _feature;
 }
 
@@ -26,18 +30,17 @@ void Graphics::setFeature(FeaturePtr feature)
 {
 	if (!feature)
 	{
-		_feature = Pivot::getSingleton().getFeatureManager()->getDefaultFeature();
+		_feature = Pivot::getSingleton().getFeatureManager()->findFeature(_selfFeatureName);
 		return;
 	}
 
-	if (getFeature().get() != feature.get())
+	if (_feature.get() != feature.get())
 		_feature = feature;
 }
 
 void Graphics::setFeature(const wstring& name)
 {
-	if (getFeature()->_featureName != name)
-		_feature = Pivot::getSingleton().getFeatureManager()->findFeature(name);
+	setFeature(Pivot::getSingleton().getFeatureManager()->findFeature(name));
 }
 
 NS_VAYO2D_END

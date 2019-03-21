@@ -33,6 +33,7 @@
     <ClInclude Include="inc\Vayo2dPicture.h" />
     <ClInclude Include="inc\Vayo2dPivot.h" />
     <ClInclude Include="inc\Vayo2dRenderer.h" />
+    <ClInclude Include="inc\Vayo2dShapeGroup.h" />
     <ClInclude Include="inc\Vayo2dSupport.h" />
     <ClInclude Include="inc\Vayo2dShape.h" />
     <ClInclude Include="inc\Vayo2dGraphics.h" />
@@ -51,6 +52,7 @@
     <ClCompile Include="src\Vayo2dRenderer.cpp" />
     <ClCompile Include="src\Vayo2dShape.cpp" />
     <ClCompile Include="src\Vayo2dGraphics.cpp" />
+    <ClCompile Include="src\Vayo2dShapeGroup.cpp" />
     <ClCompile Include="src\Vayo2dSurface.cpp" />
     <ClCompile Include="src\Vayo2dPictureManager.cpp" />
     <ClCompile Include="src\Vayo2dWatcher.cpp" />

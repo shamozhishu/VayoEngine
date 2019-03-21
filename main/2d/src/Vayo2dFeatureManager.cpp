@@ -24,17 +24,11 @@ FeatureManager::~FeatureManager()
 bool FeatureManager::init()
 {
 	_featurePool.clear();
-	FeaturePtr defaultFeaturePtr(new Feature());
-	_defaultFeature = defaultFeaturePtr;
 	vector<wstring> allFilePath;
 	findFileDir(allFilePath, ConfigManager::getSingleton().getConfig()._2d.featuresPath, L"feature");
 	unsigned len = allFilePath.size();
-
-	for (unsigned i = 0; i < len; i++)
-	{
+	for (unsigned i = 0; i < len; ++i)
 		parseFeature(allFilePath[i], true);
-	}
-
 	return true;
 }
 
@@ -312,14 +306,13 @@ FeaturePtr FeatureManager::createFeature(const wstring& name /*= L""*/)
 FeaturePtr FeatureManager::findFeature(const wstring& name)
 {
 	if (name == L"" || name == L"default_feature")
-		return _defaultFeature;
+		return nullptr;
 
 	map<wstring, FeaturePtr>::iterator it = _featurePool.find(name);
 	if (it != _featurePool.end())
 		return it->second;
 
-	Log::wprint(ELL_WARNING, L"特征[%s]不存在，使用默认特征！", name.c_str());
-	return _defaultFeature;
+	return nullptr;
 }
 
 void FeatureManager::destroyFeature(FeaturePtr feature)
@@ -341,11 +334,6 @@ void FeatureManager::destroyFeature(const wstring& name)
 void FeatureManager::clearAllFeatures()
 {
 	_featurePool.clear();
-}
-
-FeaturePtr FeatureManager::getDefaultFeature() const
-{
-	return _defaultFeature;
 }
 
 NS_VAYO2D_END

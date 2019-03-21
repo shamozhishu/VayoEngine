@@ -1,7 +1,7 @@
 /*************************************************************************\
 * 望友引擎1.0
 * Copyright (c) 2018-2019 authored by 朱加浩
-* 特征管理器
+* 图形特征管理器
 \*************************************************************************/
 #ifndef __VAYO2D_FEATURE_MANAGER_H__
 #define __VAYO2D_FEATURE_MANAGER_H__
@@ -74,10 +74,8 @@ public:
 	void       destroyFeature(FeaturePtr feature);
 	void       destroyFeature(const wstring& name);
 	void       clearAllFeatures();
-	FeaturePtr getDefaultFeature() const;
 
 private:
-	FeaturePtr                 _defaultFeature;
 	map<wstring, FeaturePtr>   _featurePool;
 	unordered_map<string, int> _attribsWordMap;
 };

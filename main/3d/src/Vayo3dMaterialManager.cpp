@@ -26,17 +26,11 @@ MaterialManager::~MaterialManager()
 bool MaterialManager::init()
 {
 	_materialPool.clear();
-	MaterialPtr defaultMaterialPtr(new Material());
-	_defaultMaterial = defaultMaterialPtr;
 	vector<wstring> allFilePath;
 	findFileDir(allFilePath, ConfigManager::getSingleton().getConfig()._3d.materialsPath, L"material");
 	unsigned len = allFilePath.size();
-
-	for (unsigned i = 0; i < len; i++)
-	{
+	for (unsigned i = 0; i < len; ++i)
 		parseMaterial(allFilePath[i], true);
-	}
-
 	return true;
 }
 
@@ -650,14 +644,13 @@ MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
 MaterialPtr MaterialManager::findMaterial(const wstring& name)
 {
 	if (name == L"" || name == L"default_material")
-		return _defaultMaterial;
+		return nullptr;
 
 	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
 	if (it != _materialPool.end())
 		return it->second;
 
-	Log::wprint(ELL_WARNING, L"材质[%s]不存在，使用默认材质！", name.c_str());
-	return _defaultMaterial;
+	return nullptr;
 }
 
 void MaterialManager::destroyMaterial(const wstring& name)
@@ -679,11 +672,6 @@ void MaterialManager::destroyMaterial(MaterialPtr material)
 void MaterialManager::clearAllMaterials()
 {
 	_materialPool.clear();
-}
-
-MaterialPtr MaterialManager::getDefaultMaterial() const
-{
-	return _defaultMaterial;
 }
 
 void MaterialManager::registerCallback(unsigned int idx, ShaderConstantSetCallback callback)

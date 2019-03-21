@@ -8,20 +8,114 @@
 
 #include "Vayo2dSupport.h"
 #include "VayoVector2d.h"
+#include "VayoRectangle.h"
+#include "VayoMatrix3x3.h"
 NS_VAYO2D_BEGIN
+
+enum EGeometryType
+{
+	EGT_RECT,
+	EGT_ROUNDED_RECT,
+	EGT_ELLIPSE,
+	EGT_GROUP,
+	EGT_TRANSFORM,
+	EGT_PATH
+};
 
 class Geometry
 {
 public:
-	Geometry(const wstring& name) : _name(name) {}
+	Geometry(const wstring& name, EGeometryType type) : _name(name), _type(type) {}
 	virtual ~Geometry() {}
+	template<typename T> T* geom_cast() const
+	{
+		switch (_type)
+		{
+		case EGT_RECT:
+			if (typeid(T) == typeid(RectGeometry))
+				return dynamic_cast<T*>((Geometry*)this);
+			break;
+		case EGT_ROUNDED_RECT:
+			if (typeid(T) == typeid(RoundedRectGeometry))
+				return dynamic_cast<T*>((Geometry*)this);
+			break;
+		case EGT_ELLIPSE:
+			if (typeid(T) == typeid(EllipseGeometry))
+				return dynamic_cast<T*>((Geometry*)this);
+			break;
+		case EGT_GROUP:
+			if (typeid(T) == typeid(GeometryGroup))
+				return dynamic_cast<T*>((Geometry*)this);
+			break;
+		case EGT_TRANSFORM:
+			if (typeid(T) == typeid(TransformedGeometry))
+				return dynamic_cast<T*>((Geometry*)this);
+			break;
+		case EGT_PATH:
+			if (typeid(T) == typeid(PathGeometry))
+				return dynamic_cast<T*>((Geometry*)this);
+			break;
+		default:
+			return nullptr;
+		}
+		return nullptr;
+	}
+
+protected:
+	PROPERTY_R_REF(wstring, _name, Name)
+	PROPERTY_R(EGeometryType, _type, Type)
+};
+
+class RectGeometry : public Geometry
+{
+public:
+	RectGeometry(const wstring& name) : Geometry(name, EGT_RECT) {}
+	virtual bool buildRect(const Rectf& rect) = 0;
+};
+
+class RoundedRectGeometry : public Geometry
+{
+public:
+	RoundedRectGeometry(const wstring& name) : Geometry(name, EGT_ROUNDED_RECT) {}
+	virtual bool buildRoundedRect(const Rectf& rect, const Vector2df& radius) = 0;
+};
+
+class EllipseGeometry : public Geometry
+{
+public:
+	EllipseGeometry(const wstring& name) : Geometry(name, EGT_ELLIPSE) {}
+	virtual bool buildRound(const Vector2df& center, float radius) = 0;
+	virtual bool buildEllipse(const Vector2df& center, const Vector2df& radius) = 0;
+};
+
+class GeometryGroup : public Geometry
+{
+public:
+	GeometryGroup(const wstring& name) : Geometry(name, EGT_GROUP) {}
+	virtual bool buildGroup() = 0;
+	virtual void addGeometry(Geometry* pGeom) = 0;
+	virtual void addGeometry(const wstring& geomName) = 0;
+	virtual void removeGeometry(Geometry* pGeom) = 0;
+	virtual void removeGeometry(const wstring& geomName) = 0;
+	virtual void removeAllGeometries() = 0;
+	virtual void setGeometries(const vector<Geometry*>& geoms) = 0;
+};
+
+class TransformedGeometry : public Geometry
+{
+public:
+	TransformedGeometry(const wstring& name) : Geometry(name, EGT_TRANSFORM) {}
+	virtual bool buildTransformedGeom(Geometry* geom, const Matrix3x3& mat) = 0;
+};
+
+class PathGeometry : public Geometry
+{
+public:
+	PathGeometry(const wstring& name) : Geometry(name, EGT_PATH) {}
 	virtual bool beginFigure() = 0;
 	virtual void endFigure() = 0;
 	virtual void addLine(const Vector2df& pt) = 0;
 	virtual void addLines(const Vector2df* pt, unsigned int size) = 0;
-
-protected:
-	PROPERTY_R_REF(wstring, _name, Name)
 };
 
 NS_VAYO2D_END

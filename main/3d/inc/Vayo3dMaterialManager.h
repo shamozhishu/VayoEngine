@@ -141,12 +141,10 @@ public:
 	void        destroyMaterial(const wstring& name);
 	void        destroyMaterial(MaterialPtr material);
 	void        clearAllMaterials();
-	MaterialPtr getDefaultMaterial() const;
 	void        registerCallback(unsigned int idx, ShaderConstantSetCallback callback);
 	void        unregisterCallback(unsigned int idx);
 
 private:
-	MaterialPtr                _defaultMaterial;
 	map<wstring, MaterialPtr>  _materialPool;
 	unordered_map<string, int> _attribsWordMap;
 	ShaderConstantSetCallback  _materialCallback[VAYO_MAX_SHADER_CALLBACK_NUM];

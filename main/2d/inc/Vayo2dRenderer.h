@@ -11,6 +11,7 @@
 #include "Vayo2dPaintbrush.h"
 #include "VayoRectangle.h"
 #include "VayoMatrix3x3.h"
+#include "Vayo2dGeometry.h"
 NS_VAYO2D_BEGIN
 
 enum ETransformKind
@@ -31,7 +32,7 @@ public:
 	virtual PicturePtr    createPicture(const wstring& filename) = 0;
 	virtual PaintbrushPtr createPaintbrush(ERenderTarget rt, EDeviceID devid) = 0;
 
-	virtual Geometry* createGeometry(const wstring& name = L"") = 0;
+	virtual Geometry* createGeometry(EGeometryType type, const wstring& name = L"") = 0;
 	virtual Geometry* findGeometry(const wstring& name);
 	virtual void      destroyGeometry(const wstring& name);
 	virtual void      destroyAllGeometries();
@@ -45,6 +46,7 @@ public:
 	virtual void drawRect(const Rectf& rc) = 0;
 	virtual void drawRect(float x, float y, float w, float h) = 0;
 	virtual void drawEllipse(const Vector2df& center, const Vector2df& radius) = 0;
+	virtual void drawRoundedRect(const Rectf& rect, const Vector2df& radius) = 0;
 	virtual void drawGeometry(Geometry* geometry) = 0;
 	virtual void drawPicture(PicturePtr pic, const Position2df& pos) = 0;
 	virtual void drawPicture(PicturePtr pic, const Rectf& dstRect, const Rectf& srcRect) = 0;

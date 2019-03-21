@@ -31,7 +31,7 @@ void SubEntity::render()
 	if (_subMesh->getVertexCount() != 0)
 	{
 		RenderSystem* pRenderSys = Root::getSingleton().getActiveRenderer();
-		pRenderSys->setMaterial(*_material);
+		pRenderSys->setMaterial(*getMaterial());
 		pRenderSys->drawMeshBuffer(_subMesh);
 	}
 }

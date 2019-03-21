@@ -198,8 +198,8 @@ MeshPtr ManualObject::convertToMesh(EHardwareMapping mappingHint /*= EHM_NEVER*/
 		if (pCurSubMesh)
 		{
 			pCurSubMesh->setHardwareMappingHint(mappingHint);
-			if (pCurSubMesh->getMaterialName() == L"" && _material->_materialName != L"")
-				pCurSubMesh->setMaterialName(_material->_materialName);
+			if (pCurSubMesh->getMaterialName() == L"" && getMaterial()->_materialName != L"")
+				pCurSubMesh->setMaterialName(getMaterial()->_materialName);
 		}
 	}
 	return _meshData;
@@ -373,7 +373,7 @@ void ManualObject::submitDisplay()
 		if (pSubMesh)
 			lastMaterialName = pSubMesh->getMaterialName();
 		if (lastMaterialName == L"")
-			lastMaterialName = _material->_materialName;
+			lastMaterialName = getMaterial()->_materialName;
 		_displayList->endList(lastMaterialName);
 	}
 }

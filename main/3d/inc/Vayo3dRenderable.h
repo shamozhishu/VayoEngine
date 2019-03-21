@@ -14,15 +14,16 @@ class _Vayo3dExport Renderable
 {
 public:
 	Renderable();
-	virtual ~Renderable() {}
+	virtual ~Renderable();
 	virtual void        render() = 0;
 	virtual MaterialPtr getMaterial() const;
-	virtual void        setMaterial(const wstring& name);
 	virtual void        setMaterial(MaterialPtr material);
+	virtual void        setMaterial(const wstring& name);
 	virtual void        getWorldTransform(Matrix4x4& mat) const;
 
-protected:
+private:
 	mutable MaterialPtr _material;
+	const wstring _selfMaterialName;
 	PROPERTY_RW(unsigned int, _renderPriority, RenderPriority)
 };
 

@@ -9,7 +9,7 @@ NS_VAYO2D_BEGIN
 void Surface::Section::render()
 {
 	Renderer* pRenderer = Pivot::getSingleton().getActiveRenderer();
-	pRenderer->drawPicture(_feature->_picture, getPos());
+	pRenderer->drawPicture(getFeature()->_picture, getPos());
 }
 
 Reflex<Surface, const wstring&, LayerManager*> Surface::_dynReflex;
