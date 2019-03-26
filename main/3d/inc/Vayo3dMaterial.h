@@ -147,8 +147,8 @@ const int MATERIAL_MAX_TEXTURES = VAYO_MATERIAL_MAX_TEXTURES;
 class _Vayo3dExport Material
 {
 public:
-	Material()
-		: _materialName(L"")
+	Material(const wstring& name)
+		: _materialName(name)
 		, _materialType(EMT_SOLID)
 		, _ambientColor(255, 255, 255, 255)
 		, _diffuseColor(255, 255, 255, 255)
@@ -189,7 +189,6 @@ public:
 		if (this == &other)
 			return *this;
 
-		_materialName = other._materialName;
 		_materialType = other._materialType;
 		_ambientColor = other._ambientColor;
 		_diffuseColor = other._diffuseColor;
@@ -265,7 +264,7 @@ public:
 	}
 
 public:
-	wstring        _materialName;
+	const wstring  _materialName;
 	EMaterialType  _materialType;
 	Colour         _ambientColor;
 	Colour         _diffuseColor;

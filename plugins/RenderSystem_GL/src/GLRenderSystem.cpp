@@ -52,6 +52,8 @@ GLRenderSystem::GLRenderSystem(const wstring& name)
 	, _isFillDisplayList(false)
 	, _maxTextureUnits(MATERIAL_MAX_TEXTURES)
 	, _maxTextureLODBias(0.0f)
+	, _curMaterial(L"GLRenderSystem_current_material")
+	, _lastMaterial(L"GLRenderSystem_last_material")
 {
 	_dimAliasedLine[0] = 1.0f;
 	_dimAliasedLine[1] = 1.0f;

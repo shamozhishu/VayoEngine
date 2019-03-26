@@ -14,6 +14,8 @@ D2DRenderer::D2DRenderer(const wstring& name)
 	, _wicFactory(nullptr)
 	, _dwriteFactory(nullptr)
 	, _activateRT(nullptr)
+	, _curFeature(L"D2DRenderer_current_feature")
+	, _lastFeature(L"D2DRenderer_last_feature")
 {
 }
 

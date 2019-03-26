@@ -164,12 +164,8 @@ D2DPathGeometry::D2DPathGeometry(const wstring& name, D2DRenderer* renderer)
 
 bool D2DPathGeometry::beginFigure()
 {
-	if (!_pathGeometry)
-	{
-		if (FAILED(_renderer->getD2DFactory()->CreatePathGeometry(&_pathGeometry)))
-			return false;
-	}
-
+	if (FAILED(_renderer->getD2DFactory()->CreatePathGeometry(&_pathGeometry)))
+		return false;
 	VAYO_ASSERT(!_geometrySink);
 	return SUCCEEDED(_pathGeometry->Open(&_geometrySink));
 }

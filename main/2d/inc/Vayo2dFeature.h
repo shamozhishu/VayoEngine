@@ -66,17 +66,48 @@ struct StrokeStyleProperties
 class Feature
 {
 public:
-	Feature()
-		: _fill(true)
+	Feature(const wstring& name)
+		: _featureName(name)
+		, _fill(true)
 		, _color(1,1,1,1)
-		, _strokeWidth(1.0f)
-	{}
+		, _strokeWidth(1.0f) {}
+
+	Feature(const Feature& other)
+	{
+		*this = other;
+	}
+
+	Feature& operator=(const Feature& other)
+	{
+		if (this == &other)
+			return *this;
+
+		_fill = other._fill;
+		_color = other._color;
+		_strokeWidth = other._strokeWidth;
+		_strokeStyle = other._strokeStyle;
+
+		return *this;
+	}
+
+	inline bool operator!=(const Feature& b) const
+	{
+		return _fill != b._fill ||
+			_color != b._color ||
+			_strokeWidth != b._strokeWidth ||
+			_strokeStyle != b._strokeStyle;
+	}
+
+	inline bool operator==(const Feature& b) const
+	{
+		return !(b != *this);
+	}
 
 public:
+	const wstring  _featureName;
 	bool                  _fill;
 	Color                 _color;
 	PicturePtr            _picture;
-	wstring               _featureName;
 	float                 _strokeWidth;
 	StrokeStyleProperties _strokeStyle;
 };

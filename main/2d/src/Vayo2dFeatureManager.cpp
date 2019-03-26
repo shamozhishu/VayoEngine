@@ -97,7 +97,7 @@ bool FeatureManager::parseFeature(stringstream& filestream)
 			if (container.size() == 2)
 			{
 				featureName = container[1];
-				featurePtr = FeaturePtr(new Feature());
+				featurePtr = FeaturePtr(new Feature(utf8ToUnicode(featureName)));
 				continue;
 			}
 		}
@@ -257,10 +257,7 @@ bool FeatureManager::parseFeature(stringstream& filestream)
 			if (0 == singleFeatureParseEndMark)
 			{
 				if (featureName != "")
-				{
-					featurePtr->_featureName = utf8ToUnicode(featureName);
 					_featurePool[featurePtr->_featureName] = featurePtr;
-				}
 
 				featureName.clear();
 				featurePtr = nullptr;
@@ -297,8 +294,7 @@ FeaturePtr FeatureManager::createFeature(const wstring& name /*= L""*/)
 		featureName = name;
 	}
 
-	FeaturePtr featurePtr(new Feature());
-	featurePtr->_featureName = featureName;
+	FeaturePtr featurePtr(new Feature(featureName));
 	_featurePool[featurePtr->_featureName] = featurePtr;
 	return featurePtr;
 }

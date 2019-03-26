@@ -101,7 +101,7 @@ bool MaterialManager::parseMaterial(stringstream& filestream)
 			if (container.size() == 2)
 			{
 				materialName = container[1];
-				materialPtr = MaterialPtr(new Material());
+				materialPtr = MaterialPtr(new Material(utf8ToUnicode(materialName)));
 				continue;
 			}
 		}
@@ -576,8 +576,6 @@ bool MaterialManager::parseMaterial(stringstream& filestream)
 			{
 				if (materialName != "")
 				{
-					materialPtr->_materialName = utf8ToUnicode(materialName);
-
 					if (materialPtr->_vertexSource != L"" && materialPtr->_fragmentSource != L"")
 					{
 						RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
@@ -635,8 +633,7 @@ MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
 		materialName = name;
 	}
 
-	MaterialPtr materialPtr(new Material());
-	materialPtr->_materialName = materialName;
+	MaterialPtr materialPtr(new Material(materialName));
 	_materialPool[materialPtr->_materialName] = materialPtr;
 	return materialPtr;
 }
