@@ -45,7 +45,7 @@ namespace Vayo {
 		void rotateVect(Vector2df& vect) const;
 		void inverseRotateVect(Vector2df& vect) const;
 
-		void transformArea(Rectf& area) const;
+		void transformRect(Rectf& rect) const;
 
 		float determinant() const;
 		bool  makeInverse();
@@ -231,7 +231,7 @@ namespace Vayo {
 		vect._y = tmp._x*_m[3] + tmp._y*_m[4];
 	}
 
-	inline void Matrix3x3::transformArea(Rectf& area) const
+	inline void Matrix3x3::transformRect(Rectf& rect) const
 	{
 
 	}

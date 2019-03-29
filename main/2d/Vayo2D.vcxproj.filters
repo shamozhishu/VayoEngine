@@ -9,6 +9,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="src\headers">
+      <UniqueIdentifier>{154610a4-783a-4883-a121-c9271d2b6ad3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Vayo2dSupport.h">
@@ -77,6 +80,12 @@
     <ClInclude Include="inc\Vayo2dShapeGroup.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Vayo2dAction.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vayo2dWireBoundingRect.h">
+      <Filter>src\headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Vayo2dPivot.cpp">
@@ -119,6 +128,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo2dShapeGroup.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vayo2dAction.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

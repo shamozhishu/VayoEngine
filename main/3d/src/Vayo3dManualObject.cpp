@@ -66,8 +66,9 @@ void ManualObject::setMaterial(MaterialPtr material)
 
 void ManualObject::getWorldTransform(Matrix4x4& mat) const
 {
-	if (getParentNode())
-		mat = getParentNode()->getAbsTransform();
+	SceneNode* sn = getParentNode();
+	if (sn)
+		mat = sn->getAbsTransform();
 	else
 		Renderable::getWorldTransform(mat);
 }

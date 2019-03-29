@@ -1,4 +1,5 @@
 #include "Vayo2dJoint.h"
+#include "Vayo2dAction.h"
 
 NS_VAYO2D_BEGIN
 
@@ -156,6 +157,48 @@ void Joint::setPosition(const Vector2df& newpos)
 Vector2df Joint::getAbsPosition() const
 {
 	return _absTransform.getTranslation();
+}
+
+void Joint::animating(float dt)
+{
+	if (isCanVisit())
+	{
+		list<Action*>::iterator ait = _actions.begin();
+		while (ait != _actions.end())
+		{
+			Action* act = *ait;
+			++ait;
+			act->animateJoint(this, dt);
+		}
+
+		updateAbsTransform();
+	}
+}
+
+void Joint::addAction(Action* action)
+{
+	if (!action || action->getOriLayerMgr() != getOriLayerMgr())
+		return;
+	list<Action*>::iterator it = std::find(_actions.begin(), _actions.end(), action);
+	if (it == _actions.end())
+		_actions.push_back(action);
+}
+
+bool Joint::removeAction(Action* action)
+{
+	list<Action*>::iterator it = std::find(_actions.begin(), _actions.end(), action);
+	if (it != _actions.end())
+	{
+		_actions.erase(it);
+		return true;
+	}
+
+	return false;
+}
+
+void Joint::removeActions()
+{
+	_actions.clear();
 }
 
 NS_VAYO2D_END

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Vayo2d.h" />
+    <ClInclude Include="inc\Vayo2dAction.h" />
     <ClInclude Include="inc\Vayo2dBody.h" />
     <ClInclude Include="inc\Vayo2dColor.h" />
     <ClInclude Include="inc\Vayo2dFeature.h" />
@@ -41,8 +42,10 @@
     <ClInclude Include="inc\Vayo2dPictureManager.h" />
     <ClInclude Include="inc\Vayo2dWatcher.h" />
     <ClInclude Include="inc\Vayo2dGraphicQueue.h" />
+    <ClInclude Include="src\Vayo2dWireBoundingRect.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Vayo2dAction.cpp" />
     <ClCompile Include="src\Vayo2dBody.cpp" />
     <ClCompile Include="src\Vayo2dFeatureManager.cpp" />
     <ClCompile Include="src\Vayo2dJoint.cpp" />

@@ -16,11 +16,13 @@ NS_VAYO3D_BEGIN
 class WireBoundingBox : public Renderable
 {
 public:
-	WireBoundingBox() {
+	WireBoundingBox()
+	{
 		getMaterial()->_lighting = false;
 	}
 
-	void render() {
+	void render()
+	{
 		if (!_aabb.isEmpty())
 		{
 			Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
@@ -28,7 +30,8 @@ public:
 		}
 	}
 
-	void setAABB(const Aabbox3df& aabb) {
+	void setAABB(const Aabbox3df& aabb)
+	{
 		_aabb = aabb;
 	}
 

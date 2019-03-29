@@ -38,8 +38,9 @@ void SubEntity::render()
 
 void SubEntity::getWorldTransform(Matrix4x4& mat) const
 {
-	if (_parent && _parent->getParentNode())
-		mat = _parent->getParentNode()->getAbsTransform();
+	SceneNode* sn = _parent ? _parent->getParentNode() : nullptr;
+	if (sn)
+		mat = sn->getAbsTransform();
 	else
 		Renderable::getWorldTransform(mat);
 }

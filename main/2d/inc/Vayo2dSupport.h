@@ -23,6 +23,7 @@ enum ERenderTarget
 class Body;
 class Watcher;
 class Graphics;
+class Action;
 class Shape;
 class ShapeGroup;
 class Surface;
@@ -36,14 +37,13 @@ class PictureManager;
 class PicProcessor;
 class Feature;
 class FeatureManager;
+class Paintbrush;
 class Geometry;
 class RectGeometry;
 class RoundedRectGeometry;
 class EllipseGeometry;
-class GeometryGroup;
-class TransformedGeometry;
 class PathGeometry;
-class Paintbrush;
+class GeometryGroup;
 
 typedef SharedPtr<Picture> PicturePtr;
 typedef SharedPtr<Feature> FeaturePtr;

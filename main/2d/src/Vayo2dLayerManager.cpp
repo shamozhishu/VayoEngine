@@ -1,6 +1,7 @@
 #include "Vayo2dLayerManager.h"
 #include "Vayo2dLayer.h"
 #include "Vayo2dWatcher.h"
+#include "Vayo2dAction.h"
 
 NS_VAYO2D_BEGIN
 
@@ -14,7 +15,7 @@ LayerManager::LayerManager(const wstring& layerMgrName)
 	, _name(layerMgrName)
 	, _activeWatcher(nullptr)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	if (0 == _name.compare(L""))
 	{
 		std::wstringstream ss;
@@ -68,11 +69,11 @@ bool LayerManager::registerForRendering(Graphics* pGraph, unsigned int queueID /
 	return true;
 }
 
-void LayerManager::showAllWireBoundingAreas(bool bShow)
+void LayerManager::showAllWireBoundingRects(bool bShow)
 {
 	map<wstring, Layer*>::iterator it = _layersPool.begin();
 	for (; it != _layersPool.end(); ++it)
-		it->second->showWireBoundingArea(bShow);
+		it->second->showWireBoundingRect(bShow);
 }
 
 bool LayerManager::loadLayerset(const wstring& layersetFile)
@@ -166,6 +167,36 @@ void LayerManager::destroyAllBodies()
 	_bodiesPool.clear();
 }
 
+void LayerManager::destroyAction(const wstring& name)
+{
+	Action* act = NULL;
+	map<wstring, Action*>::iterator it = _actionsPool.find(name);
+	if (it != _actionsPool.end())
+	{
+		act = it->second;
+		delete act;
+		_actionsPool.erase(it);
+	}
+}
+
+void LayerManager::destroyAction(Action* action)
+{
+	if (action)
+		destroyAction(action->getName());
+}
+
+void LayerManager::destroyAllActions()
+{
+	Action* act = NULL;
+	map<wstring, Action*>::iterator it = _actionsPool.begin();
+	for (; it != _actionsPool.end(); ++it)
+	{
+		act = it->second;
+		delete act;
+	}
+	_actionsPool.clear();
+}
+
 bool LayerManager::recursionLoading(XMLElement* element, Layer* parent)
 {
 	return true;
@@ -173,7 +204,6 @@ bool LayerManager::recursionLoading(XMLElement* element, Layer* parent)
 
 void LayerManager::recursionSaving(XMLElement* element, Layer* parent, tinyxml2::XMLDocument& document)
 {
-
 }
 
 NS_VAYO2D_END

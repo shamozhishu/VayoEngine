@@ -177,11 +177,13 @@ namespace Vayo {
 	template<typename T>
 	const Vector3d<T> Vector3d<T>::Origin(0, 0, 0);
 
-#define     Position3d        Vector3d
-	typedef Vector3d<float>   Vector3df;
-	typedef Vector3d<int>     Vector3di;
-	typedef Position3d<float> Position3df;
-	typedef Position3d<int>   Position3di;
+#define     Position3d               Vector3d
+	typedef Vector3d<float>          Vector3df;
+	typedef Vector3d<int>            Vector3di;
+	typedef Vector3d<unsigned int>   Vector3du;
+	typedef Position3d<float>        Position3df;
+	typedef Position3d<int>          Position3di;
+	typedef Position3d<unsigned int> Position3du;
 
 }
 

@@ -20,7 +20,7 @@ public:
 	void setActiveWatcher(Watcher* pActiveWatcher);
 	bool isCulled(Layer* layer) const;
 	bool registerForRendering(Graphics* pGraph, unsigned int queueID = EGQ_MAIN_BODY);
-	void showAllWireBoundingAreas(bool bShow);
+	void showAllWireBoundingRects(bool bShow);
 
 	bool loadLayerset(const wstring& layersetFile);
 	bool saveLayerset(const wstring& layersetFile);
@@ -37,6 +37,12 @@ public:
 	void                    destroyBody(Body* body);
 	void                    destroyAllBodies();
 
+	template<typename T> T* createAction(const wstring& name = L"");
+	template<typename T> T* findAction(const wstring& name);
+	void                    destroyAction(const wstring& name);
+	void                    destroyAction(Action* action);
+	void                    destroyAllActions();
+
 private:
 	bool recursionLoading(XMLElement* element, Layer* parent);
 	void recursionSaving(XMLElement* element, Layer* parent, tinyxml2::XMLDocument& document);
@@ -46,9 +52,10 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(LayerManager)
 
 private:
-	map<wstring, Layer*> _layersPool;
-	map<wstring, Body*>  _bodiesPool;
-	GraphicQueueGroup _graphicQueues;
+	GraphicQueueGroup     _graphicQueues;
+	map<wstring, Layer*>  _layersPool;
+	map<wstring, Body*>   _bodiesPool;
+	map<wstring, Action*> _actionsPool;
 };
 
 template<typename T>
@@ -109,6 +116,37 @@ T* LayerManager::findBody(const wstring& name)
 	T* ret = NULL;
 	map<wstring, Body*>::iterator it = _bodiesPool.find(name);
 	if (it != _bodiesPool.end())
+		ret = dynamic_cast<T*>(it->second);
+	return ret;
+}
+
+template<typename T>
+T* LayerManager::createAction(const wstring& name /*= L""*/)
+{
+	T* ret = new T(name, this);
+	Action* pAct = dynamic_cast<Action*>(ret);
+	if (NULL == pAct)
+	{
+		SAFE_DELETE(ret);
+		return NULL;
+	}
+
+	Action* pFindedAct = findAction<Action>(pAct->getName());
+	if (pFindedAct)
+	{
+		SAFE_DELETE(pFindedAct);
+	}
+
+	_actionsPool[pAct->getName()] = pAct;
+	return ret;
+}
+
+template<typename T>
+T* LayerManager::findAction(const wstring& name)
+{
+	T* ret = NULL;
+	map<wstring, Action*>::iterator it = _actionsPool.find(name);
+	if (it != _actionsPool.end())
 		ret = dynamic_cast<T*>(it->second);
 	return ret;
 }

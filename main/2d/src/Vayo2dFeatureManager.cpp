@@ -277,7 +277,7 @@ bool FeatureManager::parseFeature(stringstream& filestream)
 
 FeaturePtr FeatureManager::createFeature(const wstring& name /*= L""*/)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	wstring featureName;
 	if (name == L"" || name == L"default_feature")
 	{

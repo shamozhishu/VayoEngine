@@ -19,8 +19,32 @@ bool D2DRectGeometry::buildRect(const Rectf& rect)
 		rect._lowerRightCorner._x, rect._lowerRightCorner._y), &_rectGeometry));
 }
 
+bool D2DRectGeometry::isTransformed() const
+{
+	return _transformedGeometry != nullptr;
+}
+
+bool D2DRectGeometry::transformed(const Matrix3x3& mat)
+{
+	if (mat == IdentityMat3)
+	{
+		_transformedGeometry.Reset();
+		return false;
+	}
+
+	if (_rectGeometry)
+	{
+		D2D1::Matrix3x2F d2dMat = D2D1::Matrix3x2F(mat[0], mat[1], mat[3], mat[4], mat[6], mat[7]);
+		return SUCCEEDED(_renderer->getD2DFactory()->CreateTransformedGeometry(_rectGeometry.Get(), d2dMat, &_transformedGeometry));
+	}
+
+	return false;
+}
+
 ComPtr<ID2D1Geometry> D2DRectGeometry::getD2DGeometry() const
 {
+	if (_transformedGeometry)
+		return _transformedGeometry;
 	return _rectGeometry;
 }
 
@@ -38,8 +62,32 @@ bool D2DRoundedRectGeometry::buildRoundedRect(const Rectf& rect, const Vector2df
 			rect._lowerRightCorner._x, rect._lowerRightCorner._y), radius._x, radius._y), &_roundedRectGeometry));
 }
 
+bool D2DRoundedRectGeometry::isTransformed() const
+{
+	return _transformedGeometry != nullptr;
+}
+
+bool D2DRoundedRectGeometry::transformed(const Matrix3x3& mat)
+{
+	if (mat == IdentityMat3)
+	{
+		_transformedGeometry.Reset();
+		return false;
+	}
+
+	if (_roundedRectGeometry)
+	{
+		D2D1::Matrix3x2F d2dMat = D2D1::Matrix3x2F(mat[0], mat[1], mat[3], mat[4], mat[6], mat[7]);
+		return SUCCEEDED(_renderer->getD2DFactory()->CreateTransformedGeometry(_roundedRectGeometry.Get(), d2dMat, &_transformedGeometry));
+	}
+
+	return false;
+}
+
 ComPtr<ID2D1Geometry> D2DRoundedRectGeometry::getD2DGeometry() const
 {
+	if (_transformedGeometry)
+		return _transformedGeometry;
 	return _roundedRectGeometry;
 }
 
@@ -62,9 +110,117 @@ bool D2DEllipseGeometry::buildEllipse(const Vector2df& center, const Vector2df& 
 		radius._x, radius._y), &_ellipseGeometry));
 }
 
+bool D2DEllipseGeometry::isTransformed() const
+{
+	return _transformedGeometry != nullptr;
+}
+
+bool D2DEllipseGeometry::transformed(const Matrix3x3& mat)
+{
+	if (mat == IdentityMat3)
+	{
+		_transformedGeometry.Reset();
+		return false;
+	}
+
+	if (_ellipseGeometry)
+	{
+		D2D1::Matrix3x2F d2dMat = D2D1::Matrix3x2F(mat[0], mat[1], mat[3], mat[4], mat[6], mat[7]);
+		return SUCCEEDED(_renderer->getD2DFactory()->CreateTransformedGeometry(_ellipseGeometry.Get(), d2dMat, &_transformedGeometry));
+	}
+
+	return false;
+}
+
 ComPtr<ID2D1Geometry> D2DEllipseGeometry::getD2DGeometry() const
 {
+	if (_transformedGeometry)
+		return _transformedGeometry;
 	return _ellipseGeometry;
+}
+
+//////////////////////////////////////////////////////////////////////////
+D2DPathGeometry::D2DPathGeometry(const wstring& name, D2DRenderer* renderer)
+	: PathGeometry(name)
+	, D2DGeometry(renderer)
+{
+}
+
+bool D2DPathGeometry::beginFigure()
+{
+	if (FAILED(_renderer->getD2DFactory()->CreatePathGeometry(&_pathGeometry)))
+		return false;
+	VAYO_ASSERT(!_geometrySink);
+	_path.clear();
+	return SUCCEEDED(_pathGeometry->Open(&_geometrySink));
+}
+
+void D2DPathGeometry::endFigure()
+{
+	VAYO_ASSERT(_geometrySink);
+	unsigned int ptnum = _path.size();
+	if (ptnum > 0)
+	{
+		_geometrySink->BeginFigure(D2D1::Point2F(_path[0]._x, _path[0]._y), D2D1_FIGURE_BEGIN_FILLED);
+		if (ptnum > 1)
+		{
+			vector<D2D1_POINT_2F> pts;
+			pts.resize(ptnum - 1);
+			for (unsigned int i = 0; i < ptnum - 1; ++i)
+			{
+				pts[i].x = _path[i + 1]._x;
+				pts[i].y = _path[i + 1]._y;
+			}
+
+			_geometrySink->AddLines(&(pts[0]), pts.size());
+		}
+		_geometrySink->EndFigure(D2D1_FIGURE_END_OPEN);
+	}
+
+	_geometrySink->Close();
+	_geometrySink.Reset();
+}
+
+void D2DPathGeometry::addLine(const Vector2df& pt)
+{
+	VAYO_ASSERT(_geometrySink);
+	_path.push_back(pt);
+}
+
+void D2DPathGeometry::addLines(const Vector2df* pt, unsigned int size)
+{
+	VAYO_ASSERT(_geometrySink);
+	for (unsigned int i = 0; i < size; ++i)
+		_path.push_back(pt[i]);
+}
+
+bool D2DPathGeometry::isTransformed() const
+{
+	return _transformedGeometry != nullptr;
+}
+
+bool D2DPathGeometry::transformed(const Matrix3x3& mat)
+{
+	if (mat == IdentityMat3)
+	{
+		_transformedGeometry.Reset();
+		return false;
+	}
+
+	if (_pathGeometry)
+	{
+		D2D1::Matrix3x2F d2dMat = D2D1::Matrix3x2F(mat[0], mat[1], mat[3], mat[4], mat[6], mat[7]);
+		return SUCCEEDED(_renderer->getD2DFactory()->CreateTransformedGeometry(_pathGeometry.Get(), d2dMat, &_transformedGeometry));
+	}
+
+	return false;
+}
+
+ComPtr<ID2D1Geometry> D2DPathGeometry::getD2DGeometry() const
+{
+	if (_transformedGeometry)
+		return _transformedGeometry;
+	return _pathGeometry;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -127,89 +283,31 @@ void D2DGeometryGroup::setGeometries(const vector<Geometry*>& geoms)
 	_geoms = geoms;
 }
 
-ComPtr<ID2D1Geometry> D2DGeometryGroup::getD2DGeometry() const
+bool D2DGeometryGroup::isTransformed() const
 {
-	return _geometryGroup;
+	return _transformedGeometry != nullptr;
 }
 
-//////////////////////////////////////////////////////////////////////////
-D2DTransformedGeometry::D2DTransformedGeometry(const wstring& name, D2DRenderer* renderer)
-	: TransformedGeometry(name)
-	, D2DGeometry(renderer)
+bool D2DGeometryGroup::transformed(const Matrix3x3& mat)
 {
-}
+	if (mat == IdentityMat3)
+	{
+		_transformedGeometry.Reset();
+		return false;
+	}
 
-bool D2DTransformedGeometry::buildTransformedGeom(Geometry* geom, const Matrix3x3& mat)
-{
-	D2DGeometry* pD2DGeom = dynamic_cast<D2DGeometry*>(geom);
-	if (pD2DGeom)
+	if (_geometryGroup)
 	{
 		D2D1::Matrix3x2F d2dMat = D2D1::Matrix3x2F(mat[0], mat[1], mat[3], mat[4], mat[6], mat[7]);
-		return SUCCEEDED(_renderer->getD2DFactory()->CreateTransformedGeometry(pD2DGeom->getD2DGeometry().Get(), d2dMat, &_transformedGeometry));
+		return SUCCEEDED(_renderer->getD2DFactory()->CreateTransformedGeometry(_geometryGroup.Get(), d2dMat, &_transformedGeometry));
 	}
+
 	return false;
 }
 
-ComPtr<ID2D1Geometry> D2DTransformedGeometry::getD2DGeometry() const
+ComPtr<ID2D1Geometry> D2DGeometryGroup::getD2DGeometry() const
 {
-	return _transformedGeometry;
-}
-
-//////////////////////////////////////////////////////////////////////////
-D2DPathGeometry::D2DPathGeometry(const wstring& name, D2DRenderer* renderer)
-	: PathGeometry(name)
-	, D2DGeometry(renderer)
-{
-}
-
-bool D2DPathGeometry::beginFigure()
-{
-	if (FAILED(_renderer->getD2DFactory()->CreatePathGeometry(&_pathGeometry)))
-		return false;
-	VAYO_ASSERT(!_geometrySink);
-	return SUCCEEDED(_pathGeometry->Open(&_geometrySink));
-}
-
-void D2DPathGeometry::endFigure()
-{
-	VAYO_ASSERT(_geometrySink);
-	unsigned int ptnum = _path.size();
-	if (ptnum > 0)
-	{
-		_geometrySink->BeginFigure(D2D1::Point2F(_path[0]._x, _path[0]._y), D2D1_FIGURE_BEGIN_FILLED);
-		if (ptnum > 1)
-		{
-			vector<D2D1_POINT_2F> pts;
-			pts.resize(ptnum - 1);
-			for (unsigned int i = 0; i < ptnum - 1; ++i)
-			{
-				pts[i].x = _path[i + 1]._x;
-				pts[i].y = _path[i + 1]._y;
-			}
-
-			_geometrySink->AddLines(&(pts[0]), pts.size());
-		}
-		_geometrySink->EndFigure(D2D1_FIGURE_END_OPEN);
-	}
-
-	_geometrySink->Close();
-	_geometrySink.Reset();
-}
-
-void D2DPathGeometry::addLine(const Vector2df& pt)
-{
-	VAYO_ASSERT(_geometrySink);
-	_path.push_back(pt);
-}
-
-void D2DPathGeometry::addLines(const Vector2df* pt, unsigned int size)
-{
-	VAYO_ASSERT(_geometrySink);
-	for (unsigned int i = 0; i < size; ++i)
-		_path.push_back(pt[i]);
-}
-
-ComPtr<ID2D1Geometry> D2DPathGeometry::getD2DGeometry() const
-{
-	return _pathGeometry;
+	if (_transformedGeometry)
+		return _transformedGeometry;
+	return _geometryGroup;
 }

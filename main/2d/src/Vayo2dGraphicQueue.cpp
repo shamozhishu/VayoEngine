@@ -102,7 +102,7 @@ void GraphicQueueGroup::update()
 	{
 		bool exeTransform = true;
 
-		if (queueID == EGQ_WIRE_BOUNDING_AREA)
+		if (queueID == EGQ_WIRE_BOUNDING_RECT)
 		{
 			_currentTransform.makeIdentity();
 			_renderer->setTransform(ETK_WORLD, _currentTransform);

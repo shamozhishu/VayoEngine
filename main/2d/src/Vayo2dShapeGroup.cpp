@@ -26,12 +26,17 @@ void ShapeGroup::update(float dt)
 		Pivot::getSingleton().getCurLayerMgr()->registerForRendering(*it, getQueueID());
 }
 
-void ShapeGroup::addShape(Shape* shape, const Vector2df& position /*= Vector2df::Origin*/,
-	float rotAngle /*= 0.0f*/, const Vector2df& scale /*= Vector2df(1.0f, 1.0f)*/)
+void ShapeGroup::addShape(Shape* shape, const Matrix3x3& mat /*= IdentityMat3*/)
 {
 	Region* pRegion = getRegion(shape);
-	if (pRegion)
-		pRegion->getGeomGroup()->addGeometry(shape->getGeometry());
+	if (!pRegion)
+		return;
+	Geometry* pGeom = shape->getGeometry();
+	GeometryGroup* pGeomGroup = pRegion->getGeomGroup();
+	if (!pGeom || !pGeomGroup)
+		return;
+	pGeom->transformed(mat);
+	pGeomGroup->addGeometry(pGeom);
 }
 
 void ShapeGroup::addLayer(Layer* layer)
@@ -54,7 +59,7 @@ void ShapeGroup::addLayer(Layer* layer)
 	{
 		Shape* pShape = dynamic_cast<Shape*>(itmap->second);
 		if (pShape)
-			addShape(pShape);
+			addShape(pShape, layer->getAbsTransform());
 	}
 }
 
@@ -93,14 +98,15 @@ ShapeGroup::Region* ShapeGroup::getRegion(Shape* pShape)
 			return pRegion;
 	}
 
-	pRegion = new Region();
+	pRegion = new Region(this);
 	*(pRegion->getFeature()) = *(pShape->getFeature());
 	_regions.push_back(pRegion);
 	return pRegion;
 }
 
 //////////////////////////////////////////////////////////////////////////
-ShapeGroup::Region::Region()
+ShapeGroup::Region::Region(ShapeGroup* shapeGroup)
+	: _shapeGroup(shapeGroup)
 {
 	_geomGroup = Pivot::getSingleton().getActiveRenderer()->createGeometry(EGT_GROUP)->geom_cast<GeometryGroup>();
 }
@@ -119,6 +125,15 @@ void ShapeGroup::Region::render()
 		pRenderer->setFeature(*getFeature());
 		pRenderer->drawGeometry(_geomGroup);
 	}
+}
+
+void ShapeGroup::Region::getWorldTransform(Matrix3x3& mat) const
+{
+	Layer* layer = _shapeGroup ? _shapeGroup->getParentLayer() : nullptr;
+	if (layer)
+		mat = layer->getAbsTransform();
+	else
+		Graphics::getWorldTransform(mat);
 }
 
 NS_VAYO2D_END

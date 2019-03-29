@@ -155,11 +155,13 @@ namespace Vayo {
 	template<typename T>
 	const Vector2d<T> Vector2d<T>::Origin(0, 0);
 
-#define     Position2d        Vector2d
-	typedef Vector2d<float>   Vector2df;
-	typedef Vector2d<int>     Vector2di;
-	typedef Position2d<float> Position2df;
-	typedef Position2d<int>   Position2di;
+#define     Position2d               Vector2d
+	typedef Vector2d<float>          Vector2df;
+	typedef Vector2d<int>            Vector2di;
+	typedef Vector2d<unsigned int>   Vector2du;
+	typedef Position2d<float>        Position2df;
+	typedef Position2d<int>          Position2di;
+	typedef Position2d<unsigned int> Position2du;
 
 }
 

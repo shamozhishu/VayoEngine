@@ -43,6 +43,7 @@ public:
 	virtual void                setRotation(const Vector3df& rotation);
 	virtual const Vector3df&    getPosition() const;
 	virtual void                setPosition(const Vector3df& newpos);
+	virtual void                updateAbsTransform();
 	virtual Vector3df           getAbsPosition() const;
 	virtual void                animating(float dt);
 	virtual void                addAnimator(NodeAnimator* animator);
@@ -56,7 +57,6 @@ public:
 	UserDataBind&       getUserDataBind() { return _userDataBind; }
 
 protected:
-	virtual void updateAbsTransform();
 	DISALLOW_COPY_AND_ASSIGN(Node)
 	PROPERTY_R(SceneManager*, _oriSceneMgr, OriSceneMgr)
 protected:

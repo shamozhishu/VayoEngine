@@ -10,6 +10,7 @@
 #include "Vayo2dSupport.h"
 #include "Vayo2dPivot.h"
 #include "Vayo2dRenderer.h"
+#include "Vayo2dAction.h"
 #include "Vayo2dJoint.h"
 #include "Vayo2dLayer.h"
 #include "Vayo2dLayerManager.h"

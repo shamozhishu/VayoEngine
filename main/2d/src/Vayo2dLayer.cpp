@@ -2,17 +2,18 @@
 #include "Vayo2dBody.h"
 #include "VayoUtils.h"
 #include "Vayo2dLayerManager.h"
+#include "Vayo2dWireBoundingRect.h"
 
 NS_VAYO2D_BEGIN
 
 Reflex<Layer, const wstring&, Joint*, LayerManager*> Layer::_dynReflex;
 Layer::Layer(const wstring& name, Joint* parent, LayerManager* oriLayerMgr)
 	: Joint(name, parent, oriLayerMgr)
-	, _wireBoundingArea(nullptr)
-	, _showBoundingArea(false)
+	, _wireBoundingRect(nullptr)
+	, _showBoundingRect(false)
 	, _isAutomaticCulling(true)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	if (0 == _name.compare(L""))
 	{
 		std::wstringstream ss;
@@ -20,12 +21,12 @@ Layer::Layer(const wstring& name, Joint* parent, LayerManager* oriLayerMgr)
 		++idx;
 		_name = ss.str();
 	}
-	_wireBoundingArea = nullptr;
+	_wireBoundingRect = new WireBoundingRect();
 }
 
 Layer::~Layer()
 {
-	SAFE_DELETE(_wireBoundingArea);
+	SAFE_DELETE(_wireBoundingRect);
 	detachAllBodies();
 }
 
@@ -33,12 +34,13 @@ void Layer::visit(float dt)
 {
 	if (isCanVisit())
 	{
-		updateLocalArea();
-		updateWorldArea();
+		updateLocalRect();
+		animating(dt);
+		updateWorldRect();
 		if (!_oriLayerMgr->isCulled(this))
 		{
-			if (_showBoundingArea)
-				_oriLayerMgr->registerForRendering(_wireBoundingArea, EGQ_WIRE_BOUNDING_AREA);
+			if (_showBoundingRect)
+				_oriLayerMgr->registerForRendering(_wireBoundingRect, EGQ_WIRE_BOUNDING_RECT);
 
 			Body* pBody;
 			map<wstring, Body*>::iterator it = _bodies.begin();
@@ -53,31 +55,41 @@ void Layer::visit(float dt)
 	Joint::visit(dt);
 }
 
-void Layer::showWireBoundingArea(bool bShow)
+void Layer::showWireBoundingRect(bool bShow)
 {
-	_showBoundingArea = bShow;
+	_showBoundingRect = bShow;
 }
 
-bool Layer::isShowWireBoundingArea() const
+bool Layer::isShowWireBoundingRect() const
 {
-	if (nullptr == _wireBoundingArea)
+	if (nullptr == _wireBoundingRect)
 		return false;
-	return _showBoundingArea;
+	return _showBoundingRect;
 }
 
-const Rectf& Layer::getWorldArea() const
+const Rectf& Layer::getWorldRect() const
 {
-	return _worldArea;
+	return _worldRect;
 }
 
-void Layer::updateWorldArea()
+void Layer::updateWorldRect()
 {
-
+	_worldRect = Rectf(1, 1, 0, 0);
+	map<wstring, Body*>::iterator it = _bodies.begin();
+	for (; it != _bodies.end(); ++it)
+	{
+		_worldRect.addInternalRect(it->second->getWorldRect());
+	}
+	((WireBoundingRect*)_wireBoundingRect)->setRect(_worldRect);
 }
 
-void Layer::updateLocalArea()
+void Layer::updateLocalRect()
 {
-
+	map<wstring, Body*>::iterator it = _bodies.begin();
+	for (; it != _bodies.end(); ++it)
+	{
+		it->second->refreshLocalRect();
+	}
 }
 
 void Layer::attachBody(Body* body)
@@ -170,8 +182,8 @@ void Layer::serialize(XMLElement* outXml)
 	if (!_canVisit)
 		outXml->SetAttribute("visit", _canVisit);
 
-	if (_showBoundingArea)
-		outXml->SetAttribute("show_boundingarea", _showBoundingArea);
+	if (_showBoundingRect)
+		outXml->SetAttribute("show_boundingrect", _showBoundingRect);
 
 	if (!_isAutomaticCulling)
 		outXml->SetAttribute("auto_culling", _isAutomaticCulling);
@@ -219,7 +231,7 @@ bool Layer::deserialize(XMLElement* inXml)
 	}
 
 	inXml->QueryBoolAttribute("visit", &_canVisit);
-	inXml->QueryBoolAttribute("show_boundingarea", &_showBoundingArea);
+	inXml->QueryBoolAttribute("show_boundingrect", &_showBoundingRect);
 	inXml->QueryBoolAttribute("auto_culling", &_isAutomaticCulling);
 
 	const char* szUserData = inXml->GetText();

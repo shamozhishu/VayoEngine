@@ -34,27 +34,33 @@ public:
 	virtual void             setRotAngle(float rotAngle);
 	virtual const Vector2df& getPosition() const;
 	virtual void             setPosition(const Vector2df& newpos);
+	virtual void             updateAbsTransform();
 	virtual Vector2df        getAbsPosition() const;
+	virtual void             animating(float dt);
+	virtual void             addAction(Action* action);
+	virtual bool             removeAction(Action* action);
+	virtual void             removeActions();
 
-	const list<Joint*>& getChildren() const { return _children; }
-	const Matrix3x3&    getAbsTransform() const { return _absTransform; }
-	const UserDataBind& getUserDataBind() const { return _userDataBind; }
-	UserDataBind&       getUserDataBind() { return _userDataBind; }
+	const list<Joint*>&  getChildren() const { return _children; }
+	const list<Action*>& getActions() const { return _actions; }
+	const Matrix3x3&     getAbsTransform() const { return _absTransform; }
+	const UserDataBind&  getUserDataBind() const { return _userDataBind; }
+	UserDataBind&        getUserDataBind() { return _userDataBind; }
 
 protected:
-	virtual void updateAbsTransform();
 	DISALLOW_COPY_AND_ASSIGN(Joint)
 	PROPERTY_R(LayerManager*, _oriLayerMgr, OriLayerMgr)
 protected:
-	wstring      _name;
-	bool         _canVisit;
-	Vector2df    _position;
-	Vector2df    _scale;
-	float        _rotAngle;
-	Joint*       _parent;
-	list<Joint*> _children;
-	Matrix3x3    _absTransform;
-	UserDataBind _userDataBind;
+	wstring       _name;
+	bool          _canVisit;
+	Vector2df     _position;
+	Vector2df     _scale;
+	float         _rotAngle;
+	Joint*        _parent;
+	list<Joint*>  _children;
+	list<Action*> _actions;
+	Matrix3x3     _absTransform;
+	UserDataBind  _userDataBind;
 };
 
 NS_VAYO2D_END

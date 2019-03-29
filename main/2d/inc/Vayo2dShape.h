@@ -30,6 +30,7 @@ public:
 	~Shape();
 	virtual void update(float dt);
 	virtual void render();
+	virtual void getWorldTransform(Matrix3x3& mat) const;
 	virtual void setPoint(const Vector2df& point);
 	virtual void setLine(const Line2df& line);
 	virtual void setRect(const Rectf& rect);

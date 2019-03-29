@@ -23,7 +23,7 @@ SceneManager::SceneManager(const wstring& sceneName)
 	, _collDetector(NULL)
 	, _renderQueues(this)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	if (0 == _name.compare(L""))
 	{
 		std::wstringstream ss;

@@ -141,12 +141,36 @@ namespace Vayo {
 			return Dimension2d<T>(getWidth(), getHeight());
 		}
 
+		void addInternalPoint(const Position2d<T>& pos)
+		{
+			addInternalPoint(pos._x, pos._y);
+		}
+
+		void addInternalPoint(T x, T y)
+		{
+			if (x > _lowerRightCorner._x)
+				_lowerRightCorner._x = x;
+			if (y > _lowerRightCorner._y)
+				_lowerRightCorner._y = y;
+			if (x < _upperLeftCorner._x)
+				_upperLeftCorner._x = x;
+			if (y < _upperLeftCorner._y)
+				_upperLeftCorner._y = y;
+		}
+
+		void addInternalRect(const Rectangle<T>& rc)
+		{
+			addInternalPoint(rc._upperLeftCorner);
+			addInternalPoint(rc._lowerRightCorner);
+		}
+
 		Position2d<T> _upperLeftCorner;
 		Position2d<T> _lowerRightCorner;
 	};
 
-	typedef Rectangle<float> Rectf;
-	typedef Rectangle<int>   Recti;
+	typedef Rectangle<float>        Rectf;
+	typedef Rectangle<int>          Recti;
+	typedef Rectangle<unsigned int> Rectu;
 
 }
 

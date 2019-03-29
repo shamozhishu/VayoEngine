@@ -18,9 +18,9 @@ public:
 	Layer(const wstring& name, Joint* parent, LayerManager* oriLayerMgr);
 	virtual ~Layer();
 	virtual void         visit(float dt);
-	virtual void         showWireBoundingArea(bool bShow);
-	virtual bool         isShowWireBoundingArea() const;
-	virtual const Rectf& getWorldArea() const;
+	virtual void         showWireBoundingRect(bool bShow);
+	virtual bool         isShowWireBoundingRect() const;
+	virtual const Rectf& getWorldRect() const;
 	virtual void         attachBody(Body* body);
 	int                  getAttachedBodiesCount() const;
 	Body*                getAttacheBody(const wstring& name);
@@ -36,14 +36,14 @@ public:
 	void setAutomaticCulling(bool isCulling) { _isAutomaticCulling = isCulling; }
 
 private:
-	void updateWorldArea();
-	void updateLocalArea();
+	void updateWorldRect();
+	void updateLocalRect();
 
 private:
 	map<wstring, Body*> _bodies;
-	Rectf               _worldArea;
-	Graphics*           _wireBoundingArea;
-	bool                _showBoundingArea;
+	Rectf               _worldRect;
+	Graphics*           _wireBoundingRect;
+	bool                _showBoundingRect;
 	bool                _isAutomaticCulling;
 };
 

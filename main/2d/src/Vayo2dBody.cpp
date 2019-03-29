@@ -18,7 +18,7 @@ Body::Body(const wstring& name, LayerManager* oriLayerMgr)
 	, _collideMask(0)
 	, _oriLayerMgr(oriLayerMgr)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	if (0 == _name.compare(L""))
 	{
 		std::wstringstream ss;
@@ -52,20 +52,20 @@ void Body::setVisible(bool visible)
 	_visible = visible;
 }
 
-Rectf Body::getWorldArea() const
+Rectf Body::getWorldRect() const
 {
-	Rectf worldArea = getLocalArea();
-	if (_parentLayer && worldArea.isValid())
-		_parentLayer->getAbsTransform().transformArea(worldArea);
-	return worldArea;
+	Rectf worldRect = getLocalRect();
+	if (_parentLayer && worldRect.isValid())
+		_parentLayer->getAbsTransform().transformRect(worldRect);
+	return worldRect;
 }
 
-const Rectf& Body::getLocalArea() const
+const Rectf& Body::getLocalRect() const
 {
-	return _localArea;
+	return _localRect;
 }
 
-void Body::refreshLocalArea()
+void Body::refreshLocalRect()
 {
 
 }

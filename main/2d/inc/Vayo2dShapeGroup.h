@@ -18,8 +18,7 @@ public:
 	ShapeGroup(const wstring& name, LayerManager* oriLayerMgr);
 	virtual ~ShapeGroup();
 	virtual void update(float dt);
-	virtual void addShape(Shape* shape, const Vector2df& position = Vector2df::Origin,
-		float rotAngle = 0.0f, const Vector2df& scale = Vector2df(1.0f, 1.0f));
+	virtual void addShape(Shape* shape, const Matrix3x3& mat = IdentityMat3);
 	virtual void addLayer(Layer* layer);
 	virtual bool build();
 	virtual void destroy();
@@ -28,10 +27,12 @@ private:
 	class Region : public Graphics
 	{
 	public:
-		Region();
+		Region(ShapeGroup* shapeGroup);
 		~Region();
 		void render();
+		void getWorldTransform(Matrix3x3& mat) const;
 	private:
+		PROPERTY_R(ShapeGroup*, _shapeGroup, ShapeGroup)
 		PROPERTY_R(GeometryGroup*, _geomGroup, GeomGroup)
 	};
 	vector<Region*> _regions;

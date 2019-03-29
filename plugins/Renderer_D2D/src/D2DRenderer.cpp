@@ -56,9 +56,6 @@ Geometry* D2DRenderer::createGeometry(EGeometryType type, const wstring& name /*
 	case EGT_GROUP:
 		geom = new D2DGeometryGroup(name, this);
 		break;
-	case EGT_TRANSFORM:
-		geom = new D2DTransformedGeometry(name, this);
-		break;
 	case EGT_PATH:
 		geom = new D2DPathGeometry(name, this);
 		break;

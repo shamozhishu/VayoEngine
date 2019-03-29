@@ -284,7 +284,7 @@ Mesh::Mesh(const wstring& name)
 	: _name(name)
 	, _changedID(0)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	if (0 == _name.compare(L""))
 	{
 		std::wstringstream ss;

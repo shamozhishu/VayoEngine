@@ -19,7 +19,7 @@ GLDisplayList::GLDisplayList(const wstring& name, GLRenderSystem* renderSys)
 	: DisplayList(name)
 	, _renderSystem(renderSys)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	if (0 == _name.compare(L""))
 	{
 		std::wstringstream ss;

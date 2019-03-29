@@ -16,7 +16,7 @@ SceneNode::SceneNode(const wstring& name, Node* parent, SceneManager* oriSceneMg
 	, _showBoundingBox(false)
 	, _isAutomaticCulling(true)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	if (0 == _name.compare(L""))
 	{
 		std::wstringstream ss;

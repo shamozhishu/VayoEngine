@@ -616,7 +616,7 @@ bool MaterialManager::parseMaterial(stringstream& filestream)
 
 MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	wstring materialName;
 	if (name == L"" || name == L"default_material")
 	{

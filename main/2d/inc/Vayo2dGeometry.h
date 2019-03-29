@@ -17,16 +17,28 @@ enum EGeometryType
 	EGT_RECT,
 	EGT_ROUNDED_RECT,
 	EGT_ELLIPSE,
-	EGT_GROUP,
-	EGT_TRANSFORM,
-	EGT_PATH
+	EGT_PATH,
+	EGT_GROUP
 };
 
 class Geometry
 {
 public:
-	Geometry(const wstring& name, EGeometryType type) : _name(name), _type(type) {}
+	Geometry(const wstring& name, EGeometryType type)
+		: _name(name), _type(type)
+	{
+		static unsigned long long idx = 0;
+		if (0 == _name.compare(L""))
+		{
+			std::wstringstream ss;
+			ss << L"Geometry" << idx << L"[" << _type << L"]";
+			++idx;
+			_name = ss.str();
+		}
+	}
 	virtual ~Geometry() {}
+	virtual bool isTransformed() const = 0;
+	virtual bool transformed(const Matrix3x3& mat) = 0;
 	template<typename T> T* geom_cast() const
 	{
 		switch (_type)
@@ -43,16 +55,12 @@ public:
 			if (typeid(T) == typeid(EllipseGeometry))
 				return dynamic_cast<T*>((Geometry*)this);
 			break;
-		case EGT_GROUP:
-			if (typeid(T) == typeid(GeometryGroup))
-				return dynamic_cast<T*>((Geometry*)this);
-			break;
-		case EGT_TRANSFORM:
-			if (typeid(T) == typeid(TransformedGeometry))
-				return dynamic_cast<T*>((Geometry*)this);
-			break;
 		case EGT_PATH:
 			if (typeid(T) == typeid(PathGeometry))
+				return dynamic_cast<T*>((Geometry*)this);
+			break;
+		case EGT_GROUP:
+			if (typeid(T) == typeid(GeometryGroup))
 				return dynamic_cast<T*>((Geometry*)this);
 			break;
 		default:
@@ -88,6 +96,16 @@ public:
 	virtual bool buildEllipse(const Vector2df& center, const Vector2df& radius) = 0;
 };
 
+class PathGeometry : public Geometry
+{
+public:
+	PathGeometry(const wstring& name) : Geometry(name, EGT_PATH) {}
+	virtual bool beginFigure() = 0;
+	virtual void endFigure() = 0;
+	virtual void addLine(const Vector2df& pt) = 0;
+	virtual void addLines(const Vector2df* pt, unsigned int size) = 0;
+};
+
 class GeometryGroup : public Geometry
 {
 public:
@@ -99,23 +117,6 @@ public:
 	virtual void removeGeometry(const wstring& geomName) = 0;
 	virtual void removeAllGeometries() = 0;
 	virtual void setGeometries(const vector<Geometry*>& geoms) = 0;
-};
-
-class TransformedGeometry : public Geometry
-{
-public:
-	TransformedGeometry(const wstring& name) : Geometry(name, EGT_TRANSFORM) {}
-	virtual bool buildTransformedGeom(Geometry* geom, const Matrix3x3& mat) = 0;
-};
-
-class PathGeometry : public Geometry
-{
-public:
-	PathGeometry(const wstring& name) : Geometry(name, EGT_PATH) {}
-	virtual bool beginFigure() = 0;
-	virtual void endFigure() = 0;
-	virtual void addLine(const Vector2df& pt) = 0;
-	virtual void addLines(const Vector2df* pt, unsigned int size) = 0;
 };
 
 NS_VAYO2D_END

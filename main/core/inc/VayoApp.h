@@ -81,7 +81,7 @@ public:
 			{
 				if (pDevice->getAppPaused())
 					pDevice->sleep(0, false);
-				else
+				else if (!pDevice->getAttrib().WndPaint)
 					core.renderOneFrame(pDevice);
 			}
 		}

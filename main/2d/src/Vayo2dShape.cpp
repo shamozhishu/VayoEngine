@@ -1,5 +1,6 @@
 #include "Vayo2dShape.h"
 #include "Vayo2dPivot.h"
+#include "Vayo2dLayer.h"
 #include "Vayo2dRenderer.h"
 #include "Vayo2dLayerManager.h"
 #include "Vayo2dGeometry.h"
@@ -36,7 +37,11 @@ void Shape::render()
 		feature->_fill = false;
 	pRenderer->setFeature(*feature);
 	if (_geom)
+	{
+		if (_geom->isTransformed())
+			_geom->transformed(IdentityMat3);
 		pRenderer->drawGeometry(_geom);
+	}
 	else
 	{
 		switch (_kind)
@@ -53,6 +58,15 @@ void Shape::render()
 			pRenderer->drawRoundedRect(_form.roundedRect.rect, _form.roundedRect.radius); break;
 		}
 	}
+}
+
+void Shape::getWorldTransform(Matrix3x3& mat) const
+{
+	Layer* layer = getParentLayer();
+	if (layer)
+		mat = layer->getAbsTransform();
+	else
+		Graphics::getWorldTransform(mat);
 }
 
 void Shape::setPoint(const Vector2df& point)

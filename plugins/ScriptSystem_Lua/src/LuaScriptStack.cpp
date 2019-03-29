@@ -16,7 +16,7 @@ LuaScriptStack::LuaScriptStack(const wstring& name, LuaScriptSystem* scriptSys)
 	: ScriptProtocol(name)
 	, _scriptSys(scriptSys)
 {
-	static unsigned short idx = 0;
+	static unsigned long long idx = 0;
 	if (0 == _scriptName.compare(L""))
 	{
 		std::wstringstream ss;

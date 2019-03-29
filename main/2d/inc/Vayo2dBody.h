@@ -24,9 +24,9 @@ public:
 	virtual Layer*         getParentLayer() const;
 	virtual bool           isVisible() const;
 	virtual void           setVisible(bool visible);
-	virtual Rectf          getWorldArea() const;
-	virtual const Rectf&   getLocalArea() const;
-	virtual void           refreshLocalArea();
+	virtual Rectf          getWorldRect() const;
+	virtual const Rectf&   getLocalRect() const;
+	virtual void           refreshLocalRect();
 	BitState&              getCollideMask();
 	UserDataBind&          getUserDataBind();
 	const UserDataBind&    getUserDataBind() const;
@@ -41,7 +41,7 @@ protected:
 	wstring      _name;
 	Layer*       _parentLayer;
 	bool         _visible;
-	Rectf        _localArea;
+	Rectf        _localRect;
 	BitState     _collideMask;
 	UserDataBind _userDataBind;
 };

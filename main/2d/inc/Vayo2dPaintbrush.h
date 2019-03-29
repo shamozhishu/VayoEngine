@@ -14,6 +14,7 @@ class Paintbrush
 {
 public:
 	virtual ~Paintbrush() {}
+	virtual void resetBrush(ERenderTarget rt) = 0;
 	virtual void onPainting(Feature& feature, const Feature& lastFeature) = 0;
 };
 
