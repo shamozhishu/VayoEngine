@@ -356,9 +356,9 @@ void ManualObject::submitDisplay()
 		{
 			pSubMesh = *cit;
 			subMeshMaterialName = pSubMesh->getMaterialName();
-
-			if (subMeshMaterialName != L"")
-				pRenderSys->setMaterial(*pMaterialMgr->findMaterial(subMeshMaterialName));
+			MaterialPtr material = pMaterialMgr->findMaterial(subMeshMaterialName);
+			if (material)
+				pRenderSys->setMaterial(*material);
 			else
 				pRenderSys->setMaterial(*getMaterial());
 
