@@ -1491,21 +1491,11 @@ void GLRenderSystem::draw2DImageBatch(TexturePtr texture, const vector<Recti>& d
 		glDisable(GL_SCISSOR_TEST);
 }
 
-void GLRenderSystem::drawVertexPrimitiveList(const void* vertices, unsigned int vertexCount,
-	const unsigned int* indexList, unsigned int primitiveCount, EPrimitiveType primType)
+void GLRenderSystem::drawVertexPrimitiveListBegan(const void* vertices, unsigned int vertexCount)
 {
-	if (!primitiveCount || !vertexCount)
-	{
-		Log::wprint(ELL_ERROR,
-			L"primitiveCount=%d,vertexCount=%d(GLRenderSystem::drawVertexPrimitiveList)",
-			primitiveCount, vertexCount);
-		return;
-	}
-
-	if (!checkPrimitiveCount(primitiveCount))
+	if (!vertexCount)
 		return;
 
-	RenderSystem::drawVertexPrimitiveList(vertices, vertexCount, indexList, primitiveCount, primType);
 	setRenderMode3D();
 
 	if (_curMaterial._materialType > EMT_TRANSPARENT_REFLECTION_2_LAYER)
@@ -1534,11 +1524,8 @@ void GLRenderSystem::drawVertexPrimitiveList(const void* vertices, unsigned int 
 	{
 		glEnableClientState(GL_COLOR_ARRAY);
 		glEnableClientState(GL_VERTEX_ARRAY);
-		if ((primType != EPT_POINTS))
-		{
-			glEnableClientState(GL_NORMAL_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		}
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		if (vertices)
 		{
@@ -1556,9 +1543,20 @@ void GLRenderSystem::drawVertexPrimitiveList(const void* vertices, unsigned int 
 			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), buffer_offset(28));
 		}
 	}
+}
 
+void GLRenderSystem::drawVertexPrimitiveList(const unsigned int* indexList, unsigned int primitiveCount, EPrimitiveType primType)
+{
+	if (!checkPrimitiveCount(primitiveCount))
+		return;
+
+	setRenderMode3D();
+	_primitivesDrawn += primitiveCount;
 	renderArray(indexList, primitiveCount, primType);
+}
 
+void GLRenderSystem::drawVertexPrimitiveListEnded()
+{
 	if (_curMaterial._materialType > EMT_TRANSPARENT_REFLECTION_2_LAYER)
 	{
 		glDisableVertexAttribArray(0);
@@ -1570,11 +1568,8 @@ void GLRenderSystem::drawVertexPrimitiveList(const void* vertices, unsigned int 
 	{
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
-		if ((primType != EPT_POINTS))
-		{
-			glDisableClientState(GL_NORMAL_ARRAY);
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		}
+		glDisableClientState(GL_NORMAL_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
 }
 
@@ -1658,7 +1653,9 @@ void GLRenderSystem::drawHardwareBuffer(HardwareBufferLink* hwBuffer)
 		indexList = NULL;
 	}
 
-	drawVertexPrimitiveList(vertices, mb->getVertexCount(), indexList, mb->getPrimCount(), mb->getPrimType());
+	drawVertexPrimitiveListBegan(vertices, mb->getVertexCount());
+	drawVertexPrimitiveList(indexList, mb->getPrimCount(), mb->getPrimType());
+	drawVertexPrimitiveListEnded();
 
 	if (glhwBuffer->MappedVertex != EHM_NEVER)
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

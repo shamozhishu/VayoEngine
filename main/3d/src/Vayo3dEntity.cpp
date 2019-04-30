@@ -26,14 +26,15 @@ SubEntity::~SubEntity()
 {
 }
 
+void SubEntity::setMaterialCB(SubMesh* mb)
+{
+	Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
+}
+
 void SubEntity::render()
 {
 	if (_subMesh->getVertexCount() != 0)
-	{
-		RenderSystem* pRenderSys = Root::getSingleton().getActiveRenderer();
-		pRenderSys->setMaterial(*getMaterial());
-		pRenderSys->drawMeshBuffer(_subMesh);
-	}
+		Root::getSingleton().getActiveRenderer()->drawMeshBuffer<SubEntity>(_subMesh, this, &SubEntity::setMaterialCB);
 }
 
 void SubEntity::getWorldTransform(Matrix4x4& mat) const

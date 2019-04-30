@@ -16,7 +16,7 @@ public:
 	~GLTesselator();
 	void          beginPolygon(void* data);
 	void          beginContour();
-	void          vertex(Vertex* vert);
+	void          vertex(VertIdxPair* vert);
 	void          endContour();
 	void          endPolygon();
 	void          setBeginCallback(TessBeginDataProc pBegin);
@@ -28,7 +28,7 @@ public:
 private:
 	static const char*   getPrimitiveType(GLenum type);
 	static void CALLBACK tessBeginCB(GLenum which);
-	static void CALLBACK tessVertexCB(const Vertex* vert);
+	static void CALLBACK tessVertexCB(const VertIdxPair* vert);
 	static void CALLBACK tessEndCB();
 	static void CALLBACK tessErrorCB(GLenum errorCode);
 private:

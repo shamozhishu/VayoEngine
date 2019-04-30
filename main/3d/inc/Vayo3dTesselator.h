@@ -30,7 +30,7 @@ public:
 	virtual ~Tesselator() {}
 	virtual void          beginPolygon(void* data) = 0;
 	virtual void          beginContour() = 0;
-	virtual void          vertex(Vertex* vert) = 0;
+	virtual void          vertex(VertIdxPair* vert) = 0;
 	virtual void          endContour() = 0;
 	virtual void          endPolygon() = 0;
 	virtual void          setBeginCallback(TessBeginDataProc pBegin) = 0;

@@ -17,7 +17,7 @@ void bendWireway(const Vector3df& startCenterPos, const Vector3df& finishCenterP
 	const float angleStep = (VAYO_MATH_PI * 2.0f) / VayoDegToRad(cnt);
 	Matrix4x4 transformMat;
 
-	vector<Vertex> vertList;
+	vector<VertIdxPair> vertList;
 	Vertex tmpVert;
 	tmpVert._normal.set(0, 0, 1);
 
@@ -167,7 +167,7 @@ void comWireway(float radius, float length, SceneNode* parent, const Vector3df& 
 	const float angleStep = (VAYO_MATH_PI * 2.0f) / VayoDegToRad(cnt);
 	Matrix4x4 transformMat;
 
-	vector<Vertex> vertList;
+	vector<VertIdxPair> vertList;
 	Vertex tmpVert;
 	tmpVert._normal.set(0, 0, 1);
 
@@ -284,7 +284,7 @@ TestModel::TestModel(SceneManager* pSceneMgr)
 	m_sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pObj);
 	pObj->getParentNode()->setPosition(Vector3df(10, 10, 10));
 
-	vector<Vertex> vertList;
+	vector<VertIdxPair> vertList;
 	Vertex tmpVert;
 	tmpVert._position.set(-2, -2, 0);
 	vertList.push_back(tmpVert);
@@ -413,6 +413,19 @@ BoxModel::BoxModel(SceneManager* pSceneMgr)
 	pObj->setMaterial(L"examples/Ãè±ß");
 	pObj->generateSphere(6.5f, 30, 30, L"examples/Ãè±ß");
 	pObj->setRenderPriority(1);
+
+	pObj = m_sceneMgr->createObject<ManualObject>(L"Èý½ÇÐÎ");
+	pObj->getMaterial()->_lighting = false;
+	pObj->getMaterial()->_gouraudShading = false;
+	m_sceneMgr->getRootSceneNode()->attachObject(pObj);
+	pObj->begin(EPT_TRIANGLES);
+	pObj->colour(0xffff0000);
+	pObj->position(0, 5, 0);
+	pObj->colour(0xff00ff00);
+	pObj->position(-5, 0, 0);
+	pObj->colour(0xff0000ff);
+	pObj->position(5, 0, 0);
+	pObj->end();
 }
 
 BoxModel::~BoxModel()

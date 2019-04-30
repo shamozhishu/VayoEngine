@@ -15,10 +15,14 @@ Reflex<ManualObject, const wstring&, SceneManager*> ManualObject::_dynReflex;
 ManualObject::ManualObject(const wstring& name, SceneManager* oriSceneMgr)
 	: MovableObject(name, oriSceneMgr)
 	, _needSubmit(true)
-	, _opSubMesh(NULL)
-	, _displayList(NULL)
+	, _opSubMesh(nullptr)
+	, _opIdxBuffer(nullptr)
+	, _displayList(nullptr)
 	, _lastVertNum(0)
 	, _lastIdxNum(0)
+	, _isSharedSubMesh(false)
+	, _onlyDisplayList(false)
+	, _needComputeNorm(true)
 {
 	_meshData = Root::getSingleton().getMeshManager()->createEmptyMesh();
 	_displayList = Root::getSingleton().getActiveRenderer()->createDisplayList();
@@ -37,7 +41,7 @@ void ManualObject::update(float dt)
 
 void ManualObject::render()
 {
-	if (!_meshData->isEmptyMesh())
+	if (!_meshData->isEmptyMesh() || _onlyDisplayList)
 	{
 		// 设置所有子网格的公共材质,例如启用光照,因为类似glEnable(GL_LIGHTING)这类调用不能装入显示列表中.
 		Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
@@ -73,51 +77,98 @@ void ManualObject::getWorldTransform(Matrix4x4& mat) const
 		Renderable::getWorldTransform(mat);
 }
 
-void ManualObject::begin(EPrimitiveType primType, const wstring& materialName /*= L""*/)
+void ManualObject::begin(EPrimitiveType primType, const wstring& materialName /*= L""*/, bool sharedSubMesh /*= false*/)
 {
-	VAYO_ASSERT(!_opSubMesh);
-
-	_opSubMesh = _meshData->createSubMesh(primType);
-	_opSubMesh->setMaterialName(materialName);
-	_lastVertNum = _opSubMesh->getVertexCount();
-	_lastIdxNum = _opSubMesh->getIndexCount();
+	if (sharedSubMesh)
+	{
+		VAYO_ASSERT(!_opIdxBuffer);
+		SharedSubMesh* pSharedSubMesh = _meshData->createSharedSubMesh();
+		pSharedSubMesh->setMaterialName(pSharedSubMesh->getIBufferCount(), materialName);
+		_opIdxBuffer = pSharedSubMesh->createIBuffer(primType);
+		_lastVertNum = 0;
+		_lastIdxNum = _opIdxBuffer->getIndexCount();
+		_isSharedSubMesh = true;
+	}
+	else
+	{
+		VAYO_ASSERT(!_opSubMesh);
+		_opSubMesh = _meshData->createSubMesh(primType);
+		_opSubMesh->setMaterialName(materialName);
+		_lastVertNum = _opSubMesh->getVertexCount();
+		_lastIdxNum = _opSubMesh->getIndexCount();
+		_isSharedSubMesh = false;
+	}
 }
 
-void ManualObject::beginUpdate(unsigned int idx)
+void ManualObject::beginUpdate(unsigned int idx, bool sharedSubMesh /*= false*/)
 {
-	VAYO_ASSERT(!_opSubMesh);
-
-	if (idx >= _meshData->getSubMeshCount())
+	if (sharedSubMesh)
 	{
-		Log::wprint(ELL_ERROR, L"Index out of bounds(ManualObject::beginUpdate).");
-		return;
+		VAYO_ASSERT(!_opIdxBuffer);
+		if (idx >= _meshData->getSharedSubMesh()->getIBufferCount())
+		{
+			Log::wprint(ELL_ERROR, L"Index out of bounds(ManualObject::beginUpdate).");
+			return;
+		}
+		_opIdxBuffer = _meshData->getSharedSubMesh()->getIBuffer(idx);
+		_opIdxBuffer->clearIndexList();
+		_lastIdxNum = _opIdxBuffer->getIndexCount();
+		_isSharedSubMesh = true;
 	}
-
-	_opSubMesh = _meshData->getSubMesh(idx);
-	_opSubMesh->clearVertexList();
-	_opSubMesh->clearIndexList();
-	_lastVertNum = _opSubMesh->getVertexCount();
-	_lastIdxNum = _opSubMesh->getIndexCount();
+	else
+	{
+		VAYO_ASSERT(!_opSubMesh);
+		if (idx >= _meshData->getSubMeshCount())
+		{
+			Log::wprint(ELL_ERROR, L"Index out of bounds(ManualObject::beginUpdate).");
+			return;
+		}
+		_opSubMesh = _meshData->getSubMesh(idx);
+		_opSubMesh->clearVertexList();
+		_opSubMesh->clearIndexList();
+		_lastVertNum = _opSubMesh->getVertexCount();
+		_lastIdxNum = _opSubMesh->getIndexCount();
+		_isSharedSubMesh = false;
+	}
 }
 
 void ManualObject::end()
 {
-	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
-	_opSubMesh->computeVertexNormals();
-
-	if (_lastVertNum != _opSubMesh->getVertexCount())
+	if (_isSharedSubMesh)
 	{
-		_opSubMesh->setDirty(EBT_VERTEX);
+		VAYO_ASSERT(_opIdxBuffer);
+		_meshData->getSharedSubMesh()->setVDirty();
 		_needSubmit = true;
-	}
 
-	if (_lastIdxNum != _opSubMesh->getIndexCount())
+		if (_lastIdxNum != _opIdxBuffer->getIndexCount())
+			_opIdxBuffer->setIDirty();
+
+		_opIdxBuffer = NULL;
+	}
+	else
 	{
-		_opSubMesh->setDirty(EBT_INDEX);
-		_needSubmit = true;
-	}
+		VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
+		if (_opSubMesh->getIndexCount() == 0)
+		{
+			unsigned int size = _opSubMesh->getVertexCount();
+			for (unsigned i = 0; i < size; ++i)
+				_opSubMesh->addIndex(i);
+		}
 
-	_opSubMesh = NULL;
+		if (_lastVertNum != _opSubMesh->getVertexCount())
+		{
+			_opSubMesh->setDirty(EBT_VERTEX);
+			_needSubmit = true;
+		}
+
+		if (_lastIdxNum != _opSubMesh->getIndexCount())
+		{
+			_opSubMesh->setDirty(EBT_INDEX);
+			_needSubmit = true;
+		}
+
+		_opSubMesh = NULL;
+	}
 }
 
 void ManualObject::position(const Vector3df& pos)
@@ -127,9 +178,15 @@ void ManualObject::position(const Vector3df& pos)
 
 void ManualObject::position(float x, float y, float z)
 {
-	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
-	_opSubMesh->addIndex(_opSubMesh->getVertexCount());
-	_opSubMesh->addPosition(Vector3df(x, y, z));
+	if (_isSharedSubMesh)
+	{
+		_meshData->getSharedSubMesh()->addPosition(Vector3df(x, y, z));
+	}
+	else
+	{
+		VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
+		_opSubMesh->addPosition(Vector3df(x, y, z));
+	}
 }
 
 void ManualObject::normal(const Vector3df& norm)
@@ -139,8 +196,15 @@ void ManualObject::normal(const Vector3df& norm)
 
 void ManualObject::normal(float x, float y, float z)
 {
-	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
-	_opSubMesh->addNormal(Vector3df(x, y, z));
+	if (_isSharedSubMesh)
+	{
+		_meshData->getSharedSubMesh()->addNormal(Vector3df(x, y, z));
+	}
+	else
+	{
+		VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
+		_opSubMesh->addNormal(Vector3df(x, y, z));
+	}
 }
 
 void ManualObject::textureCoord(const Vector2df& uv)
@@ -150,8 +214,15 @@ void ManualObject::textureCoord(const Vector2df& uv)
 
 void ManualObject::textureCoord(float u, float v)
 {
-	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
-	_opSubMesh->addTexCoord(Vector2df(u, v));
+	if (_isSharedSubMesh)
+	{
+		_meshData->getSharedSubMesh()->addTexCoord(Vector2df(u, v));
+	}
+	else
+	{
+		VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
+		_opSubMesh->addTexCoord(Vector2df(u, v));
+	}
 }
 
 void ManualObject::colour(const Colour& col)
@@ -161,41 +232,71 @@ void ManualObject::colour(const Colour& col)
 
 void ManualObject::colour(int r, int g, int b, int a /*= 255*/)
 {
-	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
-	_opSubMesh->addColor(Colour(a, r, g, b));
+	if (_isSharedSubMesh)
+	{
+		_meshData->getSharedSubMesh()->addColor(Colour(a, r, g, b));
+	}
+	else
+	{
+		VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
+		_opSubMesh->addColor(Colour(a, r, g, b));
+	}
 }
 
 void ManualObject::index(unsigned int idx)
 {
-	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
-	_opSubMesh->addIndex(idx);
+	if (_isSharedSubMesh)
+		_opIdxBuffer->addIndex(idx);
+	else
+		_opSubMesh->addIndex(idx);
 }
 
 void ManualObject::triangle(unsigned int i1, unsigned int i2, unsigned int i3)
 {
-	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
-	_opSubMesh->addIndex(i1);
-	_opSubMesh->addIndex(i2);
-	_opSubMesh->addIndex(i3);
+	if (_isSharedSubMesh)
+	{
+		VAYO_ASSERT(_opIdxBuffer && "ManualObject::_opIdxBuffer == NULL");
+		_opIdxBuffer->addIndex(i1);
+		_opIdxBuffer->addIndex(i2);
+		_opIdxBuffer->addIndex(i3);
+	}
+	else
+	{
+		VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
+		_opSubMesh->addIndex(i1);
+		_opSubMesh->addIndex(i2);
+		_opSubMesh->addIndex(i3);
+	}
 }
 
 void ManualObject::quad(unsigned int i1, unsigned int i2, unsigned int i3, unsigned int i4)
 {
-	VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
-	_opSubMesh->addIndex(i1);
-	_opSubMesh->addIndex(i2);
-	_opSubMesh->addIndex(i3);
-	_opSubMesh->addIndex(i4);
+	if (_isSharedSubMesh)
+	{
+		VAYO_ASSERT(_opIdxBuffer && "ManualObject::_opIdxBuffer == NULL");
+		_opIdxBuffer->addIndex(i1);
+		_opIdxBuffer->addIndex(i2);
+		_opIdxBuffer->addIndex(i3);
+		_opIdxBuffer->addIndex(i4);
+	}
+	else
+	{
+		VAYO_ASSERT(_opSubMesh && "ManualObject::_opSubMesh == NULL");
+		_opSubMesh->addIndex(i1);
+		_opSubMesh->addIndex(i2);
+		_opSubMesh->addIndex(i3);
+		_opSubMesh->addIndex(i4);
+	}
 }
 
 MeshPtr ManualObject::convertToMesh(EHardwareMapping mappingHint /*= EHM_NEVER*/) const
 {
-	SubMesh* pCurSubMesh = NULL;
+	SubMesh* pCurSubMesh = nullptr;
 	const vector<SubMesh*>& subMeshList = _meshData->getSubMeshList();
 	vector<SubMesh*>::const_iterator cit = subMeshList.cbegin();
 	for (; cit != subMeshList.cend(); ++cit)
 	{
-		pCurSubMesh = (*cit);
+		pCurSubMesh = *cit;
 		if (pCurSubMesh)
 		{
 			pCurSubMesh->setHardwareMappingHint(mappingHint);
@@ -203,6 +304,16 @@ MeshPtr ManualObject::convertToMesh(EHardwareMapping mappingHint /*= EHM_NEVER*/
 				pCurSubMesh->setMaterialName(getMaterial()->_materialName);
 		}
 	}
+
+	SharedSubMesh* pSharedSubMesh = _meshData->getSharedSubMesh();
+	if (pSharedSubMesh)
+	{
+		pSharedSubMesh->setVHardwareMappingHint(mappingHint);
+		unsigned size = pSharedSubMesh->getIBufferCount();
+		for (unsigned i = 0; i < size; ++i)
+			pSharedSubMesh->getIBuffer(i)->setIHardwareMappingHint(mappingHint);
+	}
+
 	return _meshData;
 }
 
@@ -219,6 +330,16 @@ SubMesh* ManualObject::getOpSubMesh() const
 void ManualObject::resetSubmit()
 {
 	_needSubmit = true;
+}
+
+void ManualObject::setOnlyDisplayList(bool onlyDisplayList)
+{
+	_onlyDisplayList = onlyDisplayList;
+}
+
+void ManualObject::setNeedComputeNormal(bool needComputeNorm)
+{
+	_needComputeNorm = needComputeNorm;
 }
 
 void ManualObject::generatePlane(float extent, float step, const wstring& materialName)
@@ -344,30 +465,72 @@ void ManualObject::submitDisplay()
 {
 	if (!_meshData->isEmptyMesh())
 	{
-		SubMesh* pSubMesh = NULL;
-		wstring subMeshMaterialName;
+		if (_needComputeNorm)
+			_meshData->computeNormals(Mesh::ENT_FACE);
+
 		RenderSystem* pRenderSys = Root::getSingleton().getActiveRenderer();
-		MaterialManager* pMaterialMgr = Root::getSingleton().getMaterialManager();
-		const vector<SubMesh*>& subMeshList = _meshData->getSubMeshList();
-		vector<SubMesh*>::const_iterator cit = subMeshList.cbegin();
 		_displayList->newList();
 
+		SharedSubMesh* pSharedSubMesh = _meshData->getSharedSubMesh();
+		if (pSharedSubMesh)
+		{
+			if (_onlyDisplayList)
+			{
+				pSharedSubMesh->setVHardwareMappingHint(EHM_NEVER);
+				unsigned size = pSharedSubMesh->getIBufferCount();
+				for (unsigned i = 0; i < size; ++i)
+				{
+					IndexBuffer* pIdxBuf = pSharedSubMesh->getIBuffer(i);
+					pIdxBuf->setIHardwareMappingHint(EHM_NEVER);
+				}
+
+				pRenderSys->drawMeshBuffer<ManualObject>(pSharedSubMesh, this, &ManualObject::setMaterialCB);
+				_meshData->destroySharedSubMesh();
+			}
+			else
+			{
+				EHardwareMapping oldVertHwmapping = pSharedSubMesh->getMappedVertexHint();
+				pSharedSubMesh->setVHardwareMappingHint(EHM_NEVER);
+				unsigned size = pSharedSubMesh->getIBufferCount();
+				vector<EHardwareMapping> oldIdxHwmappingList(size);
+
+				for (unsigned i = 0; i < size; ++i)
+				{
+					IndexBuffer* pIdxBuf = pSharedSubMesh->getIBuffer(i);
+					oldIdxHwmappingList[i] = pIdxBuf->getMappedIndexHint();
+					pIdxBuf->setIHardwareMappingHint(EHM_NEVER);
+				}
+
+				pRenderSys->drawMeshBuffer<ManualObject>(pSharedSubMesh, this, &ManualObject::setMaterialCB);
+
+				pSharedSubMesh->setVHardwareMappingHint(oldVertHwmapping);
+				for (unsigned i = 0; i < size; ++i)
+					pSharedSubMesh->getIBuffer(i)->setIHardwareMappingHint(oldIdxHwmappingList[i]);
+			}
+		}
+
+		SubMesh* pSubMesh = nullptr;
+		const vector<SubMesh*>& subMeshList = _meshData->getSubMeshList();
+		vector<SubMesh*>::const_iterator cit = subMeshList.cbegin();
 		for (; cit != subMeshList.cend(); ++cit)
 		{
 			pSubMesh = *cit;
-			subMeshMaterialName = pSubMesh->getMaterialName();
-			MaterialPtr material = pMaterialMgr->findMaterial(subMeshMaterialName);
-			if (material)
-				pRenderSys->setMaterial(*material);
+			if (_onlyDisplayList)
+			{
+				pSubMesh->setHardwareMappingHint(EHM_NEVER);
+				pRenderSys->drawMeshBuffer<ManualObject>(pSubMesh, this, &ManualObject::setMaterialCB);
+				pSubMesh->clearVertexList();
+				pSubMesh->clearIndexList();
+			}
 			else
-				pRenderSys->setMaterial(*getMaterial());
-
-			EHardwareMapping oldVertHwmapping = pSubMesh->getMappedVertexHint();
-			EHardwareMapping oldIdxHwmapping = pSubMesh->getMappedIndexHint();
-			pSubMesh->setHardwareMappingHint(EHM_NEVER);
-			pRenderSys->drawMeshBuffer(pSubMesh);
-			pSubMesh->setHardwareMappingHint(oldVertHwmapping, EBT_VERTEX);
-			pSubMesh->setHardwareMappingHint(oldIdxHwmapping, EBT_INDEX);
+			{
+				EHardwareMapping oldVertHwmapping = pSubMesh->getMappedVertexHint();
+				EHardwareMapping oldIdxHwmapping = pSubMesh->getMappedIndexHint();
+				pSubMesh->setHardwareMappingHint(EHM_NEVER);
+				pRenderSys->drawMeshBuffer<ManualObject>(pSubMesh, this, &ManualObject::setMaterialCB);
+				pSubMesh->setHardwareMappingHint(oldVertHwmapping, EBT_VERTEX);
+				pSubMesh->setHardwareMappingHint(oldIdxHwmapping, EBT_INDEX);
+			}
 		}
 
 		wstring lastMaterialName;
@@ -375,8 +538,30 @@ void ManualObject::submitDisplay()
 			lastMaterialName = pSubMesh->getMaterialName();
 		if (lastMaterialName == L"")
 			lastMaterialName = getMaterial()->_materialName;
+
 		_displayList->endList(lastMaterialName);
+
+		if (_onlyDisplayList)
+			_meshData->destroyAllSubMeshs();
 	}
+}
+
+void ManualObject::setMaterialCB(SubMesh* mb)
+{
+	MaterialPtr material = Root::getSingleton().getMaterialManager()->findMaterial(mb->getMaterialName());
+	if (material)
+		Root::getSingleton().getActiveRenderer()->setMaterial(*material);
+	else
+		Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
+}
+
+void ManualObject::setMaterialCB(SharedSubMesh* mb, unsigned idx)
+{
+	MaterialPtr material = Root::getSingleton().getMaterialManager()->findMaterial(mb->getMaterialName(idx));
+	if (material)
+		Root::getSingleton().getActiveRenderer()->setMaterial(*material);
+	else
+		Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
 }
 
 void ManualObject::serialize(XMLElement* outXml)

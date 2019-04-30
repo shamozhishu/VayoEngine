@@ -26,8 +26,8 @@ public:
 	void transformPositionList(const Matrix4x4& posMat, unsigned int contourIdx = -1);
 	void transformNormalList(const Matrix4x4& normMat, unsigned int contourIdx = -1);
 	void changeNormalList(const Vector3df& newNorm, unsigned int contourIdx = -1);
-	vector<Vertex>& getVertexList();
-	const vector<Vertex>& getVertexList() const;
+	vector<VertIdxPair>& getVertexList();
+	const vector<VertIdxPair>& getVertexList() const;
 	vector<unsigned int>& getContour(unsigned int listIdx);
 	const vector<unsigned int>& getContour(unsigned int listIdx) const;
 	unsigned int getContoursCount() const;
@@ -54,9 +54,9 @@ private:
 	ManualObject*                _opDstObj;
 	wstring                      _materialName;
 	unsigned int                 _contourSrcIdx;
-	vector<Vertex>               _vertexList;
+	vector<VertIdxPair>          _vertexList;
 	vector<vector<unsigned int>> _contourList;
-	list<Vertex>                 _combineVertices;
+	list<VertIdxPair>            _combineVertices;
 };
 
 NS_VAYO3D_END

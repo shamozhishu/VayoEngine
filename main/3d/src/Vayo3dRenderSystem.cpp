@@ -73,8 +73,10 @@ void RenderSystem::draw3DTriangle(const Triangle3df& triangle, Colour color /*= 
 	vertices[2]._color = color;
 	vertices[2]._normal = vertices[0]._normal;
 	vertices[2]._texCoord.set(1.f, 0.f);
-	const unsigned int indexList[] = {0,1,2};
-	drawVertexPrimitiveList(vertices, 3, indexList, 1, EPT_TRIANGLES);
+	unsigned int indexList[] = {0,1,2};
+	drawVertexPrimitiveListBegan(vertices, 3);
+	drawVertexPrimitiveList(indexList, 1, EPT_TRIANGLES);
+	drawVertexPrimitiveListEnded();
 }
 
 void RenderSystem::draw3DBox(const Aabbox3df box, Colour color /*= Colour(255, 255, 255, 255)*/)
@@ -93,19 +95,6 @@ void RenderSystem::draw3DBox(const Aabbox3df box, Colour color /*= Colour(255, 2
 	draw3DLine(edges[3], edges[2], color);
 	draw3DLine(edges[7], edges[6], color);
 	draw3DLine(edges[5], edges[4], color);
-}
-
-void RenderSystem::drawMeshBuffer(SubMesh* mb)
-{
-	if (!mb)
-		return;
-
-	HardwareBufferLink* hwBuffer = getBufferLink(mb);
-	if (hwBuffer)
-		drawHardwareBuffer(hwBuffer);
-	else
-		drawVertexPrimitiveList(mb->getVertices(), mb->getVertexCount(),
-			mb->getIndices(), mb->getPrimCount(), mb->getPrimType());
 }
 
 void RenderSystem::updateAllHardwareBuffers()

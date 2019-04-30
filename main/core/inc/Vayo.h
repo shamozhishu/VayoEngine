@@ -52,6 +52,7 @@
 #include "VayoPlane3d.h"
 #include "VayoAabbox3d.h"
 #include "VayoTriangle3d.h"
+#include "VayoMatrix3x3.h"
 #include "VayoMatrix4x4.h"
 #include "VayoQuaternion.h"
 // 应用程序基类

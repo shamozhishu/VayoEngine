@@ -79,6 +79,7 @@ private:
 	MovableObject* m_pSphereBorder1;
 	MovableObject* m_pSphere2;
 	MovableObject* m_pSphereBorder2;
+	MovableObject* m_pTestTri;
 
 	SceneManager* m_pCurSceneMgr;
 };

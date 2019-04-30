@@ -26,8 +26,8 @@ public:
 	void     setMaterial(const wstring& name);
 	void     setMaterial(MaterialPtr material);
 	void     getWorldTransform(Matrix4x4& mat) const;
-	void     begin(EPrimitiveType primType, const wstring& materialName = L"");
-	void     beginUpdate(unsigned int idx);
+	void     begin(EPrimitiveType primType, const wstring& materialName = L"", bool sharedSubMesh = false);
+	void     beginUpdate(unsigned int idx, bool sharedSubMesh = false);
 	void     end();
 	void     position(const Vector3df& pos);
 	void     position(float x, float y, float z);
@@ -44,6 +44,8 @@ public:
 	MeshPtr  getMesh() const;
 	SubMesh* getOpSubMesh() const;
 	void     resetSubmit();
+	void     setOnlyDisplayList(bool onlyDisplayList);
+	void     setNeedComputeNormal(bool needComputeNorm);
 
 public:
 	/* 生成模型 */
@@ -57,14 +59,20 @@ public:
 
 protected:
 	void submitDisplay();
+	void setMaterialCB(SubMesh* mb);
+	void setMaterialCB(SharedSubMesh* mb, unsigned idx);
 
 private:
-	bool         _needSubmit;
-	unsigned int _lastVertNum;
-	unsigned int _lastIdxNum;
-	MeshPtr      _meshData;
-	SubMesh*     _opSubMesh;
-	DisplayList* _displayList;
+	bool           _needSubmit;
+	bool           _isSharedSubMesh;
+	bool           _onlyDisplayList;
+	bool           _needComputeNorm;
+	unsigned int   _lastVertNum;
+	unsigned int   _lastIdxNum;
+	MeshPtr        _meshData;
+	SubMesh*       _opSubMesh;
+	IndexBuffer*   _opIdxBuffer;
+	DisplayList*   _displayList;
 };
 
 NS_VAYO3D_END

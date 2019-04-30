@@ -40,6 +40,15 @@ public:
 	Vector2df  _texCoord;
 };
 
+struct VertIdxPair
+{
+	Vertex _vert;
+	unsigned int _idx;
+	VertIdxPair() : _idx(0) {}
+	VertIdxPair(Vertex vertex) : _vert(vertex), _idx(0) {}
+	VertIdxPair(Vertex vertex, unsigned int idx) : _vert(vertex), _idx(idx) {}
+};
+
 NS_VAYO3D_END
 
 #endif // __VAYO3D_VERTEX_H__

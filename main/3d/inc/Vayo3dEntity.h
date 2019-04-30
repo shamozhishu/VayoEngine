@@ -19,6 +19,7 @@ class _Vayo3dExport SubEntity : public Renderable
 protected:
 	SubEntity(Entity* parent, SubMesh* addedSubMesh);
 	~SubEntity();
+	void setMaterialCB(SubMesh* mb);
 
 public:
 	void               render();

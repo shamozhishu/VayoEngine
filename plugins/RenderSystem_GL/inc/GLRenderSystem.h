@@ -80,8 +80,9 @@ public:
 	void fillingDisplayList(bool isFilling) { _isFillDisplayList = isFilling; }
 
 protected:
-	void drawVertexPrimitiveList(const void* vertices, unsigned int vertexCount,
-		const unsigned int* indexList, unsigned int primitiveCount, EPrimitiveType primType);
+	void drawVertexPrimitiveListBegan(const void* vertices, unsigned int vertexCount);
+	void drawVertexPrimitiveList(const unsigned int* indexList, unsigned int primitiveCount, EPrimitiveType primType);
+	void drawVertexPrimitiveListEnded();
 
 	typedef struct tagHardwareBufferLink_OpenGL : public HardwareBufferLink
 	{

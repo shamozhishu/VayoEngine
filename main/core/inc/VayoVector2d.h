@@ -38,6 +38,8 @@ namespace Vayo {
 		Vector2d<T> operator/(const T v) const { return Vector2d<T>(_x / v, _y / v); }
 		Vector2d<T>& operator/=(const T v) { _x /= v; _y /= v; return *this; }
 
+		T operator^(const Vector2d<T>& other) const { return _x * other._y - other._x * _y; }
+
 		bool operator==(const Vector2d<T>& other) const { return equals(_x, other._x) && equals(_y, other._y); }
 		bool operator!=(const Vector2d<T>& other) const { return !equals(_x, other._x) || !equals(_y, other._y); }
 

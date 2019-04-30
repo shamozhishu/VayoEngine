@@ -8,15 +8,12 @@ NS_VAYO3D_BEGIN
 
 void __stdcall TessGridParser::tessBeginDataCB(EPrimitiveType which, TessGridHandler* tess)
 {
-	tess->_opDstObj->begin(which, tess->_materialName);
+	tess->_opDstObj->begin(which, tess->_materialName, true);
 }
 
-void __stdcall TessGridParser::tessVertexDataCB(Vertex* vert, TessGridHandler* tess)
+void __stdcall TessGridParser::tessVertexDataCB(VertIdxPair* vert, TessGridHandler* tess)
 {
-	tess->_opDstObj->colour(vert[0]._color.getRed(), vert[0]._color.getGreen(), vert[0]._color.getBlue(), vert[0]._color.getAlpha());
-	tess->_opDstObj->textureCoord(vert[0]._texCoord._x, vert[0]._texCoord._y);
-	tess->_opDstObj->normal(vert[0]._normal._x, vert[0]._normal._y, vert[0]._normal._z);
-	tess->_opDstObj->position(vert[0]._position._x, vert[0]._position._y, vert[0]._position._z);
+	tess->_opDstObj->index(vert->_idx);
 }
 
 void __stdcall TessGridParser::tessEndDataCB(TessGridHandler* tess)
@@ -24,47 +21,49 @@ void __stdcall TessGridParser::tessEndDataCB(TessGridHandler* tess)
 	tess->_opDstObj->end();
 }
 
-void __stdcall TessGridParser::tessCombineDataCB(const double newVertex[3], const Vertex* neighborVertex[4], const float neighborWeight[4], Vertex** outData, TessGridHandler* tess)
+void __stdcall TessGridParser::tessCombineDataCB(const double newVertex[3], const VertIdxPair* neighborVertex[4], const float neighborWeight[4], VertIdxPair** outData, TessGridHandler* tess)
 {
 	float red, green, blue, x, y, z, a, b, c, d;
 	Vertex tmpVert;
 	tmpVert._position.set((float)newVertex[0], (float)newVertex[1], (float)newVertex[2]);
 
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_color.getRed() : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_color.getRed() : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_color.getRed() : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_color.getRed() : 0.0f;
+	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._color.getRed() : 0.0f;
+	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._color.getRed() : 0.0f;
+	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._color.getRed() : 0.0f;
+	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._color.getRed() : 0.0f;
 	red = a + b + c + d;
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_color.getGreen() : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_color.getGreen() : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_color.getGreen() : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_color.getGreen() : 0.0f;
+	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._color.getGreen() : 0.0f;
+	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._color.getGreen() : 0.0f;
+	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._color.getGreen() : 0.0f;
+	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._color.getGreen() : 0.0f;
 	green = a + b + c + d;
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_color.getBlue() : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_color.getBlue() : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_color.getBlue() : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_color.getBlue() : 0.0f;
+	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._color.getBlue() : 0.0f;
+	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._color.getBlue() : 0.0f;
+	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._color.getBlue() : 0.0f;
+	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._color.getBlue() : 0.0f;
 	blue = a + b + c + d;
 	tmpVert._color.set(255, red, green, blue);
 
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_normal._x : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_normal._x : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_normal._x : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_normal._x : 0.0f;
+	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._x : 0.0f;
+	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._x : 0.0f;
+	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._x : 0.0f;
+	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._x : 0.0f;
 	x = a + b + c + d;
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_normal._y : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_normal._y : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_normal._y : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_normal._y : 0.0f;
+	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._y : 0.0f;
+	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._y : 0.0f;
+	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._y : 0.0f;
+	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._y : 0.0f;
 	y = a + b + c + d;
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_normal._z : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_normal._z : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_normal._z : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_normal._z : 0.0f;
+	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._z : 0.0f;
+	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._z : 0.0f;
+	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._z : 0.0f;
+	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._z : 0.0f;
 	z = a + b + c + d;
 	tmpVert._normal.set(x, y, z);
 
-	tess->_combineVertices.push_back(tmpVert);
+	SharedSubMesh* pSharedSubMesh = tess->_opDstObj->getMesh()->getSharedSubMesh();
+	unsigned int idx = pSharedSubMesh->addCombineVertex(tmpVert);
+	tess->_combineVertices.push_back(VertIdxPair(tmpVert, idx + pSharedSubMesh->getVertexCount()));
 	*outData = &tess->_combineVertices.back();
 }
 //----------------------------------------------------------------------------------

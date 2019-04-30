@@ -13,9 +13,9 @@ class TessGridParser
 {
 	friend class TessGridHandler;
 	static void __stdcall tessBeginDataCB(EPrimitiveType which, TessGridHandler* tess);
-	static void __stdcall tessVertexDataCB(Vertex* vert, TessGridHandler* tess);
+	static void __stdcall tessVertexDataCB(VertIdxPair* vert, TessGridHandler* tess);
 	static void __stdcall tessEndDataCB(TessGridHandler* tess);
-	static void __stdcall tessCombineDataCB(const double newVertex[3], const Vertex* neighborVertex[4], const float neighborWeight[4], Vertex** outData, TessGridHandler* tess);
+	static void __stdcall tessCombineDataCB(const double newVertex[3], const VertIdxPair* neighborVertex[4], const float neighborWeight[4], VertIdxPair** outData, TessGridHandler* tess);
 	//----------------------------------------------------------------------------------
 	//##解析.tessgrid格式模型文件##
 	//----------------------------------------------------------------------------------

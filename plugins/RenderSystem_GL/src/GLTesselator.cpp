@@ -56,12 +56,12 @@ void GLTesselator::beginContour()
 	gluTessBeginContour(_tess);
 }
 
-void GLTesselator::vertex(Vertex* vert)
+void GLTesselator::vertex(VertIdxPair* vert)
 {
 	GLdouble coords[3];
-	coords[0] = (GLdouble)vert[0]._position._x;
-	coords[1] = (GLdouble)vert[0]._position._y;
-	coords[2] = (GLdouble)vert[0]._position._z;
+	coords[0] = (GLdouble)vert[0]._vert._position._x;
+	coords[1] = (GLdouble)vert[0]._vert._position._y;
+	coords[2] = (GLdouble)vert[0]._vert._position._z;
 	gluTessVertex(_tess, coords, vert);
 }
 
@@ -122,17 +122,17 @@ void CALLBACK GLTesselator::tessBeginCB(GLenum which)
 #endif
 }
 
-void CALLBACK GLTesselator::tessVertexCB(const Vertex* vert)
+void CALLBACK GLTesselator::tessVertexCB(const VertIdxPair* vert)
 {
-	glColor4ub(vert[0]._color.getRed(), vert[0]._color.getGreen(), vert[0]._color.getBlue(), vert[0]._color.getAlpha());
-	glTexCoord2f(vert[0]._texCoord._x, vert[0]._texCoord._y);
-	glNormal3f(vert[0]._normal._x, vert[0]._normal._y, vert[0]._normal._z);
-	glVertex3f(vert[0]._position._x, vert[0]._position._y, vert[0]._position._z);
+	glColor4ub(vert[0]._vert._color.getRed(), vert[0]._vert._color.getGreen(), vert[0]._vert._color.getBlue(), vert[0]._vert._color.getAlpha());
+	glTexCoord2f(vert[0]._vert._texCoord._x, vert[0]._vert._texCoord._y);
+	glNormal3f(vert[0]._vert._normal._x, vert[0]._vert._normal._y, vert[0]._vert._normal._z);
+	glVertex3f(vert[0]._vert._position._x, vert[0]._vert._position._y, vert[0]._vert._position._z);
 #ifdef _DEBUG
-	Log::print(ELL_DEBUG, "    glColor4ub(%d,%d,%d,%d);", vert[0]._color.getRed(), vert[0]._color.getGreen(), vert[0]._color.getBlue(), vert[0]._color.getAlpha());
-	Log::print(ELL_DEBUG, "    glTexCoord2f(%f,%f);", vert[0]._texCoord._x, vert[0]._texCoord._y);
-	Log::print(ELL_DEBUG, "    glNormal3f(%f,%f,%f);", vert[0]._normal._x, vert[0]._normal._y, vert[0]._normal._z);
-	Log::print(ELL_DEBUG, "    glVertex3f(%f,%f,%f);", vert[0]._position._x, vert[0]._position._y, vert[0]._position._z);
+	Log::print(ELL_DEBUG, "    glColor4ub(%d,%d,%d,%d);", vert[0]._vert._color.getRed(), vert[0]._vert._color.getGreen(), vert[0]._vert._color.getBlue(), vert[0]._vert._color.getAlpha());
+	Log::print(ELL_DEBUG, "    glTexCoord2f(%f,%f);", vert[0]._vert._texCoord._x, vert[0]._vert._texCoord._y);
+	Log::print(ELL_DEBUG, "    glNormal3f(%f,%f,%f);", vert[0]._vert._normal._x, vert[0]._vert._normal._y, vert[0]._vert._normal._z);
+	Log::print(ELL_DEBUG, "    glVertex3f(%f,%f,%f);", vert[0]._vert._position._x, vert[0]._vert._position._y, vert[0]._vert._position._z);
 #endif
 }
 

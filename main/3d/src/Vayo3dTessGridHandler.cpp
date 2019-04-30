@@ -52,6 +52,7 @@ TessGridHandler::~TessGridHandler()
 
 void TessGridHandler::reset(int vertexSize /*= 0*/, int contourSize /*= 0*/)
 {
+	_combineVertices.clear();
 	_vertexList.clear();
 	_contourList.clear();
 	if (vertexSize > 0)
@@ -152,6 +153,12 @@ bool TessGridHandler::tesselating(ManualObject* tessObj, bool reverse /*= false*
 
 	_opDstObj = tessObj;
 	_materialName = materialName;
+
+	SharedSubMesh* pSharedSubMesh = _opDstObj->getMesh()->createSharedSubMesh();
+	unsigned int vertListOffset = pSharedSubMesh->getVertexCount();
+	for (unsigned i = 0; i < verticesNum; ++i)
+		pSharedSubMesh->addVertex(_vertexList[i]._vert);
+
 	_tesselator->beginPolygon(this);
 
 	if (reverse)
@@ -164,9 +171,15 @@ bool TessGridHandler::tesselating(ManualObject* tessObj, bool reverse /*= false*
 			if (aContourVertNum > 0)
 			{
 				_tesselator->beginContour();
+
 				vector<unsigned int>::const_reverse_iterator citor = curContour.crbegin();
 				for (; citor != curContour.crend(); ++citor)
-					_tesselator->vertex(&_vertexList[*citor]);
+				{
+					unsigned int idx = *citor;
+					_vertexList[idx]._idx = idx + vertListOffset;
+					_tesselator->vertex(&_vertexList[idx]);
+				}
+
 				_tesselator->endContour();
 			}
 		}
@@ -181,9 +194,15 @@ bool TessGridHandler::tesselating(ManualObject* tessObj, bool reverse /*= false*
 			if (aContourVertNum > 0)
 			{
 				_tesselator->beginContour();
+
 				vector<unsigned int>::const_iterator citor = curContour.cbegin();
 				for (; citor != curContour.cend(); ++citor)
-					_tesselator->vertex(&_vertexList[*citor]);
+				{
+					unsigned int idx = *citor;
+					_vertexList[idx]._idx = idx + vertListOffset;
+					_tesselator->vertex(&_vertexList[idx]);
+				}
+
 				_tesselator->endContour();
 			}
 		}
@@ -191,6 +210,7 @@ bool TessGridHandler::tesselating(ManualObject* tessObj, bool reverse /*= false*
 
 	_combineVertices.clear();
 	_tesselator->endPolygon();
+	pSharedSubMesh->mergeCombineVerticesToVBuffer();
 	_combineVertices.clear();
 
 	return true;
@@ -226,27 +246,46 @@ bool TessGridHandler::tesselatingOnce(ManualObject* tessObj, unsigned int contou
 
 	_opDstObj = tessObj;
 	_materialName = materialName;
+
+	SharedSubMesh* pSharedSubMesh = _opDstObj->getMesh()->createSharedSubMesh();
+	unsigned int vertListOffset = pSharedSubMesh->getVertexCount();
+
 	_tesselator->beginPolygon(this);
 
 	if (reverse)
 	{
 		_tesselator->beginContour();
+
 		vector<unsigned int>::const_reverse_iterator citor = curContour.crbegin();
 		for (; citor != curContour.crend(); ++citor)
-			_tesselator->vertex(&_vertexList[*citor]);
+		{
+			unsigned int idx = *citor;
+			pSharedSubMesh->addVertex(_vertexList[idx]._vert);
+			_vertexList[idx]._idx = vertListOffset++;
+			_tesselator->vertex(&_vertexList[idx]);
+		}
+
 		_tesselator->endContour();
 	}
 	else
 	{
 		_tesselator->beginContour();
+
 		vector<unsigned int>::const_iterator citor = curContour.cbegin();
 		for (; citor != curContour.cend(); ++citor)
-			_tesselator->vertex(&_vertexList[*citor]);
+		{
+			unsigned int idx = *citor;
+			pSharedSubMesh->addVertex(_vertexList[idx]._vert);
+			_vertexList[idx]._idx = vertListOffset++;
+			_tesselator->vertex(&_vertexList[idx]);
+		}
+
 		_tesselator->endContour();
 	}
 
 	_combineVertices.clear();
 	_tesselator->endPolygon();
+	pSharedSubMesh->mergeCombineVerticesToVBuffer();
 	_combineVertices.clear();
 
 	return true;
@@ -257,14 +296,14 @@ void TessGridHandler::transformVertexList(const Matrix4x4& posMat, const Matrix4
 	if (posMat == IdentityMat4 && normMat == IdentityMat4)
 		return;
 
-	vector<Vertex>::iterator it = _vertexList.begin();
+	vector<VertIdxPair>::iterator it = _vertexList.begin();
 	for (; it != _vertexList.end(); ++it)
 	{
-		Vertex& vert = *it;
+		VertIdxPair& vi = *it;
 		if (posMat != IdentityMat4)
-			posMat.transformVect(vert._position);
+			posMat.transformVect(vi._vert._position);
 		if (normMat != IdentityMat4)
-			normMat.transformVect(vert._normal);
+			normMat.transformVect(vi._vert._normal);
 	}
 }
 
@@ -277,7 +316,7 @@ void TessGridHandler::transformPositionList(const Matrix4x4& posMat, unsigned in
 	{
 		vector<unsigned int>::iterator it = _contourList[contourIdx].begin();
 		for (; it != _contourList[contourIdx].end(); ++it)
-			posMat.transformVect(_vertexList[*it]._position);
+			posMat.transformVect(_vertexList[*it]._vert._position);
 	}
 	else
 		transformVertexList(posMat, IdentityMat4);
@@ -292,7 +331,7 @@ void TessGridHandler::transformNormalList(const Matrix4x4& normMat, unsigned int
 	{
 		vector<unsigned int>::iterator it = _contourList[contourIdx].begin();
 		for (; it != _contourList[contourIdx].end(); ++it)
-			normMat.transformVect(_vertexList[*it]._normal);
+			normMat.transformVect(_vertexList[*it]._vert._normal);
 	}
 	else
 		transformVertexList(IdentityMat4, normMat);
@@ -304,7 +343,7 @@ void TessGridHandler::changeNormalList(const Vector3df& newNorm, unsigned int co
 	{
 		vector<unsigned int>::const_iterator cit = _contourList[contourIdx].cbegin();
 		for (; cit != _contourList[contourIdx].cend(); ++cit)
-			_vertexList[*cit]._normal = newNorm;
+			_vertexList[*cit]._vert._normal = newNorm;
 	}
 	else
 	{
@@ -317,18 +356,18 @@ void TessGridHandler::changeNormalList(const Vector3df& newNorm, unsigned int co
 			{
 				vector<unsigned int>::const_iterator citor = curContour.cbegin();
 				for (; citor != curContour.cend(); ++citor)
-					_vertexList[*citor]._normal = newNorm;
+					_vertexList[*citor]._vert._normal = newNorm;
 			}
 		}
 	}
 }
 
-vector<Vertex>& TessGridHandler::getVertexList()
+vector<VertIdxPair>& TessGridHandler::getVertexList()
 {
 	return _vertexList;
 }
 
-const vector<Vertex>& TessGridHandler::getVertexList() const
+const vector<VertIdxPair>& TessGridHandler::getVertexList() const
 {
 	return _vertexList;
 }
@@ -403,7 +442,7 @@ bool TessGridHandler::beginStretch(ManualObject* stretchDstObj, unsigned int con
 		vector<unsigned int>::const_reverse_iterator citor = curContour.crbegin();
 		for (; citor != curContour.crend(); ++citor)
 		{
-			tmpVert = _vertexList[*citor];
+			tmpVert = _vertexList[*citor]._vert;
 			stretchDstObj->colour(tmpVert._color);
 			stretchDstObj->textureCoord(tmpVert._texCoord);
 			stretchDstObj->normal(tmpVert._normal);
@@ -415,7 +454,7 @@ bool TessGridHandler::beginStretch(ManualObject* stretchDstObj, unsigned int con
 		vector<unsigned int>::const_iterator citor = curContour.cbegin();
 		for (; citor != curContour.cend(); ++citor)
 		{
-			tmpVert = _vertexList[*citor];
+			tmpVert = _vertexList[*citor]._vert;
 			stretchDstObj->colour(tmpVert._color);
 			stretchDstObj->textureCoord(tmpVert._texCoord);
 			stretchDstObj->normal(tmpVert._normal);
@@ -867,7 +906,7 @@ void TessGridHandler::generatePipe(vector<Position3df>& centerTrackLine, ManualO
 	vector<Vector3df> oriPosList;
 	for (unsigned int i = 0; i < triNum; ++i)
 	{
-		oriPosList.push_back(_vertexList[_contourList[contourSrcIdx][i]]._position);
+		oriPosList.push_back(_vertexList[_contourList[contourSrcIdx][i]]._vert._position);
 	}
 
 	if (reverse)

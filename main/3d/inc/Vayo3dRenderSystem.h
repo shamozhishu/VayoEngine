@@ -109,7 +109,6 @@ public:
 		const vector<Colour>* colors = NULL,
 		bool useAlphaChannelOfTexture = false) = 0;
 
-	virtual void drawMeshBuffer(SubMesh* mb);
 	virtual void updateAllHardwareBuffers();
 	virtual void removeHardwareBuffer(SubMesh* mb);
 	virtual void removeAllHardwareBuffers();
@@ -130,13 +129,16 @@ public:
 		EMaterialType baseMaterial = EMT_SOLID);
 
 	MaterialRenderer* getMaterialRenderer(int idx) const;
+	template<typename T>
+	void drawMeshBuffer(SubMesh* mb, T* caller, void(T::*setMaterialCB)(SubMesh*));
+	template<typename T>
+	void drawMeshBuffer(SharedSubMesh* mb, T* caller, void(T::*setMaterialCB)(SharedSubMesh*, unsigned));
 
 protected:
+	virtual void drawVertexPrimitiveListBegan(const void* vertices, unsigned int vertexCount) = 0;
+	virtual void drawVertexPrimitiveList(const unsigned int* indexList, unsigned int primitiveCount, EPrimitiveType primType) = 0;
+	virtual void drawVertexPrimitiveListEnded() = 0;
 	bool checkPrimitiveCount(unsigned int primCnt) const;
-	virtual void drawVertexPrimitiveList(const void* vertices, unsigned int vertexCount,
-		const unsigned int* indexList, unsigned int primitiveCount, EPrimitiveType primType) {
-		_primitivesDrawn += primitiveCount;
-	}
 
 	typedef struct tagHardwareBufferLink
 	{
@@ -177,6 +179,49 @@ protected:
 	PROPERTY_R_REF(wstring, _name,     Name)
 	PROPERTY_R_REF(Recti,   _viewPort, ViewPort)
 };
+
+template<typename T>
+void RenderSystem::drawMeshBuffer(SubMesh* mb, T* caller, void(T::*setMaterialCB)(SubMesh*))
+{
+	if (!mb)
+		return;
+
+	if (caller && setMaterialCB)
+		(caller->*(setMaterialCB))(mb);
+
+	HardwareBufferLink* hwBuffer = getBufferLink(mb);
+	if (hwBuffer)
+	{
+		drawHardwareBuffer(hwBuffer);
+	}
+	else
+	{
+		drawVertexPrimitiveListBegan(mb->getVertices(), mb->getVertexCount());
+		drawVertexPrimitiveList(mb->getIndices(), mb->getPrimCount(), mb->getPrimType());
+		drawVertexPrimitiveListEnded();
+	}
+}
+
+template<typename T>
+void RenderSystem::drawMeshBuffer(SharedSubMesh* mb, T* caller, void(T::*setMaterialCB)(SharedSubMesh*, unsigned))
+{
+	if (!mb)
+		return;
+
+	unsigned length = mb->getIBufferCount();
+	const vector<IndexBuffer>& idxBuffers = mb->getIBufferList();
+
+	drawVertexPrimitiveListBegan(mb->getVertices(), mb->getVertexCount());
+	for (unsigned i = 0; i < length; ++i)
+	{
+		if (caller && setMaterialCB)
+			(caller->*(setMaterialCB))(mb, i);
+
+		const IndexBuffer& idxBuffer = idxBuffers[i];
+		drawVertexPrimitiveList(idxBuffer.getIndices(), idxBuffer.getPrimCount(), idxBuffer.getPrimType());
+	}
+	drawVertexPrimitiveListEnded();
+}
 
 NS_VAYO3D_END
 

@@ -132,6 +132,8 @@ ModelPage::ModelPage()
 	m_pSphere2->setVisible(false);
 	m_pSphereBorder2 = m_pCurSceneMgr->findObject<ManualObject>(Language::getSingleton().getLanguageByID(28));
 	m_pSphereBorder2->setVisible(false);
+	m_pTestTri = m_pCurSceneMgr->findObject<ManualObject>(L"Èý½ÇÐÎ");
+	m_pTestTri->setVisible(false);
 
 	initAllViewState(ModelViewer::getSingleton().getFPSCamera());
 	initAllViewState(ModelViewer::getSingleton().getOrbitCamera());
@@ -246,6 +248,7 @@ void ModelPage::handleInput()
 		switchShow(m_pSphereBorder1, true, pActiveCamera, false);
 		switchShow(m_pSphere2, true, pActiveCamera, false);
 		switchShow(m_pSphereBorder2, true, pActiveCamera, false);
+		switchShow(m_pTestTri, true, pActiveCamera, false);
 	}
 }
 
@@ -289,6 +292,7 @@ void ModelPage::hideAllModel(Camera* camera)
 	switchShow(m_pSphereBorder1, false, camera, false);
 	switchShow(m_pSphere2, false, camera, false);
 	switchShow(m_pSphereBorder2, false, camera, false);
+	switchShow(m_pTestTri, false, camera, false);
 }
 
 void ModelPage::initAllViewState(Camera* camera)

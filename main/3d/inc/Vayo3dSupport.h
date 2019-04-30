@@ -22,8 +22,8 @@ enum EPrimitiveType
 {
 	EPT_POINTS,
 	EPT_LINES,
-	EPT_LINE_STRIP,
 	EPT_LINE_LOOP,
+	EPT_LINE_STRIP,
 	EPT_TRIANGLES,
 	EPT_TRIANGLE_STRIP,
 	EPT_TRIANGLE_FAN,
@@ -72,12 +72,16 @@ class Material;
 class MaterialManager;
 class MaterialRenderer;
 class Vertex;
-class Mesh;
+class VertexBuffer;
+class IndexBuffer;
 class SubMesh;
+class SharedSubMesh;
+class Mesh;
 class MeshManager;
 class Tesselator;
 class DisplayList;
 class MaterialRendererServices;
+struct VertIdxPair;
 
 typedef SharedPtr<Mesh> MeshPtr;
 typedef SharedPtr<Texture> TexturePtr;
