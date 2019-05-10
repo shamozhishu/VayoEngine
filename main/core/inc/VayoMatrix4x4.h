@@ -117,10 +117,10 @@ namespace Vayo {
 		// \return Returns false if there is no inverse matrix.
 		bool getInverse(Matrix4x4& out) const;
 
-		// Builds a right-handed perspective projection matrix based on a field of view
+		// Builds a right-handed perspective projection matrix based on a field of view.
 		void buildProjectionMatrixPerspectiveFovRH(float fieldOfViewRadians, float aspectRatio, float zNear, float zFar);
 
-		// Builds a left-handed perspective projection matrix based on a field of view
+		// Builds a left-handed perspective projection matrix based on a field of view.
 		void buildProjectionMatrixPerspectiveFovLH(float fieldOfViewRadians, float aspectRatio, float zNear, float zFar);
 
 		// Builds a right-handed perspective projection matrix.
@@ -129,8 +129,14 @@ namespace Vayo {
 		// Builds a left-handed perspective projection matrix.
 		void buildProjectionMatrixPerspectiveLH(float widthOfViewVolume, float heightOfViewVolume, float zNear, float zFar);
 
+		// Builds a right-handed orthogonal projection matrix based on a size of rectangle.
+		void buildProjectionMatrixOrthoRH(float left, float right, float bottom, float top, float zNear, float zFar);
+
 		// Builds a right-handed orthogonal projection matrix.
 		void buildProjectionMatrixOrthoRH(float widthOfViewVolume, float heightOfViewVolume, float zNear, float zFar);
+
+		// Builds a left-handed orthogonal projection matrix based on a size of rectangle.
+		void buildProjectionMatrixOrthoLH(float left, float right, float bottom, float top, float zNear, float zFar);
 
 		// Builds a left-handed orthogonal projection matrix.
 		void buildProjectionMatrixOrthoLH(float widthOfViewVolume, float heightOfViewVolume, float zNear, float zFar);
@@ -656,7 +662,7 @@ namespace Vayo {
 		return !(*this == other);
 	}
 
-	// Builds a right-handed perspective projection matrix based on a field of view
+	// Builds a right-handed perspective projection matrix based on a field of view.
 	inline void Matrix4x4::buildProjectionMatrixPerspectiveFovRH(float fieldOfViewRadians, float aspectRatio, float zNear, float zFar)
 	{
 		float top = zNear * tanf(0.5f*fieldOfViewRadians);
@@ -685,7 +691,7 @@ namespace Vayo {
 		(*this)(3, 3) = 0;
 	}
 
-	// Builds a left-handed perspective projection matrix based on a field of view
+	// Builds a left-handed perspective projection matrix based on a field of view.
 	inline void Matrix4x4::buildProjectionMatrixPerspectiveFovLH(float fieldOfViewRadians, float aspectRatio, float zNear, float zFar)
 	{
 		float h = (float)(cos(fieldOfViewRadians / 2) / sin(fieldOfViewRadians / 2));
@@ -760,14 +766,9 @@ namespace Vayo {
 		(*this)(3, 3) = 0;
 	}
 
-	// Builds a right-handed orthogonal projection matrix.
-	inline void Matrix4x4::buildProjectionMatrixOrthoRH(float widthOfViewVolume, float heightOfViewVolume, float zNear, float zFar)
+	// Builds a right-handed orthogonal projection matrix based on a size of rectangle.
+	inline void Matrix4x4::buildProjectionMatrixOrthoRH(float left, float right, float bottom, float top, float zNear, float zFar)
 	{
-		float top = heightOfViewVolume / 2.0f;
-		float bottom = -top;
-		float right = widthOfViewVolume / 2.0f;
-		float left = -right;
-
 		(*this)(0, 0) = 2 / (right - left);
 		(*this)(1, 0) = 0;
 		(*this)(2, 0) = 0;
@@ -787,6 +788,36 @@ namespace Vayo {
 		(*this)(1, 3) = (bottom + top) / (bottom - top);
 		(*this)(2, 3) = (zNear + zFar) / (zNear - zFar);
 		(*this)(3, 3) = 1;
+	}
+
+	// Builds a right-handed orthogonal projection matrix.
+	inline void Matrix4x4::buildProjectionMatrixOrthoRH(float widthOfViewVolume, float heightOfViewVolume, float zNear, float zFar)
+	{
+		(*this)(0, 0) = 2 / widthOfViewVolume;
+		(*this)(1, 0) = 0;
+		(*this)(2, 0) = 0;
+		(*this)(3, 0) = 0;
+
+		(*this)(0, 1) = 0;
+		(*this)(1, 1) = 2 / heightOfViewVolume;
+		(*this)(2, 1) = 0;
+		(*this)(3, 1) = 0;
+
+		(*this)(0, 2) = 0;
+		(*this)(1, 2) = 0;
+		(*this)(2, 2) = 2 / (zNear - zFar);
+		(*this)(3, 2) = 0;
+
+		(*this)(0, 3) = 0;
+		(*this)(1, 3) = 0;
+		(*this)(2, 3) = (zNear + zFar) / (zNear - zFar);
+		(*this)(3, 3) = 1;
+	}
+
+	// Builds a left-handed orthogonal projection matrix based on a size of rectangle.
+	inline void Matrix4x4::buildProjectionMatrixOrthoLH(float left, float right, float bottom, float top, float zNear, float zFar)
+	{
+		// ...
 	}
 
 	// Builds a left-handed orthogonal projection matrix.

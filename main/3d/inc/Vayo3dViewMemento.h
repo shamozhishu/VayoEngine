@@ -54,7 +54,7 @@ protected:
 	float     _zoomSpeed;
 	Matrix4x4 _thisRot;
 	Matrix4x4 _lastRot;
-	Matrix4x4 _transform;
+	Matrix4x4 _finalRot;
 };
 
 // Ó¥ÑÛÉãÏñ»úÊÓÍ¼±¸ÍüÂ¼
@@ -67,7 +67,7 @@ public:
 protected:
 	float     _zoomSpeed;
 	float     _zoomFactor;
-	Matrix4x4 _transform;
+	Matrix4x4 _finalRot;
 };
 
 NS_VAYO3D_END

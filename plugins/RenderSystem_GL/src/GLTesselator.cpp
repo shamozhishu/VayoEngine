@@ -105,11 +105,11 @@ void GLTesselator::setWindingProperty(ETessWinding value)
 	GLdouble val = GLU_TESS_WINDING_ODD;
 	switch (value)
 	{
-	case Tesselator::ETW_WINDING_ODD: val = GLU_TESS_WINDING_ODD; break;
-	case Tesselator::ETW_WINDING_NONZERO: val = GLU_TESS_WINDING_NONZERO; break;
-	case Tesselator::ETW_WINDING_POSITIVE: val = GLU_TESS_WINDING_POSITIVE; break;
-	case Tesselator::ETW_WINDING_NEGATIVE: val = GLU_TESS_WINDING_NEGATIVE; break;
-	case Tesselator::ETW_WINDING_ABS_GEQ_TWO: val = GLU_TESS_WINDING_ABS_GEQ_TWO; break;
+	case ETW_WINDING_ODD: val = GLU_TESS_WINDING_ODD; break;
+	case ETW_WINDING_NONZERO: val = GLU_TESS_WINDING_NONZERO; break;
+	case ETW_WINDING_POSITIVE: val = GLU_TESS_WINDING_POSITIVE; break;
+	case ETW_WINDING_NEGATIVE: val = GLU_TESS_WINDING_NEGATIVE; break;
+	case ETW_WINDING_ABS_GEQ_TWO: val = GLU_TESS_WINDING_ABS_GEQ_TWO; break;
 	}
 	gluTessProperty(_tess, GLU_TESS_WINDING_RULE, val);
 }

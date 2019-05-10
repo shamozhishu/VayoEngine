@@ -19,6 +19,13 @@ class _Vayo3dExport ManualObject : public MovableObject, public Renderable
 {
 	static Reflex<ManualObject, const wstring&, SceneManager*> _dynReflex;
 public:
+	enum
+	{
+		ECH_NEED_COMPUTE_NORM = ESTATE_01, // 在生成显示列表前自动计算法线信息
+		ECH_GL_IMMEDIATE_MODE = ESTATE_02, // 在生成显示列表时使用OpenGL立即模式
+		ECH_ONLY_DISPLAY_LIST = ESTATE_03  // 在生成显示列表后销毁使用过的子网格
+	};
+public:
 	ManualObject(const wstring& name, SceneManager* oriSceneMgr);
 	~ManualObject();
 	void     update(float dt);
@@ -26,9 +33,9 @@ public:
 	void     setMaterial(const wstring& name);
 	void     setMaterial(MaterialPtr material);
 	void     getWorldTransform(Matrix4x4& mat) const;
-	void     begin(EPrimitiveType primType, const wstring& materialName = L"", bool sharedSubMesh = false);
-	void     beginUpdate(unsigned int idx, bool sharedSubMesh = false);
-	void     end();
+	bool     begin(EPrimitiveType primType, const wstring& materialName = L"", bool sharedSubMesh = false);
+	bool     beginUpdate(unsigned int idx, bool sharedSubMesh = false);
+	void     end(bool endlist = false);
 	void     position(const Vector3df& pos);
 	void     position(float x, float y, float z);
 	void     normal(const Vector3df& norm);
@@ -44,8 +51,8 @@ public:
 	MeshPtr  getMesh() const;
 	SubMesh* getOpSubMesh() const;
 	void     resetSubmit();
-	void     setOnlyDisplayList(bool onlyDisplayList);
-	void     setNeedComputeNormal(bool needComputeNorm);
+	void     setCharacteristic(unsigned int character);
+	bool     getCharacteristic(unsigned int character);
 
 public:
 	/* 生成模型 */
@@ -58,21 +65,20 @@ public:
 	bool parseCustomAttrib();
 
 protected:
-	void submitDisplay();
+	void submitDisplayList();
 	void setMaterialCB(SubMesh* mb);
 	void setMaterialCB(SharedSubMesh* mb, unsigned idx);
 
 private:
-	bool           _needSubmit;
-	bool           _isSharedSubMesh;
-	bool           _onlyDisplayList;
-	bool           _needComputeNorm;
-	unsigned int   _lastVertNum;
-	unsigned int   _lastIdxNum;
-	MeshPtr        _meshData;
+	bool          _needSubmit;
+	bool     _isSharedSubMesh;
+	unsigned int _lastVertNum;
+	unsigned int  _lastIdxNum;
+	BitState    _characterBit;
+	MeshPtr         _meshData;
 	SubMesh*       _opSubMesh;
-	IndexBuffer*   _opIdxBuffer;
-	DisplayList*   _displayList;
+	IndexBuffer* _opIdxBuffer;
+	DisplayList* _displayList;
 };
 
 NS_VAYO3D_END

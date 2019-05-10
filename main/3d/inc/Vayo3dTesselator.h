@@ -9,17 +9,18 @@
 #include "Vayo3dSupport.h"
 NS_VAYO3D_BEGIN
 
+enum ETessWinding
+{
+	ETW_WINDING_ODD,
+	ETW_WINDING_NONZERO,
+	ETW_WINDING_POSITIVE,
+	ETW_WINDING_NEGATIVE,
+	ETW_WINDING_ABS_GEQ_TWO
+};
+
 class Tesselator
 {
 public:
-	enum ETessWinding
-	{
-		ETW_WINDING_ODD,
-		ETW_WINDING_NONZERO,
-		ETW_WINDING_POSITIVE,
-		ETW_WINDING_NEGATIVE,
-		ETW_WINDING_ABS_GEQ_TWO
-	};
 	typedef void(*TessBeginDataProc)   (unsigned int, void*);
 	typedef void(*TessVertexDataProc)  (void*, void*);
 	typedef void(*TessEndDataProc)     (void*);
@@ -28,17 +29,17 @@ public:
 public:
 	Tesselator(const wstring& name) : _name(name) {}
 	virtual ~Tesselator() {}
-	virtual void          beginPolygon(void* data) = 0;
-	virtual void          beginContour() = 0;
-	virtual void          vertex(VertIdxPair* vert) = 0;
-	virtual void          endContour() = 0;
-	virtual void          endPolygon() = 0;
-	virtual void          setBeginCallback(TessBeginDataProc pBegin) = 0;
-	virtual void          setVertexCallback(TessVertexDataProc pVertex) = 0;
-	virtual void          setEndCallback(TessEndDataProc pEnd) = 0;
-	virtual void          setErrorCallback(TessErrorDataProc pError) = 0;
-	virtual void          setCombineCallback(TessCombineDataProc pCombine) = 0;
-	virtual void          setWindingProperty(ETessWinding value) = 0;
+	virtual void beginPolygon(void* data) = 0;
+	virtual void beginContour() = 0;
+	virtual void vertex(VertIdxPair* vert) = 0;
+	virtual void endContour() = 0;
+	virtual void endPolygon() = 0;
+	virtual void setBeginCallback(TessBeginDataProc pBegin) = 0;
+	virtual void setVertexCallback(TessVertexDataProc pVertex) = 0;
+	virtual void setEndCallback(TessEndDataProc pEnd) = 0;
+	virtual void setErrorCallback(TessErrorDataProc pError) = 0;
+	virtual void setCombineCallback(TessCombineDataProc pCombine) = 0;
+	virtual void setWindingProperty(ETessWinding value) = 0;
 protected:
 	PROPERTY_R_REF(wstring, _name, Name)
 };

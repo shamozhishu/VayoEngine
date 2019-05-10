@@ -84,9 +84,9 @@ void ViewMementoOrbit::storage(Camera* camera)
 		ViewMementoFPS::setSpatialInfo(cameraOrbit->getParentNode());
 		_moveSpeed = cameraOrbit->_moveSpeed[1];
 		_zoomSpeed = cameraOrbit->_zoomSpeed[1];
-		_thisRot = cameraOrbit->_arcball._thisRot;
-		_lastRot = cameraOrbit->_arcball._lastRot;
-		_transform = cameraOrbit->_arcball._transform;
+		_thisRot = cameraOrbit->_arcball.getThisRot();
+		_lastRot = cameraOrbit->_arcball.getLastRot();
+		_finalRot = cameraOrbit->_arcball.getFinalRot();
 	}
 }
 
@@ -99,9 +99,9 @@ void ViewMementoOrbit::recover(Camera* camera)
 		ViewMementoFPS::getSpatialInfo(cameraOrbit->getParentNode());
 		cameraOrbit->_moveSpeed[0] = cameraOrbit->_moveSpeed[1] = _moveSpeed;
 		cameraOrbit->_zoomSpeed[0] = cameraOrbit->_zoomSpeed[1] = _zoomSpeed;
-		cameraOrbit->_arcball._thisRot = _thisRot;
-		cameraOrbit->_arcball._lastRot = _lastRot;
-		cameraOrbit->_arcball._transform = _transform;
+		cameraOrbit->_arcball.setThisRot(_thisRot);
+		cameraOrbit->_arcball.setLastRot(_lastRot);
+		cameraOrbit->_arcball.setFinalRot(_finalRot);
 	}
 }
 
@@ -116,7 +116,7 @@ void ViewMementoEagleEye::storage(Camera* camera)
 		_moveSpeed = cameraEagleEye->_moveSpeed[1];
 		_zoomSpeed = cameraEagleEye->_zoomSpeed[1];
 		_zoomFactor = cameraEagleEye->_zoomFactor;
-		_transform = cameraEagleEye->_arcball._transform;
+		_finalRot = cameraEagleEye->_arcball.getFinalRot();
 	}
 }
 
@@ -130,7 +130,7 @@ void ViewMementoEagleEye::recover(Camera* camera)
 		cameraEagleEye->_moveSpeed[0] = cameraEagleEye->_moveSpeed[1] = _moveSpeed;
 		cameraEagleEye->_zoomSpeed[0] = cameraEagleEye->_zoomSpeed[1] = _zoomSpeed;
 		cameraEagleEye->_zoomFactor = _zoomFactor;
-		cameraEagleEye->_arcball._transform = _transform;
+		cameraEagleEye->_arcball.setFinalRot(_finalRot);
 	}
 }
 

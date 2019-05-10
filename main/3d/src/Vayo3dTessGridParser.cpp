@@ -13,7 +13,13 @@ void __stdcall TessGridParser::tessBeginDataCB(EPrimitiveType which, TessGridHan
 
 void __stdcall TessGridParser::tessVertexDataCB(VertIdxPair* vert, TessGridHandler* tess)
 {
-	tess->_opDstObj->index(vert->_idx);
+	if (tess->_opDstObj->getCharacteristic(ManualObject::ECH_GL_IMMEDIATE_MODE))
+	{
+		tess->_opDstObj->normal(vert->_vert._normal);
+		tess->_opDstObj->position(vert->_vert._position);
+	}
+	else
+		tess->_opDstObj->index(vert->_idx);
 }
 
 void __stdcall TessGridParser::tessEndDataCB(TessGridHandler* tess)
@@ -61,10 +67,18 @@ void __stdcall TessGridParser::tessCombineDataCB(const double newVertex[3], cons
 	z = a + b + c + d;
 	tmpVert._normal.set(x, y, z);
 
-	SharedSubMesh* pSharedSubMesh = tess->_opDstObj->getMesh()->getSharedSubMesh();
-	unsigned int idx = pSharedSubMesh->addCombineVertex(tmpVert);
-	tess->_combineVertices.push_back(VertIdxPair(tmpVert, idx + pSharedSubMesh->getVertexCount()));
-	*outData = &tess->_combineVertices.back();
+	if (tess->_opDstObj->getCharacteristic(ManualObject::ECH_GL_IMMEDIATE_MODE))
+	{
+		tess->_combineVertices.push_back(VertIdxPair(tmpVert, 0));
+		*outData = &tess->_combineVertices.back();
+	}
+	else
+	{
+		SharedSubMesh* pSharedSubMesh = tess->_opDstObj->getMesh()->getSharedSubMesh();
+		unsigned int idx = pSharedSubMesh->addCombineVertex(tmpVert);
+		tess->_combineVertices.push_back(VertIdxPair(tmpVert, idx + pSharedSubMesh->getVertexCount()));
+		*outData = &tess->_combineVertices.back();
+	}
 }
 //----------------------------------------------------------------------------------
 //##解析.tessgrid格式模型文件##

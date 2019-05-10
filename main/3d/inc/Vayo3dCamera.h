@@ -8,6 +8,7 @@
 
 #include "VayoInput.h"
 #include "VayoBitState.h"
+#include "VayoRectangle.h"
 #include "Vayo3dArcball.h"
 #include "Vayo3dFrustum.h"
 #include "Vayo3dViewMemento.h"
@@ -136,6 +137,7 @@ public:
 	void resetArcball();
 	void setMoveSpeed(float speed);
 	void setZoomSpeed(float speed);
+	void setZoomFactor(float zoom);
 	void setLens(float fovY, float aspect, float zn, float zf);
 	void lookAt(const Vector3df& pos, const Vector3df& target = Vector3df::Origin, const Vector3df& worldUp = Vector3df::YAxis);
 	bool touchBegan(const Touch& touch, EMouseKeys key);
@@ -153,6 +155,7 @@ protected:
 protected:
 	float   _moveSpeed[2];
 	float   _zoomSpeed[2];
+	float   _zoomFactor;
 	Arcball _arcball;
 };
 
@@ -166,8 +169,10 @@ public:
 	~EagleEyeCamera();
 	void  update(float dt);
 	bool  isOrthogonal() { return true; }
-	void  setZoomFactor(float zoom);
+	void  forbidRotaion(bool isForbid);
+	void  forbidViewScale(bool isForbid);
 	void  setLens(float widthOfViewVolume, float heightOfViewVolume, float zn, float zf);
+	void  setLens(float left, float right, float bottom, float top, float zn, float zf);
 	float getFovY() const;
 	float getFovX() const;
 	float getNearWindowWidth() const;
@@ -177,16 +182,13 @@ public:
 	void  touchMoved(const Touch& touch, EMouseKeys key);
 	void  touchEnded(const Touch& touch, EMouseKeys key);
 	bool  touchWheel(const Touch& touch, float wheel);
-	bool  keyClicked(const tagKeyInput& keyInput);
-	void  serialize(XMLElement* outXml);
-	bool  deserialize(XMLElement* inXml);
 
 protected:
 	ViewMementoPtr createViewMemento();
-
-protected:
-	float    _zoomFactor;
-	BitState _direction;
+private:
+	bool    _canRot;
+	bool _viewScale;
+	Rectf  _eyeArea;
 };
 
 NS_VAYO3D_END

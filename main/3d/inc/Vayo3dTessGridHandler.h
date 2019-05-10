@@ -6,8 +6,9 @@
 #ifndef __VAYO3D_TESS_GRID_HANDLER_H__
 #define __VAYO3D_TESS_GRID_HANDLER_H__
 
-#include "Vayo3dManualObject.h"
 #include "VayoMatrix4x4.h"
+#include "Vayo3dTesselator.h"
+#include "Vayo3dManualObject.h"
 NS_VAYO3D_BEGIN
 
 class _Vayo3dExport TessGridHandler
@@ -20,8 +21,8 @@ public:
 	void reset(int vertexSize = 0, int contourSize = 0);
 	bool parseTessgridFile(const wstring& filename, bool fullPath = false);
 	bool parseTessgridFile(wstringstream& filestream);
-	bool tesselating(ManualObject* tessObj, bool reverse = false, const wstring& materialName = L"");
-	bool tesselatingOnce(ManualObject* tessObj, unsigned int contourIdx, bool reverse = false, const wstring& materialName = L"");
+	bool tesselating(ManualObject* tessObj, bool reverse = false, const wstring& materialName = L"", bool endlist = false, ETessWinding winding = ETW_WINDING_ODD);
+	bool tesselatingOnce(ManualObject* tessObj, unsigned int contourIdx, bool reverse = false, const wstring& materialName = L"", bool endlist = false, ETessWinding winding = ETW_WINDING_ODD);
 	void transformVertexList(const Matrix4x4& posMat, const Matrix4x4& normMat);
 	void transformPositionList(const Matrix4x4& posMat, unsigned int contourIdx = -1);
 	void transformNormalList(const Matrix4x4& normMat, unsigned int contourIdx = -1);
@@ -35,7 +36,7 @@ public:
 	const vector<vector<unsigned int>>& getContourList() const;
 	bool beginStretch(ManualObject* stretchDstObj, unsigned int contourSrcIdx, bool reverse = false, const wstring& materialName = L"");
 	void stretching(const Matrix4x4& transform);
-	void endStretch();
+	void endStretch(bool endlist = false);
 	bool filterAdjoinSamePoint(vector<Vector2df>& outPts, const vector<Vector2df>& intPts, bool eraseCollinearPoint = true);
 	bool filterAdjoinSamePoint(vector<Vector3df>& outPts, const vector<Vector3df>& intPts, bool eraseCollinearPoint = true);
 	bool gainCircleCenter(Position2df& ptO, const Position2df& ptA, const Position2df& ptB, float degree, bool clockwise);
@@ -56,6 +57,7 @@ private:
 	unsigned int                 _contourSrcIdx;
 	vector<VertIdxPair>          _vertexList;
 	vector<vector<unsigned int>> _contourList;
+	vector<Vertex>               _stretchVBuffer;
 	list<VertIdxPair>            _combineVertices;
 };
 

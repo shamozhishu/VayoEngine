@@ -76,6 +76,8 @@ public:
 		ShaderConstantSetCallback* callback = NULL,
 		EMaterialType baseMaterial = EMT_SOLID);
 
+	void setRenderMode3D();
+	void setRenderMode2D(bool alpha, bool texture, bool alphaChannel);
 	void setBasicRenderStates(const Material& material, const Material& lastMaterial, bool resetAllRenderStates);
 	void fillingDisplayList(bool isFilling) { _isFillDisplayList = isFilling; }
 
@@ -105,8 +107,6 @@ protected:
 	HardwareBufferLinkItor deleteHardwareBuffer(HardwareBufferLink* hwBuffer);
 
 private:
-	void  setRenderMode3D();
-	void  setRenderMode2D(bool alpha, bool texture, bool alphaChannel);
 	void  setWrapMode(const Material& material);
 	bool  changeRenderContext(Device* renderWnd);
 	GLint getTextureWrapMode(unsigned char clamp);

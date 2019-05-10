@@ -337,7 +337,7 @@ void Camera::regenerateViewArea()
 {
 	SceneNode* pParent = getParentNode();
 	if (pParent)
-		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * pParent->getAbsTransform() * _affector;
+		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _affector * pParent->getAbsTransform();
 	else
 		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _affector;
 }
@@ -517,10 +517,12 @@ Reflex<OrbitCamera, const wstring&, SceneManager*> OrbitCamera::_dynReflex;
 OrbitCamera::OrbitCamera(const wstring& name, SceneManager* oriSceneMgr)
 	: Camera(name, oriSceneMgr)
 	, _arcball(0, 0)
+	, _zoomFactor(1.0f)
 {
 	_moveSpeed[0] = _moveSpeed[1] = _zoomSpeed[0] = _zoomSpeed[1] = 5.0f;
 	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_arcball.setBounds(size._width, size._height);
+	_arcball.updateScale(_zoomFactor, _zoomFactor, _zoomFactor);
 	_position.set(0, 0, 100);
 }
 
@@ -537,10 +539,7 @@ void OrbitCamera::update(float dt)
 
 void OrbitCamera::resetArcball()
 {
-	_arcball._transform.makeIdentity();
-	_arcball._thisRot.makeIdentity();
-	_arcball._lastRot.makeIdentity();
-	_arcball._deltaRot.makeIdentity();
+	_arcball.reset();
 }
 
 void OrbitCamera::setMoveSpeed(float speed)
@@ -551,6 +550,12 @@ void OrbitCamera::setMoveSpeed(float speed)
 void OrbitCamera::setZoomSpeed(float speed)
 {
 	_zoomSpeed[0] = _zoomSpeed[1] = speed;
+}
+
+void OrbitCamera::setZoomFactor(float zoom)
+{
+	_zoomFactor = zoom;
+	_arcball.updateScale(_zoomFactor, _zoomFactor, _zoomFactor);
 }
 
 void OrbitCamera::setLens(float fovY, float aspect, float zn, float zf)
@@ -613,7 +618,7 @@ bool OrbitCamera::touchWheel(const Touch& touch, float wheel)
 	Vector3df rayDir = getRayInViewSpace(touch.getCurPos()._x, touch.getCurPos()._y);
 	transformMat.rotateVect(rayDir);
 	rayDir.normalize();
-	float factor = wheel*_zoomSpeed[0];
+	float factor = wheel * _zoomSpeed[0];
 	rayDir *= factor;
 	_position += rayDir;
 	_needRefresh = true;
@@ -640,9 +645,9 @@ void OrbitCamera::regenerateViewArea()
 {
 	SceneNode* pParent = getParentNode();
 	if (pParent)
-		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * pParent->getAbsTransform() * _arcball._transform * _affector;
+		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _arcball.getFinalTransform() * _affector * pParent->getAbsTransform();
 	else
-		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _arcball._transform * _affector;
+		_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _arcball.getFinalTransform() * _affector;
 }
 
 ViewMementoPtr OrbitCamera::createViewMemento()
@@ -655,6 +660,7 @@ void OrbitCamera::serialize(XMLElement* outXml)
 	Camera::serialize(outXml);
 	outXml->SetAttribute("moveSpeed", _moveSpeed[1]);
 	outXml->SetAttribute("zoomSpeed", _zoomSpeed[1]);
+	outXml->SetAttribute("zoomFactor", _zoomFactor);
 }
 
 bool OrbitCamera::deserialize(XMLElement* inXml)
@@ -663,6 +669,8 @@ bool OrbitCamera::deserialize(XMLElement* inXml)
 		return false;
 	_moveSpeed[0] = _moveSpeed[1] = inXml->FloatAttribute("moveSpeed");
 	_zoomSpeed[0] = _zoomSpeed[1] = inXml->FloatAttribute("zoomSpeed");
+	inXml->QueryFloatAttribute("zoomFactor", &_zoomFactor);
+	setZoomFactor(_zoomFactor);
 	return true;
 }
 
@@ -670,15 +678,19 @@ bool OrbitCamera::deserialize(XMLElement* inXml)
 Reflex<EagleEyeCamera, const wstring&, SceneManager*> EagleEyeCamera::_dynReflex;
 EagleEyeCamera::EagleEyeCamera(const wstring& name, SceneManager* oriSceneMgr)
 	: OrbitCamera(name, oriSceneMgr)
-	, _zoomFactor(1.0f)
+	, _canRot(true)
+	, _viewScale(true)
 {
+	_zoomSpeed[0] = _zoomSpeed[1] = 0.1f;
 	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_nearWindowHeight = size._width;
 	_farWindowHeight = size._height;
-	_nearZ = -10000.0f;
-	_farZ = 10000.0f;
-	_zoomSpeed[0] = _zoomSpeed[1] = 0.1f;
-	_arcball.updateScale(_zoomFactor, _zoomFactor, _zoomFactor);
+	_nearZ = -1000000.0f;
+	_farZ = 1000000.0f;
+	float halfW = _nearWindowHeight * 0.5f;
+	float halfH = _farWindowHeight * 0.5f;
+	_eyeArea = Rectf(-halfW, -halfH, halfW, halfH);
+	_viewArea.getTransform(Frustum::EFT_PROJECTION).buildProjectionMatrixOrthoRH(_nearWindowHeight, _farWindowHeight, _nearZ, _farZ);
 }
 
 EagleEyeCamera::~EagleEyeCamera()
@@ -689,31 +701,51 @@ void EagleEyeCamera::update(float dt)
 {
 	if (Root::getSingleton().getCurSceneMgr()->getActiveCamera() != this)
 		return;
-	if (_direction.checkState(EDIRECTION_UPWARD))
-		fly(_moveSpeed[0] * dt);
-	if (_direction.checkState(EDIRECTION_DOWNWARD))
-		fly(-_moveSpeed[0] * dt);
-	if (_direction.checkState(EDIRECTION_LEFTWARD))
-		strafe(-_moveSpeed[0] * dt);
-	if (_direction.checkState(EDIRECTION_RIGHTWARD))
-		strafe(_moveSpeed[0] * dt);
 	OrbitCamera::update(dt);
 }
 
-void EagleEyeCamera::setZoomFactor(float zoom)
+void EagleEyeCamera::forbidRotaion(bool isForbid)
 {
-	_zoomFactor = zoom;
-	_arcball.updateScale(_zoomFactor, _zoomFactor, _zoomFactor);
+	_canRot = !isForbid;
+}
+
+void EagleEyeCamera::forbidViewScale(bool isForbid)
+{
+	_viewScale = !isForbid;
 }
 
 void EagleEyeCamera::setLens(float widthOfViewVolume, float heightOfViewVolume, float zn, float zf)
 {
-	_arcball.setBounds(widthOfViewVolume, heightOfViewVolume);
-	_nearWindowHeight = widthOfViewVolume;
-	_farWindowHeight = heightOfViewVolume;
-	_nearZ = zn;
-	_farZ = zf;
-	_viewArea.getTransform(Frustum::EFT_PROJECTION).buildProjectionMatrixOrthoRH(_nearWindowHeight, _farWindowHeight, _nearZ, _farZ);
+	if (widthOfViewVolume > 0.0f && heightOfViewVolume > 0.0f)
+	{
+		_nearZ = zn;
+		_farZ = zf;
+		_nearWindowHeight = widthOfViewVolume;
+		_farWindowHeight = heightOfViewVolume;
+		float halfW = _nearWindowHeight * 0.5f;
+		float halfH = _farWindowHeight * 0.5f;
+		_eyeArea = Rectf(-halfW, -halfH, halfW, halfH);
+		_viewArea.getTransform(Frustum::EFT_PROJECTION).buildProjectionMatrixOrthoRH(_nearWindowHeight, _farWindowHeight, _nearZ, _farZ);
+		Dimension2di size = Root::getSingleton().getActiveDevice()->getScreenSize();
+		_arcball.setBounds(size._width, size._height);
+	}
+}
+
+void EagleEyeCamera::setLens(float left, float right, float bottom, float top, float zn, float zf)
+{
+	float w = right - left;
+	float h = top - bottom;
+	if (w > 0.0f && h > 0.0f)
+	{
+		_nearZ = zn;
+		_farZ = zf;
+		_nearWindowHeight = w;
+		_farWindowHeight = h;
+		_eyeArea = Rectf(left, bottom, right, top);
+		_viewArea.getTransform(Frustum::EFT_PROJECTION).buildProjectionMatrixOrthoRH(left, right, bottom, top, zn, zf);
+		Dimension2di size = Root::getSingleton().getActiveDevice()->getScreenSize();
+		_arcball.setBounds(size._width, size._height);
+	}
 }
 
 float EagleEyeCamera::getFovY() const
@@ -743,6 +775,8 @@ float EagleEyeCamera::getFarWindowWidth() const
 
 bool EagleEyeCamera::touchBegan(const Touch& touch, EMouseKeys key)
 {
+	if (_canRot)
+		return OrbitCamera::touchBegan(touch, key);
 	return false;
 }
 
@@ -750,6 +784,10 @@ void EagleEyeCamera::touchMoved(const Touch& touch, EMouseKeys key)
 {
 	switch (key)
 	{
+	case EMK_LEFT:
+		if (_canRot)
+			_arcball.updateRotate(touch.getCurPos()._x, touch.getCurPos()._y, true);
+		break;
 	case EMK_RIGHT:
 		_arcball.updateTranslate(touch.getDelta()._x * _moveSpeed[0], -touch.getDelta()._y * _moveSpeed[0], 0);
 		break;
@@ -758,59 +796,56 @@ void EagleEyeCamera::touchMoved(const Touch& touch, EMouseKeys key)
 
 void EagleEyeCamera::touchEnded(const Touch& touch, EMouseKeys key)
 {
-	// do nothing.
+	if (_canRot)
+		OrbitCamera::touchEnded(touch, key);
 }
 
 bool EagleEyeCamera::touchWheel(const Touch& touch, float wheel)
 {
-	_zoomFactor += wheel * _zoomSpeed[0];
-	if (_zoomFactor <= 0.01f)
-		_zoomFactor -= wheel * _zoomSpeed[0];
-	_arcball.updateScale(_zoomFactor, _zoomFactor, _zoomFactor);
-	return true;
-}
-
-bool EagleEyeCamera::keyClicked(const tagKeyInput& keyInput)
-{
-	OrbitCamera::keyClicked(keyInput);
-
-	bool ret = false;
-	unsigned int uCurDire = 0;
-	switch (keyInput.Key)
+	if (_viewScale)
 	{
-	case KEY_KEY_W: uCurDire = EDIRECTION_DOWNWARD; ret = true; break;
-	case KEY_KEY_S: uCurDire = EDIRECTION_UPWARD; ret = true; break;
-	case KEY_KEY_A: uCurDire = EDIRECTION_RIGHTWARD; ret = true; break;
-	case KEY_KEY_D: uCurDire = EDIRECTION_LEFTWARD; ret = true; break;
-	default: _direction.clearState(); break;
+		float zoom = _zoomFactor + wheel * _zoomSpeed[0];
+		if (zoom <= 0.001f)
+		{
+			if (_zoomFactor > 0.001f)
+				_zoomFactor = zoom;
+			_arcball.updateScale(0, 0, 0);
+		}
+		else
+		{
+			_zoomFactor = zoom;
+			_arcball.updateScale(zoom, zoom, zoom);
+		}
+
+		return true;
 	}
 
-	if (keyInput.PressedDown)
-		_direction.addState(uCurDire);
+	float ratio;
+	float w = _eyeArea.getWidth();
+	float h = _eyeArea.getHeight();
+	if (w >= h)
+	{
+		ratio = w / h;
+		h -= wheel * _zoomSpeed[0];
+		w = h * ratio;
+	}
 	else
-		_direction.eraseState(uCurDire);
+	{
+		ratio = h / w;
+		w -= wheel * _zoomSpeed[0];
+		h = w * ratio;
+	}
 
-	return ret;
+	w *= 0.5f;
+	h *= 0.5f;
+	setLens(-w, w, -h, h, _nearZ, _farZ);
+
+	return true;
 }
 
 ViewMementoPtr EagleEyeCamera::createViewMemento()
 {
 	return ViewMementoPtr(new ViewMementoEagleEye());
-}
-
-void EagleEyeCamera::serialize(XMLElement* outXml)
-{
-	OrbitCamera::serialize(outXml);
-	outXml->SetAttribute("zoomFactor", _zoomFactor);
-}
-
-bool EagleEyeCamera::deserialize(XMLElement* inXml)
-{
-	if (!OrbitCamera::deserialize(inXml))
-		return false;
-	inXml->QueryFloatAttribute("zoomFactor", &_zoomFactor);
-	setZoomFactor(_zoomFactor);
-	return true;
 }
 
 NS_VAYO3D_END

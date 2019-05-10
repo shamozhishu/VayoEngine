@@ -300,6 +300,9 @@ bool SubMesh::computeFaceNormals()
 	if (indexCount <= 0)
 		return false;
 
+	for (int i = 0; i < vertexCount; ++i)
+		_vertices[i]._normal.set(0, 0, 0);
+
 	Triangle3df tri;
 	Vector3df norm;
 	unsigned idx1, idx2, idx3;
@@ -333,6 +336,9 @@ bool SubMesh::computeVertexNormals()
 	int indexCount = (int)_indices.size();
 	if (indexCount <= 0)
 		return false;
+
+	for (int i = 0; i < vertexCount; ++i)
+		_vertices[i]._normal.set(0, 0, 0);
 
 	Triangle3df tri;
 	unsigned idx1, idx2, idx3;

@@ -14,17 +14,17 @@ class GLTesselator : public Tesselator
 public:
 	GLTesselator(const wstring& name);
 	~GLTesselator();
-	void          beginPolygon(void* data);
-	void          beginContour();
-	void          vertex(VertIdxPair* vert);
-	void          endContour();
-	void          endPolygon();
-	void          setBeginCallback(TessBeginDataProc pBegin);
-	void          setVertexCallback(TessVertexDataProc pVertex);
-	void          setEndCallback(TessEndDataProc pEnd);
-	void          setErrorCallback(TessErrorDataProc pError);
-	void          setCombineCallback(TessCombineDataProc pCombine);
-	void          setWindingProperty(ETessWinding value);
+	void beginPolygon(void* data);
+	void beginContour();
+	void vertex(VertIdxPair* vert);
+	void endContour();
+	void endPolygon();
+	void setBeginCallback(TessBeginDataProc pBegin);
+	void setVertexCallback(TessVertexDataProc pVertex);
+	void setEndCallback(TessEndDataProc pEnd);
+	void setErrorCallback(TessErrorDataProc pError);
+	void setCombineCallback(TessCombineDataProc pCombine);
+	void setWindingProperty(ETessWinding value);
 private:
 	static const char*   getPrimitiveType(GLenum type);
 	static void CALLBACK tessBeginCB(GLenum which);

@@ -351,6 +351,7 @@ bool GLRenderSystem::init(unsigned char antiAliasFactor /*= 0*/, bool handleSRGB
 		return false;
 	}
 
+	Log::print(ELL_DEBUG, "OpenGL version: %d.%d", GLVersion.major, GLVersion.minor);
 	createMaterialRenderers();
 	const Dimension2di& renderTargetSize = getCurRenderTargetSize();
 	setViewpot(Recti(0, 0, renderTargetSize._width, renderTargetSize._height));
@@ -539,13 +540,13 @@ bool GLRenderSystem::setWndPixelFormat(Device* renderWnd)
 		if (!SetPixelFormat(_hCurrentDC, _pixelFormat, &g_pfd))
 		{
 			wchar_t szErrHint[256];
-			wsprintf(szErrHint, L"Can't set the pixel format %d.", _pixelFormat);
+			wsprintf(szErrHint, L"Can't set the pixel format %d", _pixelFormat);
 			printLastError(szErrHint);
 			return false;
 		}
 	}
 
-	Log::print(ELL_DEBUG, "Pixel Format %d.", _pixelFormat);
+	Log::print(ELL_DEBUG, "Pixel Format %d", _pixelFormat);
 	return true;
 }
 
@@ -1981,7 +1982,8 @@ void GLRenderSystem::setBasicRenderStates(const Material& material, const Materi
 	}
 
 	setWrapMode(material);
-	glActiveTexture(GL_TEXTURE0);
+	if (_maxTextureUnits > 0)
+		glActiveTexture(GL_TEXTURE0);
 }
 
 void GLRenderSystem::testGLErrorBegan()

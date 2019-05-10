@@ -16,6 +16,14 @@ public:
 	virtual ~DisplayList() {}
 	virtual void newList() = 0;
 	virtual void endList(const wstring& lastMaterialName = L"") = 0;
+	virtual bool isFillingList() = 0;
+	virtual bool beginDraw(EPrimitiveType primType, const wstring& materialName = L"") = 0;
+	virtual void endDraw() = 0;
+	virtual void position(float x, float y, float z) = 0;
+	virtual void normal(float x, float y, float z) = 0;
+	virtual void textureCoord(float u, float v) = 0;
+	virtual void colour(int r, int g, int b, int a = 255) = 0;
+
 protected:
 	PROPERTY_R_REF(wstring, _name, Name)
 };
