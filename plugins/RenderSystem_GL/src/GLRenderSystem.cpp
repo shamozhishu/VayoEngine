@@ -1993,7 +1993,6 @@ void GLRenderSystem::testGLErrorBegan()
 
 bool GLRenderSystem::testGLErrorEnded(const wstring& errLog /*= L""*/)
 {
-#ifdef _DEBUG
 	wstring infoLog;
 	GLenum glErr = glGetError();
 	switch (glErr)
@@ -2010,6 +2009,4 @@ bool GLRenderSystem::testGLErrorEnded(const wstring& errLog /*= L""*/)
 	}
 	Log::wprint(ELL_ERROR, L"%s[%s]", errLog.c_str(), infoLog.c_str());
 	return true;
-#endif
-	return false;
 }

@@ -16,9 +16,6 @@
 
 NS_VAYO3D_BEGIN
 
-/* 获取视图空间内的拾取射线方向(拾取射线的起点为(0,0,0)) */
-_Vayo3dExport Vector3df getRayInViewSpace(int xScreen, int yScreen);
-
 // 摄像机基类
 class _Vayo3dExport Camera : public MovableObject, public TouchDelegate, public KeypadDelegate
 {
@@ -78,6 +75,11 @@ public:
 
 	virtual void serialize(XMLElement* outXml);
 	virtual bool deserialize(XMLElement* inXml);
+
+	/* 获取屏幕坐标对应的视图空间内的位置 */
+	Vector3df getPosInViewSpace(int xScreen, int yScreen);
+	/* 获取视图空间内的拾取射线方向(拾取射线的起点为(0,0,0)) */
+	Vector3df getRayInViewSpace(int xScreen, int yScreen);
 
 protected:
 	virtual void regenerateViewArea();
@@ -170,7 +172,6 @@ public:
 	void  update(float dt);
 	bool  isOrthogonal() { return true; }
 	void  forbidRotaion(bool isForbid);
-	void  forbidViewScale(bool isForbid);
 	void  setLens(float widthOfViewVolume, float heightOfViewVolume, float zn, float zf);
 	void  setLens(float left, float right, float bottom, float top, float zn, float zf);
 	float getFovY() const;
@@ -182,13 +183,16 @@ public:
 	void  touchMoved(const Touch& touch, EMouseKeys key);
 	void  touchEnded(const Touch& touch, EMouseKeys key);
 	bool  touchWheel(const Touch& touch, float wheel);
+	bool  keyClicked(const tagKeyInput& keyInput);
 
 protected:
+	void regenerateViewArea();
 	ViewMementoPtr createViewMemento();
 private:
-	bool    _canRot;
-	bool _viewScale;
-	Rectf  _eyeArea;
+	bool      _canRot;
+	bool      _cursorZoom;
+	Rectf     _eyeArea;
+	Matrix4x4 _offsetMat;
 };
 
 NS_VAYO3D_END

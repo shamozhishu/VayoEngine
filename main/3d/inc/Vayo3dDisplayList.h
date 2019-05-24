@@ -16,7 +16,7 @@ public:
 	virtual ~DisplayList() {}
 	virtual void newList() = 0;
 	virtual void endList(const wstring& lastMaterialName = L"") = 0;
-	virtual bool isFillingList() = 0;
+	virtual bool isEmpty() = 0;
 	virtual bool beginDraw(EPrimitiveType primType, const wstring& materialName = L"") = 0;
 	virtual void endDraw() = 0;
 	virtual void position(float x, float y, float z) = 0;

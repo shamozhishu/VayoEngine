@@ -8,30 +8,11 @@
 
 NS_VAYO3D_BEGIN
 
-Vector3df getRayInViewSpace(int xScreen, int yScreen)
+void Camera::setNeedRefresh(bool isRefresh)
 {
-	Camera* pCamera = Root::getSingleton().getCurSceneMgr()->getActiveCamera();
-	if (!pCamera)
-		return Vector3df::Origin;
-
-	Matrix4x4 projMat = pCamera->getProj();
-	if (!projMat.makeInverse())
-		return Vector3df::Origin;
-
-	Recti viewPort = Root::getSingleton().getActiveRenderer()->getViewPort();
-	float xN = (float)(xScreen - viewPort._upperLeftCorner._x) * 2.0f / (float)viewPort.getWidth() - 1.0f;
-	float yN = (float)(-yScreen + viewPort._upperLeftCorner._y) * 2.0f / (float)viewPort.getHeight() + 1.0f;
-	float wC = pCamera->getNearZ();
-	bool isOrtho = pCamera->isOrthogonal();
-	float xC = isOrtho ? xN : xN * wC;
-	float yC = isOrtho ? yN : yN * wC;
-	Vector3df rayDir(xC, yC, 0.0f);
-	projMat.transformVect(rayDir);
-	rayDir.normalize();
-	return rayDir;
+	_needRefresh = isRefresh;
 }
 
-//////////////////////////////////////////////////////////////////////////
 Camera::Camera(const wstring& name, SceneManager* oriSceneMgr)
 	: MovableObject(name, oriSceneMgr)
 	, TouchDelegate(oriSceneMgr->getName())
@@ -90,11 +71,6 @@ void Camera::refresh()
 	recalculateViewArea();
 	Root::getSingleton().getActiveRenderer()->setTransform(ETS_VIEW, getView());
 	Root::getSingleton().getActiveRenderer()->setTransform(ETS_PROJECTION, getProj());
-}
-
-void Camera::setNeedRefresh(bool isRefresh)
-{
-	_needRefresh = isRefresh;
 }
 
 bool Camera::getWorldPos(Vector3df& outWorldPos) const
@@ -418,6 +394,30 @@ bool Camera::deserialize(XMLElement* inXml)
 	return true;
 }
 
+Vector3df Camera::getPosInViewSpace(int xScreen, int yScreen)
+{
+	Matrix4x4 projMat = _viewArea.getTransform(Frustum::EFT_PROJECTION);
+	if (!projMat.makeInverse())
+		return Vector3df::Origin;
+	Recti viewPort = Root::getSingleton().getActiveRenderer()->getViewPort();
+	float xN = (float)(xScreen - viewPort._upperLeftCorner._x) * 2.0f / (float)viewPort.getWidth() - 1.0f;
+	float yN = (float)(-yScreen + viewPort._upperLeftCorner._y) * 2.0f / (float)viewPort.getHeight() + 1.0f;
+	float wC = getNearZ();
+	bool isOrtho = isOrthogonal();
+	float xC = isOrtho ? xN : xN * wC;
+	float yC = isOrtho ? yN : yN * wC;
+	Vector3df ptView(xC, yC, 0.0f);
+	projMat.transformVect(ptView);
+	return ptView;
+}
+
+Vector3df Camera::getRayInViewSpace(int xScreen, int yScreen)
+{
+	Vector3df rayDir = getPosInViewSpace(xScreen, yScreen);
+	rayDir.normalize();
+	return rayDir;
+}
+
 //////////////////////////////////////////////////////////////////////////
 Reflex<FPSCamera, const wstring&, SceneManager*> FPSCamera::_dynReflex;
 FPSCamera::FPSCamera(const wstring& name, SceneManager* oriSceneMgr)
@@ -593,8 +593,19 @@ void OrbitCamera::touchMoved(const Touch& touch, EMouseKeys key)
 		_arcball.updateRotate(touch.getCurPos()._x, touch.getCurPos()._y, true);
 		break;
 	case EMK_RIGHT:
-		_arcball.updateTranslate(touch.getDelta()._x * _moveSpeed[0], -touch.getDelta()._y * _moveSpeed[0], 0);
-		break;
+	{
+		Matrix4x4 transformMat, invMat;
+		invMat = _view;
+		if (invMat.makeInverse())
+			transformMat = invMat;
+		Vector3df curPosView = getPosInViewSpace(touch.getCurPos()._x, touch.getCurPos()._y);
+		Vector3df prePosView = getPosInViewSpace(touch.getPrePos()._x, touch.getPrePos()._y);
+		transformMat.rotateVect(curPosView);
+		transformMat.rotateVect(prePosView);
+		curPosView -= prePosView;
+		_arcball.updateTranslate(curPosView._x, curPosView._y, curPosView._z);
+	}
+	break;
 	}
 }
 
@@ -679,9 +690,8 @@ Reflex<EagleEyeCamera, const wstring&, SceneManager*> EagleEyeCamera::_dynReflex
 EagleEyeCamera::EagleEyeCamera(const wstring& name, SceneManager* oriSceneMgr)
 	: OrbitCamera(name, oriSceneMgr)
 	, _canRot(true)
-	, _viewScale(true)
+	, _cursorZoom(false)
 {
-	_zoomSpeed[0] = _zoomSpeed[1] = 0.1f;
 	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_nearWindowHeight = size._width;
 	_farWindowHeight = size._height;
@@ -707,11 +717,6 @@ void EagleEyeCamera::update(float dt)
 void EagleEyeCamera::forbidRotaion(bool isForbid)
 {
 	_canRot = !isForbid;
-}
-
-void EagleEyeCamera::forbidViewScale(bool isForbid)
-{
-	_viewScale = !isForbid;
 }
 
 void EagleEyeCamera::setLens(float widthOfViewVolume, float heightOfViewVolume, float zn, float zf)
@@ -789,8 +794,19 @@ void EagleEyeCamera::touchMoved(const Touch& touch, EMouseKeys key)
 			_arcball.updateRotate(touch.getCurPos()._x, touch.getCurPos()._y, true);
 		break;
 	case EMK_RIGHT:
-		_arcball.updateTranslate(touch.getDelta()._x * _moveSpeed[0], -touch.getDelta()._y * _moveSpeed[0], 0);
-		break;
+	{
+		Matrix4x4 transformMat, invMat;
+		invMat = _view * _arcball._finalZoom;
+		if (invMat.makeInverse())
+			transformMat = invMat;
+		Vector3df curPosView = getPosInViewSpace(touch.getCurPos()._x, touch.getCurPos()._y);
+		Vector3df prePosView = getPosInViewSpace(touch.getPrePos()._x, touch.getPrePos()._y);
+		transformMat.transformVect(curPosView);
+		transformMat.transformVect(prePosView);
+		curPosView -= prePosView;
+		_arcball.updateTranslate(curPosView._x, curPosView._y, curPosView._z);
+	}
+	break;
 	}
 }
 
@@ -802,45 +818,48 @@ void EagleEyeCamera::touchEnded(const Touch& touch, EMouseKeys key)
 
 bool EagleEyeCamera::touchWheel(const Touch& touch, float wheel)
 {
-	if (_viewScale)
-	{
-		float zoom = _zoomFactor + wheel * _zoomSpeed[0];
-		if (zoom <= 0.001f)
-		{
-			if (_zoomFactor > 0.001f)
-				_zoomFactor = zoom;
-			_arcball.updateScale(0, 0, 0);
-		}
-		else
-		{
-			_zoomFactor = zoom;
-			_arcball.updateScale(zoom, zoom, zoom);
-		}
-
-		return true;
-	}
-
-	float ratio;
-	float w = _eyeArea.getWidth();
-	float h = _eyeArea.getHeight();
-	if (w >= h)
-	{
-		ratio = w / h;
-		h -= wheel * _zoomSpeed[0];
-		w = h * ratio;
-	}
+	float zoom = 1.0f;
+	if (wheel > 0)
+		zoom = 1.25f;
 	else
-	{
-		ratio = h / w;
-		w -= wheel * _zoomSpeed[0];
-		h = w * ratio;
-	}
+		zoom = 0.8f;
+	_arcball.updateScale(zoom, zoom, zoom);
 
-	w *= 0.5f;
-	h *= 0.5f;
-	setLens(-w, w, -h, h, _nearZ, _farZ);
+	Matrix4x4 transformMat, invMat;
+	invMat = _view;
+	if (invMat.makeInverse())
+		transformMat = invMat;
+	Vector3df curPosView = getPosInViewSpace(touch.getCurPos()._x, touch.getCurPos()._y);
+	Vector3df prePosView = getPosInViewSpace(touch.getPrePos()._x, touch.getPrePos()._y);
+	transformMat.transformVect(curPosView);
+	transformMat.transformVect(prePosView);
+	prePosView -= curPosView;
+	_offsetMat.setTranslation(_offsetMat.getTranslation() + prePosView);
 
 	return true;
+}
+
+bool EagleEyeCamera::keyClicked(const tagKeyInput& keyInput)
+{
+	if (keyInput.Control && keyInput.PressedDown)
+		_cursorZoom = true;
+	else
+		_cursorZoom = false;
+	return false;
+}
+
+void EagleEyeCamera::regenerateViewArea()
+{
+	if (_cursorZoom && _offsetMat.getTranslation() != Vector3df::Origin)
+	{
+		SceneNode* pParent = getParentNode();
+		if (pParent)
+			_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _offsetMat * _arcball.getFinalTransform() * _affector * pParent->getAbsTransform();
+		else
+			_viewArea.getTransform(Frustum::EFT_VIEW) = _view * _offsetMat * _arcball.getFinalTransform() * _affector;
+	}
+	else
+		OrbitCamera::regenerateViewArea();
 }
 
 ViewMementoPtr EagleEyeCamera::createViewMemento()

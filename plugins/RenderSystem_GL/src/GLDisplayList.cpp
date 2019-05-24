@@ -1,13 +1,9 @@
 #include "GLDisplayList.h"
 #include "GLRenderSystem.h"
 
-bool GLDisplayList::isFillingList()
-{
-	return _isFillingList;
-}
-
 GLDisplayList::GLDisplayList(const wstring& name, GLRenderSystem* renderSys)
 	: DisplayList(name)
+	, _isEmpty(true)
 	, _isBeginDraw(false)
 	, _isFillingList(false)
 	, _renderSystem(renderSys)
@@ -25,18 +21,31 @@ GLDisplayList::GLDisplayList(const wstring& name, GLRenderSystem* renderSys)
 
 void GLDisplayList::newList()
 {
-	_isFillingList = true;
-	_renderSystem->fillingDisplayList(true);
-	glNewList(_displayListName, GL_COMPILE);
+	if (!_isFillingList)
+	{
+		_isFillingList = true;
+		_renderSystem->fillingDisplayList(true);
+		glNewList(_displayListName, GL_COMPILE);
+	}
 }
 
 void GLDisplayList::endList(const wstring& lastMaterialName /*= L""*/)
 {
-	_isFillingList = false;
-	glEndList();
-	_renderSystem->fillingDisplayList(false);
-	// 重置材质为显示列表最后一次调用的材质内容.
-	_lastMaterialName = lastMaterialName;
+	if (_isFillingList)
+	{
+		_isFillingList = false;
+		_renderSystem->testGLErrorBegan();
+		glEndList();
+		_isEmpty = _renderSystem->testGLErrorEnded(L"glEndList()");
+		_renderSystem->fillingDisplayList(false);
+		// 重置材质为显示列表最后一次调用的材质内容.
+		_lastMaterialName = lastMaterialName;
+	}
+}
+
+bool GLDisplayList::isEmpty()
+{
+	return _isEmpty;
 }
 
 GLDisplayList::~GLDisplayList()
@@ -49,8 +58,6 @@ bool GLDisplayList::beginDraw(EPrimitiveType primType, const wstring& materialNa
 {
 	if (_isBeginDraw)
 		return false;
-
-	_renderSystem->setRenderMode3D();
 
 	switch (primType)
 	{
@@ -76,6 +83,9 @@ bool GLDisplayList::beginDraw(EPrimitiveType primType, const wstring& materialNa
 		glBegin(GL_POLYGON); _isBeginDraw = true; break;
 	}
 
+	_markColor.set(0x00000000);
+	_markNormal = Vector3df::Origin;
+	_markTexCoord.set(-1000000.0f, -1000000.0f);
 	return _isBeginDraw;
 }
 
@@ -94,18 +104,27 @@ void GLDisplayList::position(float x, float y, float z)
 
 void GLDisplayList::normal(float x, float y, float z)
 {
-	if (_isBeginDraw)
+	if (_markNormal != Vector3df(x, y, z))
+	{
 		glNormal3f(x, y, z);
+		_markNormal.set(x, y, z);
+	}
 }
 
 void GLDisplayList::textureCoord(float u, float v)
 {
-	if (_isBeginDraw)
+	if (_markTexCoord != Vector2df(u, v))
+	{
 		glTexCoord2f(u, v);
+		_markTexCoord.set(u, v);
+	}
 }
 
 void GLDisplayList::colour(int r, int g, int b, int a /*= 255*/)
 {
-	if (_isBeginDraw)
+	if (_markColor != Colour(a, r, g, b))
+	{
 		glColor4ub(r, g, b, a);
+		_markColor.set(a, r, g, b);
+	}
 }

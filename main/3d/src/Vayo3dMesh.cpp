@@ -652,16 +652,18 @@ bool Mesh::isEmptyMesh() const
 void Mesh::computeNormals(ENormalType normType)
 {
 	unsigned size = _subMeshList.size();
-	for (unsigned int i = 0; i < size; ++i)
+	switch (normType)
 	{
-		switch (normType)
-		{
-		case ENT_FACE:
-			_subMeshList[i]->computeFaceNormals(); break;
-		case ENT_VERTEX:
-			_subMeshList[i]->computeVertexNormals(); break;
-		default: return;
-		}
+	case ENT_FACE:
+		for (unsigned int i = 0; i < size; ++i)
+			_subMeshList[i]->computeFaceNormals();
+		break;
+	case ENT_VERTEX:
+		for (unsigned int i = 0; i < size; ++i)
+			_subMeshList[i]->computeVertexNormals();
+		break;
+	default:
+		return;
 	}
 }
 

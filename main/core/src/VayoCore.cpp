@@ -8,7 +8,7 @@
 
 NS_VAYO_BEGIN
 
-Core* s_core = nullptr;
+static Core* s_core = nullptr;
 Core::Core()
 	: _isLaunched(false)
 	, _mainDevice(nullptr)
@@ -46,6 +46,11 @@ Core& Core::getCore()
 		VAYO_ASSERT(s_core);
 	}
 	return *s_core;
+}
+
+Core* Core::getCorePtr()
+{
+	return s_core;
 }
 
 bool Core::launch(Config* config)

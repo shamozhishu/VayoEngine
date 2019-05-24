@@ -17,7 +17,7 @@ void bendWireway(const Vector3df& startCenterPos, const Vector3df& finishCenterP
 	const float angleStep = (VAYO_MATH_PI * 2.0f) / VayoDegToRad(cnt);
 	Matrix4x4 transformMat;
 
-	vector<VertIdxPair> vertList;
+	deque<VertIdxPair> vertList;
 	Vertex tmpVert;
 	tmpVert._normal.set(0, 0, 1);
 
@@ -167,7 +167,7 @@ void comWireway(float radius, float length, SceneNode* parent, const Vector3df& 
 	const float angleStep = (VAYO_MATH_PI * 2.0f) / VayoDegToRad(cnt);
 	Matrix4x4 transformMat;
 
-	vector<VertIdxPair> vertList;
+	deque<VertIdxPair> vertList;
 	Vertex tmpVert;
 	tmpVert._normal.set(0, 0, 1);
 
@@ -284,7 +284,7 @@ TestModel::TestModel(SceneManager* pSceneMgr)
 	m_sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pObj);
 	pObj->getParentNode()->setPosition(Vector3df(10, 10, 10));
 
-	vector<VertIdxPair> vertList;
+	deque<VertIdxPair> vertList;
 	Vertex tmpVert;
 	tmpVert._position.set(-2, -2, 0);
 	vertList.push_back(tmpVert);

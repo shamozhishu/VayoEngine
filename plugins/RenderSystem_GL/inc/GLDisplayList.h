@@ -7,6 +7,9 @@
 #define __GL_DISPLAY_LIST_H__
 
 #include "GLSupport.h"
+#include "VayoVector2d.h"
+#include "VayoVector3d.h"
+#include "Vayo3dColour.h"
 #include "Vayo3dDisplayList.h"
 
 class GLDisplayList : public DisplayList
@@ -16,7 +19,7 @@ public:
 	~GLDisplayList();
 	void newList();
 	void endList(const wstring& lastMaterialName = L"");
-	bool isFillingList();
+	bool isEmpty();
 	bool beginDraw(EPrimitiveType primType, const wstring& materialName = L"");
 	void endDraw();
 	void position(float x, float y, float z);
@@ -25,8 +28,12 @@ public:
 	void colour(int r, int g, int b, int a = 255);
 
 private:
+	bool _isEmpty;
 	bool _isBeginDraw;
 	bool _isFillingList;
+	Colour _markColor;
+	Vector3df _markNormal;
+	Vector2df _markTexCoord;
 	GLRenderSystem* _renderSystem;
 	PROPERTY_R(GLuint,      _displayListName,  DisplayListName)
 	PROPERTY_R_REF(wstring, _lastMaterialName, LastMaterialName)

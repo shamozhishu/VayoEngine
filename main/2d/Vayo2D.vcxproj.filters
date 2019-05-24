@@ -26,9 +26,6 @@
     <ClInclude Include="inc\Vayo2dRenderer.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Vayo2dSurface.h">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="inc\Vayo2dColor.h">
       <Filter>inc</Filter>
     </ClInclude>
@@ -119,9 +116,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo2dGraphicQueue.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Vayo2dSurface.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Vayo2dPictureManager.cpp">

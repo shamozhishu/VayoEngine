@@ -27,13 +27,13 @@ public:
 	void transformPositionList(const Matrix4x4& posMat, unsigned int contourIdx = -1);
 	void transformNormalList(const Matrix4x4& normMat, unsigned int contourIdx = -1);
 	void changeNormalList(const Vector3df& newNorm, unsigned int contourIdx = -1);
-	vector<VertIdxPair>& getVertexList();
-	const vector<VertIdxPair>& getVertexList() const;
+	deque<VertIdxPair>& getVertexList();
+	const deque<VertIdxPair>& getVertexList() const;
 	vector<unsigned int>& getContour(unsigned int listIdx);
 	const vector<unsigned int>& getContour(unsigned int listIdx) const;
 	unsigned int getContoursCount() const;
-	vector<vector<unsigned int>>& getContourList();
-	const vector<vector<unsigned int>>& getContourList() const;
+	deque<vector<unsigned int>>& getContourList();
+	const deque<vector<unsigned int>>& getContourList() const;
 	bool beginStretch(ManualObject* stretchDstObj, unsigned int contourSrcIdx, bool reverse = false, const wstring& materialName = L"");
 	void stretching(const Matrix4x4& transform);
 	void endStretch(bool endlist = false);
@@ -51,14 +51,14 @@ private:
 	void initTesselator();
 	DISALLOW_COPY_AND_ASSIGN(TessGridHandler)
 	friend class TessGridParser;
-	Tesselator*                  _tesselator;
-	ManualObject*                _opDstObj;
-	wstring                      _materialName;
-	unsigned int                 _contourSrcIdx;
-	vector<VertIdxPair>          _vertexList;
-	vector<vector<unsigned int>> _contourList;
-	vector<Vertex>               _stretchVBuffer;
-	list<VertIdxPair>            _combineVertices;
+	Tesselator*                 _tesselator;
+	ManualObject*               _opDstObj;
+	wstring                     _materialName;
+	unsigned int                _contourSrcIdx;
+	deque<VertIdxPair>          _vertexList;
+	deque<vector<unsigned int>> _contourList;
+	vector<Vertex>              _stretchVBuffer;
+	deque<VertIdxPair>          _combineVertices;
 };
 
 NS_VAYO3D_END

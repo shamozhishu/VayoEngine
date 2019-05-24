@@ -34,8 +34,7 @@ void Arcball::mapToSphere(const Position2df& mousePos, Vector3df& newVec) const
 }
 
 Arcball::Arcball(float w, float h)
-	: _zoomVec(1, 1, 1)
-	, _isClicked(false)
+	: _isClicked(false)
 	, _isDragging(false)
 {
 	setBounds(w, h);
@@ -47,22 +46,18 @@ Arcball::~Arcball()
 
 void Arcball::reset()
 {
-	_zoomVec.set(1, 1, 1);
 	_thisRot.makeIdentity();
 	_lastRot.makeIdentity();
 	_deltaRot.makeIdentity();
 	_finalRot.makeIdentity();
+	_finalPos.makeIdentity();
+	_finalZoom.makeIdentity();
 }
 
 void Arcball::setBounds(float w, float h)
 {
 	_adjustWidth = 1.0f / ((w - 1.0f) * 0.5f);
 	_adjustHeight = 1.0f / ((h - 1.0f) * 0.5f);
-}
-
-void Arcball::updateScale(float xscale, float yscale, float zscale)
-{
-	_zoomVec.set(xscale, yscale, zscale);
 }
 
 void Arcball::updateRotate(float xscreen, float yscreen, bool isClick)
@@ -94,19 +89,31 @@ void Arcball::updateRotate(float xscreen, float yscreen, bool isClick)
 	}
 }
 
+void Arcball::updateRotate(float xrot, float yrot, float zrot)
+{
+	_thisRot.setRotationDegrees(Vector3df(xrot, yrot, zrot));
+	Vector3df curPos = _finalRot.getTranslation();
+	_finalRot = _lastRot = _thisRot;
+	_finalRot.setTranslation(curPos);
+}
+
+void Arcball::updateScale(float xscale, float yscale, float zscale)
+{
+	Matrix4x4 zoomMat;
+	zoomMat.setScale(Vector3df(xscale, yscale, zscale));
+	_finalZoom *= zoomMat;
+}
+
 void Arcball::updateTranslate(float xpos, float ypos, float zpos)
 {
-	Vector3df vec(_adjustWidth * xpos, _adjustHeight * ypos, _adjustHeight * zpos);
-	_finalRot.setTranslation(_finalRot.getTranslation() + vec);
+	_finalPos.setTranslation(_finalPos.getTranslation() + Vector3df(xpos, ypos, zpos));
 }
 
 Matrix4x4 Arcball::getFinalTransform()
 {
-	if (_zoomVec == Vector3df(1, 1, 1))
-		return _finalRot;
-	Matrix4x4 mat;
-	mat.setScale(_zoomVec);
-	return _finalRot * mat;
+	if (_finalZoom == IdentityMat4)
+		return _finalPos * _finalRot;
+	return _finalZoom * _finalPos * _finalRot;
 }
 
 void Arcball::click(const Position2df& mousePos)

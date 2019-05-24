@@ -48,6 +48,13 @@ enum EBufferType
 	EBT_VERTEX_AND_INDEX
 };
 
+enum ENormalType
+{
+	ENT_NONE,
+	ENT_FACE,
+	ENT_VERTEX
+};
+
 class Camera;
 class ViewMemento;
 class SpriteBox;

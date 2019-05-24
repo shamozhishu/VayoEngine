@@ -26,6 +26,7 @@ public:
 	Core();
 	virtual ~Core();
 	static Core& getCore();
+	static Core* getCorePtr();
 
 	virtual bool launch(Config* config);
 	bool         isLaunched() const { return _isLaunched; }

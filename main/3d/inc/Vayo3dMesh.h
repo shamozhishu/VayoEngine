@@ -135,12 +135,6 @@ class _Vayo3dExport Mesh
 	friend class MeshManager;
 	Mesh(const wstring& name);
 public:
-	enum ENormalType
-	{
-		ENT_FACE,
-		ENT_VERTEX
-	};
-public:
 	~Mesh();
 	const wstring&          getName() const;
 	SubMesh*                createSubMesh(EPrimitiveType primType);

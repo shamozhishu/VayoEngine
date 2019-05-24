@@ -157,7 +157,7 @@ bool TessGridHandler::tesselating(ManualObject* tessObj, bool reverse /*= false*
 
 	unsigned int vertListOffset = 0;
 	SharedSubMesh* pSharedSubMesh = nullptr;
-	bool allowSharedSubMesh = !_opDstObj->getCharacteristic(ManualObject::ECH_GL_IMMEDIATE_MODE);
+	bool allowSharedSubMesh = !_opDstObj->isUseDisplayList();
 	if (allowSharedSubMesh)
 	{
 		pSharedSubMesh = _opDstObj->getMesh()->createSharedSubMesh();
@@ -171,7 +171,7 @@ bool TessGridHandler::tesselating(ManualObject* tessObj, bool reverse /*= false*
 
 	if (reverse)
 	{
-		vector<vector<unsigned int>>::const_reverse_iterator cit = _contourList.crbegin();
+		deque<vector<unsigned int>>::const_reverse_iterator cit = _contourList.crbegin();
 		for (; cit != _contourList.crend(); ++cit)
 		{
 			const vector<unsigned int>& curContour = *cit;
@@ -195,7 +195,7 @@ bool TessGridHandler::tesselating(ManualObject* tessObj, bool reverse /*= false*
 	}
 	else
 	{
-		vector<vector<unsigned int>>::const_iterator cit = _contourList.cbegin();
+		deque<vector<unsigned int>>::const_iterator cit = _contourList.cbegin();
 		for (; cit != _contourList.cend(); ++cit)
 		{
 			const vector<unsigned int>& curContour = *cit;
@@ -263,7 +263,7 @@ bool TessGridHandler::tesselatingOnce(ManualObject* tessObj, unsigned int contou
 
 	unsigned int vertListOffset = 0;
 	SharedSubMesh* pSharedSubMesh = nullptr;
-	bool allowSharedSubMesh = !_opDstObj->getCharacteristic(ManualObject::ECH_GL_IMMEDIATE_MODE);
+	bool allowSharedSubMesh = !_opDstObj->isUseDisplayList();
 	if (allowSharedSubMesh)
 	{
 		pSharedSubMesh = _opDstObj->getMesh()->createSharedSubMesh();
@@ -329,7 +329,7 @@ void TessGridHandler::transformVertexList(const Matrix4x4& posMat, const Matrix4
 	if (posMat == IdentityMat4 && normMat == IdentityMat4)
 		return;
 
-	vector<VertIdxPair>::iterator it = _vertexList.begin();
+	deque<VertIdxPair>::iterator it = _vertexList.begin();
 	for (; it != _vertexList.end(); ++it)
 	{
 		VertIdxPair& vi = *it;
@@ -380,7 +380,7 @@ void TessGridHandler::changeNormalList(const Vector3df& newNorm, unsigned int co
 	}
 	else
 	{
-		vector<vector<unsigned int>>::const_iterator cit = _contourList.cbegin();
+		deque<vector<unsigned int>>::const_iterator cit = _contourList.cbegin();
 		for (; cit != _contourList.cend(); ++cit)
 		{
 			const vector<unsigned int>& curContour = *cit;
@@ -395,12 +395,12 @@ void TessGridHandler::changeNormalList(const Vector3df& newNorm, unsigned int co
 	}
 }
 
-vector<VertIdxPair>& TessGridHandler::getVertexList()
+deque<VertIdxPair>& TessGridHandler::getVertexList()
 {
 	return _vertexList;
 }
 
-const vector<VertIdxPair>& TessGridHandler::getVertexList() const
+const deque<VertIdxPair>& TessGridHandler::getVertexList() const
 {
 	return _vertexList;
 }
@@ -430,12 +430,12 @@ unsigned int TessGridHandler::getContoursCount() const
 	return _contourList.size();
 }
 
-vector<vector<unsigned int>>& TessGridHandler::getContourList()
+deque<vector<unsigned int>>& TessGridHandler::getContourList()
 {
 	return _contourList;
 }
 
-const vector<vector<unsigned int>>& TessGridHandler::getContourList() const
+const deque<vector<unsigned int>>& TessGridHandler::getContourList() const
 {
 	return _contourList;
 }
@@ -468,7 +468,7 @@ bool TessGridHandler::beginStretch(ManualObject* stretchDstObj, unsigned int con
 	}
 
 	Vertex tmpVert;
-	bool allowSharedSubMesh = !stretchDstObj->getCharacteristic(ManualObject::ECH_GL_IMMEDIATE_MODE);
+	bool allowSharedSubMesh = !stretchDstObj->isUseDisplayList();
 	if (allowSharedSubMesh)
 		stretchDstObj->begin(EPT_TRIANGLES, materialName);
 	else
@@ -492,6 +492,7 @@ bool TessGridHandler::beginStretch(ManualObject* stretchDstObj, unsigned int con
 			}
 			else
 			{
+				tmpVert._normal.set(0, 0, 0);
 				_stretchVBuffer[i++] = tmpVert;
 			}
 		}
@@ -511,6 +512,7 @@ bool TessGridHandler::beginStretch(ManualObject* stretchDstObj, unsigned int con
 			}
 			else
 			{
+				tmpVert._normal.set(0, 0, 0);
 				_stretchVBuffer[i++] = tmpVert;
 			}
 		}
@@ -530,7 +532,7 @@ void TessGridHandler::stretching(const Matrix4x4& transform)
 	SubMesh* pSideSubMesh = NULL;
 	unsigned int vertNum, triNum = _contourList[_contourSrcIdx].size();
 
-	bool allowSharedSubMesh = !_opDstObj->getCharacteristic(ManualObject::ECH_GL_IMMEDIATE_MODE);
+	bool allowSharedSubMesh = !_opDstObj->isUseDisplayList();
 	if (allowSharedSubMesh)
 	{
 		pSideSubMesh = _opDstObj->getOpSubMesh();
@@ -550,6 +552,7 @@ void TessGridHandler::stretching(const Matrix4x4& transform)
 	for (unsigned int i = 0; i < triNum; ++i)
 	{
 		tmpVert = _stretchVBuffer[vertNum - triNum + i];
+		tmpVert._normal.set(0, 0, 0);
 		if (triNum != vertNum)
 			_stretchVBuffer.push_back(tmpVert);
 		transform.transformVect(tmpVert._position);

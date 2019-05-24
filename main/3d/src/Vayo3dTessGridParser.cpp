@@ -13,7 +13,7 @@ void __stdcall TessGridParser::tessBeginDataCB(EPrimitiveType which, TessGridHan
 
 void __stdcall TessGridParser::tessVertexDataCB(VertIdxPair* vert, TessGridHandler* tess)
 {
-	if (tess->_opDstObj->getCharacteristic(ManualObject::ECH_GL_IMMEDIATE_MODE))
+	if (tess->_opDstObj->isUseDisplayList())
 	{
 		tess->_opDstObj->normal(vert->_vert._normal);
 		tess->_opDstObj->position(vert->_vert._position);
@@ -50,30 +50,31 @@ void __stdcall TessGridParser::tessCombineDataCB(const double newVertex[3], cons
 	blue = a + b + c + d;
 	tmpVert._color.set(255, red, green, blue);
 
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._x : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._x : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._x : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._x : 0.0f;
-	x = a + b + c + d;
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._y : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._y : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._y : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._y : 0.0f;
-	y = a + b + c + d;
-	a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._z : 0.0f;
-	b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._z : 0.0f;
-	c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._z : 0.0f;
-	d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._z : 0.0f;
-	z = a + b + c + d;
-	tmpVert._normal.set(x, y, z);
-
-	if (tess->_opDstObj->getCharacteristic(ManualObject::ECH_GL_IMMEDIATE_MODE))
+	if (tess->_opDstObj->isUseDisplayList())
 	{
+		tmpVert._normal = neighborVertex[0]->_vert._normal;
 		tess->_combineVertices.push_back(VertIdxPair(tmpVert, 0));
 		*outData = &tess->_combineVertices.back();
 	}
 	else
 	{
+		a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._x : 0.0f;
+		b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._x : 0.0f;
+		c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._x : 0.0f;
+		d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._x : 0.0f;
+		x = a + b + c + d;
+		a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._y : 0.0f;
+		b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._y : 0.0f;
+		c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._y : 0.0f;
+		d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._y : 0.0f;
+		y = a + b + c + d;
+		a = neighborVertex[0] ? neighborWeight[0] * neighborVertex[0]->_vert._normal._z : 0.0f;
+		b = neighborVertex[1] ? neighborWeight[1] * neighborVertex[1]->_vert._normal._z : 0.0f;
+		c = neighborVertex[2] ? neighborWeight[2] * neighborVertex[2]->_vert._normal._z : 0.0f;
+		d = neighborVertex[3] ? neighborWeight[3] * neighborVertex[3]->_vert._normal._z : 0.0f;
+		z = a + b + c + d;
+		tmpVert._normal.set(x, y, z);
+
 		SharedSubMesh* pSharedSubMesh = tess->_opDstObj->getMesh()->getSharedSubMesh();
 		unsigned int idx = pSharedSubMesh->addCombineVertex(tmpVert);
 		tess->_combineVertices.push_back(VertIdxPair(tmpVert, idx + pSharedSubMesh->getVertexCount()));

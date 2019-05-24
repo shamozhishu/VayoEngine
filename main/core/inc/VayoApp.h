@@ -22,13 +22,7 @@ public:
 
 	virtual ~App()
 	{
-		Core* pCore = &Core::getCore();
-		if (pCore)
-		{
-			enableTouch(false);
-			enableKeypad(false);
-			delete pCore;
-		}
+		shutdown();
 	}
 
 	template<typename T>
@@ -48,6 +42,17 @@ public:
 		enableTouch(true);
 		enableKeypad(true);
 		return true;
+	}
+
+	virtual void shutdown()
+	{
+		Core* pCore = Core::getCorePtr();
+		if (pCore)
+		{
+			enableTouch(false);
+			enableKeypad(false);
+			delete pCore;
+		}
 	}
 
 	virtual void run()
