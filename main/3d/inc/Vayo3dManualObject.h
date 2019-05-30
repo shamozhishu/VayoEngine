@@ -15,7 +15,7 @@
 
 NS_VAYO3D_BEGIN
 
-class _Vayo3dExport ManualObject : public MovableObject, public Renderable
+class _Vayo3dExport ManualObject : public MovableObject
 {
 	static Reflex<ManualObject, const wstring&, SceneManager*> _dynReflex;
 	PROPERTY_R(MeshPtr,      _meshData,   Mesh)
@@ -26,8 +26,6 @@ public:
 	ManualObject(const wstring& name, SceneManager* oriSceneMgr);
 	~ManualObject();
 	void    update(float dt);
-	void    render();
-	void    getWorldTransform(Matrix4x4& mat) const;
 	bool    begin(EPrimitiveType primType, const wstring& materialName = L"", bool sharedSubMesh = false);
 	bool    beginUpdate(unsigned int idx, bool sharedSubMesh = false);
 	void    end(bool endlist = false);
@@ -43,20 +41,25 @@ public:
 	void    triangle(unsigned int i1, unsigned int i2, unsigned int i3);
 	void    quad(unsigned int i1, unsigned int i2, unsigned int i3, unsigned int i4);
 	MeshPtr convertToMesh(EHardwareMapping mappingHint = EHM_NEVER) const;
-	void    useDisplayList(bool isUse, unsigned int displayListMaxVertCnt = 2000000);
+	void    useDisplayList(bool isUse);
 	bool    isUseDisplayList() const;
+	void    setSectionMaterial(MaterialPtr material);
+	void    setSectionMaterial(const wstring& materialName);
 
 public:
 	class Section : public Renderable
 	{
 		friend class ManualObject;
 		ManualObject* _parent;
-		DisplayList*  _displayList;
+		vector<DisplayList*> _displayLists;
 	public:
 		Section(ManualObject* parent);
 		~Section();
 		void render();
+		void getWorldTransform(Matrix4x4& mat) const;
 	};
+	Section* getSection(unsigned int idx) const;
+	const vector<Section*>& getSections() const { return _sections; }
 
 public:
 	/* 生成模型 */
@@ -69,21 +72,16 @@ public:
 	bool parseCustomAttrib();
 
 protected:
-	Section* getSection(const wstring& materialName);
-	void setMaterialCB(SubMesh* mb);
-	void setMaterialCB(SharedSubMesh* mb, unsigned idx);
+	Section* gainSection(const wstring& materialName);
 
 private:
-	Section*               _opSection;
-	map<wstring, Section*> _sections;
-	IndexBuffer*           _opIdxBuffer;
-	DisplayList*           _displayList;
-	unsigned int           _lastVertNum;
-	unsigned int           _lastIdxNum;
-	unsigned int           _listVertNum;
-	unsigned int           _listMaxVertCnt;
-	bool                   _isSharedSubMesh;
-	bool                   _isUseDisplayList;
+	vector<Section*> _sections;
+	Section*         _opSection;
+	IndexBuffer*     _opIdxBuffer;
+	unsigned int     _lastVertNum;
+	unsigned int     _lastIdxNum;
+	bool             _isSharedSubMesh;
+	bool             _isUseDisplayList;
 };
 
 NS_VAYO3D_END

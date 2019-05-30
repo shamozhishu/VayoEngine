@@ -226,58 +226,42 @@ bool RenderSystem::checkPrimitiveCount(unsigned int primCnt) const
 	return true;
 }
 
-DisplayList* RenderSystem::findDisplayList(const wstring& name)
+void RenderSystem::destroyDisplayList(DisplayList* pDisplayList)
 {
-	map<wstring, DisplayList*>::iterator it = _displayListSet.find(name);
-	if (it != _displayListSet.end())
-		return it->second;
-	return NULL;
-}
-
-void RenderSystem::destroyDisplayList(const wstring& name)
-{
-	map<wstring, DisplayList*>::iterator it = _displayListSet.find(name);
+	auto it = std::find(_displayListSet.begin(), _displayListSet.end(), pDisplayList);
 	if (it != _displayListSet.end())
 	{
-		SAFE_DELETE(it->second);
+		SAFE_DELETE(*it);
 		_displayListSet.erase(it);
 	}
 }
 
 void RenderSystem::destroyAllDisplayList()
 {
-	map<wstring, DisplayList*>::iterator it = _displayListSet.begin();
+	auto it = _displayListSet.begin();
 	for (; it != _displayListSet.end(); ++it)
 	{
-		SAFE_DELETE(it->second);
+		SAFE_DELETE(*it);
 	}
 	_displayListSet.clear();
 }
 
-Tesselator* RenderSystem::findTesselator(const wstring& name)
+void RenderSystem::destroyTesselator(Tesselator* pTesselator)
 {
-	map<wstring, Tesselator*>::iterator it = _tesselators.find(name);
-	if (it != _tesselators.end())
-		return it->second;
-	return NULL;
-}
-
-void RenderSystem::destroyTesselator(const wstring& name)
-{
-	map<wstring, Tesselator*>::iterator it = _tesselators.find(name);
+	auto it = std::find(_tesselators.begin(), _tesselators.end(), pTesselator);
 	if (it != _tesselators.end())
 	{
-		SAFE_DELETE(it->second);
+		SAFE_DELETE(*it);
 		_tesselators.erase(it);
 	}
 }
 
 void RenderSystem::destroyAllTesselators()
 {
-	map<wstring, Tesselator*>::iterator it = _tesselators.begin();
+	auto it = _tesselators.begin();
 	for (; it != _tesselators.end(); ++it)
 	{
-		SAFE_DELETE(it->second);
+		SAFE_DELETE(*it);
 	}
 	_tesselators.clear();
 }

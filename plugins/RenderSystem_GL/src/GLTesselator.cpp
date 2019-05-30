@@ -20,19 +20,9 @@ const char* GLTesselator::getPrimitiveType(GLenum type)
 	return "";
 }
 
-GLTesselator::GLTesselator(const wstring& name)
-	: Tesselator(name)
-	, _tess(NULL)
+GLTesselator::GLTesselator()
+	: _tess(NULL)
 {
-	static unsigned long long idx = 0;
-	if (0 == _name.compare(L""))
-	{
-		std::wstringstream ss;
-		ss << L"OpenGL_Tesselator" << idx;
-		++idx;
-		_name = ss.str();
-	}
-
 	_tess = gluNewTess();
 	gluTessCallback(_tess, GLU_TESS_BEGIN, (void(__stdcall*)(void))tessBeginCB);
 	gluTessCallback(_tess, GLU_TESS_VERTEX, (void(__stdcall*)(void))tessVertexCB);

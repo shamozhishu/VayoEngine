@@ -1,21 +1,12 @@
 #include "GLDisplayList.h"
 #include "GLRenderSystem.h"
 
-GLDisplayList::GLDisplayList(const wstring& name, GLRenderSystem* renderSys)
-	: DisplayList(name)
-	, _isEmpty(true)
+GLDisplayList::GLDisplayList(GLRenderSystem* renderSys)
+	: _isEmpty(true)
 	, _isBeginDraw(false)
 	, _isFillingList(false)
 	, _renderSystem(renderSys)
 {
-	static unsigned long long idx = 0;
-	if (0 == _name.compare(L""))
-	{
-		std::wstringstream ss;
-		ss << L"OpenGL_DisplayList" << idx;
-		++idx;
-		_name = ss.str();
-	}
 	_displayListName = glGenLists(1);
 }
 

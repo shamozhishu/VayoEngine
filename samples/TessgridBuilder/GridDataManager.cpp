@@ -88,10 +88,10 @@ bool CGridDataManager::GeneratingModel(CString modelName, bool display)
 			return false;
 	}
 
-	ManualObject* pObj = pCurSceneMgr->findObject<ManualObject>(refGridData.m_prop.m_modelName.GetString());
+	ManualObject* pObj = pCurSceneMgr->findObject<ManualObject>(refGridData.m_model.m_modelName.GetString());
 	if (!pObj)
 	{
-		pObj = pCurSceneMgr->createObject<ManualObject>(refGridData.m_prop.m_modelName.GetString());
+		pObj = pCurSceneMgr->createObject<ManualObject>(refGridData.m_model.m_modelName.GetString());
 		SceneNode* pSceneNode = pCurSceneMgr->findSceneNode<SceneNode>(L"Model_Root_SceneNode");
 		if (!pSceneNode)
 		{
@@ -119,7 +119,7 @@ void CGridDataManager::ClearAllModel()
 CGridData* CGridDataManager::GetGridData(CString modelName)
 {
 	static CGridData findGridData;
-	findGridData.m_prop.m_modelName = modelName;
+	findGridData.m_model.m_modelName = modelName;
 	list<CGridData>::iterator it = std::find(m_gridDataset.begin(), m_gridDataset.end(), findGridData);
 	if (it == m_gridDataset.end())
 		return NULL;
@@ -129,7 +129,7 @@ CGridData* CGridDataManager::GetGridData(CString modelName)
 const CGridData* CGridDataManager::GetGridData(CString modelName) const
 {
 	static CGridData findGridData;
-	findGridData.m_prop.m_modelName = modelName;
+	findGridData.m_model.m_modelName = modelName;
 	list<CGridData>::const_iterator cit = std::find(m_gridDataset.cbegin(), m_gridDataset.cend(), findGridData);
 	if (cit == m_gridDataset.cend())
 		return NULL;
@@ -154,7 +154,7 @@ const std::list<CGridData>& CGridDataManager::GetGridDataset() const
 bool CGridDataManager::BuildModelData(const CGridData& gridData, bool isBuildManulObject)
 {
 	m_gridBuilder.rebuild();
-	m_gridBuilder.setProp(gridData.m_prop.m_modelName.GetString(), gridData.m_prop.m_materialName.GetString());
+	m_gridBuilder.setModel(gridData.m_model.m_modelName.GetString());
 
 	TessGridBuilder::EPlace place = TessGridBuilder::EP_XY;
 	if (gridData.m_place.m_plane == _T("XZÆ½Ãæ"))
@@ -285,25 +285,21 @@ bool CGridDataManager::ParseTessgridFile(wstringstream& filestream)
 	return succParse;
 }
 
-bool CGridDataManager::ParseProp(wstringstream& strin)
+bool CGridDataManager::ParseModel(wstringstream& strin)
 {
 	wstring tag;
 	strin >> tag;
-	if (tag != L"@prop")
+	if (tag != L"@model")
 		return false;
 
 	strin >> tag;
-	m_currentGridData.m_prop.m_modelName = tag.c_str();
-
-	strin >> tag;
-	if (tag != L"default_material")
-		m_currentGridData.m_prop.m_materialName = tag.c_str();
+	m_currentGridData.m_model.m_modelName = tag.c_str();
 
 	unsigned int ignore;
 	strin >> ignore >> ignore;
 
 	strin >> tag;
-	if (tag != L"@end_prop")
+	if (tag != L"@end_model")
 		return false;
 
 	return true;
@@ -612,7 +608,7 @@ bool CGridDataManager::ParseCircle(wstringstream& strin)
 
 bool CGridDataManager::ParseGridding(wstringstream& strin)
 {
-	if (!ParseProp(strin))
+	if (!ParseModel(strin))
 		return false;
 
 	wstring tag;

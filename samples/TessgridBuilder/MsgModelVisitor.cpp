@@ -43,12 +43,11 @@ void CMsgModelVisitor::OnNewBuild()
 	if (dlg.DoModal() == IDOK)
 	{
 		CGridData gridData;
-		gridData.m_prop.m_modelName = dlg.GetModelName();
-		gridData.m_prop.m_materialName = dlg.GetModelMaterial();
+		gridData.m_model.m_modelName = dlg.GetModelName();
 		std::list<CGridData>& gridDataset = CGridDataManager::GetIns().GetGridDataset();
 		gridDataset.push_back(gridData);
 		const CGridData& refGridData = gridDataset.back();
-		HTREEITEM rootTreeItem = m_pEditorCtrls->m_treeCtrl.InsertItem(refGridData.m_prop.m_modelName, EICON_MODEL, EICON_MODEL, NULL);
+		HTREEITEM rootTreeItem = m_pEditorCtrls->m_treeCtrl.InsertItem(refGridData.m_model.m_modelName, EICON_MODEL, EICON_MODEL, NULL);
 		m_pEditorCtrls->m_treeCtrl.SetItemData(rootTreeItem, (DWORD_PTR)&refGridData);
 		HTREEITEM treeItem = m_pEditorCtrls->m_treeCtrl.InsertItem(_T("圆形轮廓"), EICON_CIRCLECONTOUR, EICON_CIRCLECONTOUR, rootTreeItem);
 		m_pEditorCtrls->m_treeCtrl.SetItemData(treeItem, (DWORD_PTR)&refGridData);
@@ -195,18 +194,9 @@ LRESULT CMsgModelVisitor::OnPropertyChanged(WPARAM wParam, LPARAM lParam)
 		if (propName == _T("模型名称"))
 		{
 			CGridData* pGridData = (CGridData*)m_pEditorCtrls->m_treeCtrl.GetItemData(m_pEditorCtrls->m_hParentModelItem);
-			if (pGridData && propValue != pGridData->m_prop.m_modelName)
+			if (pGridData && propValue != pGridData->m_model.m_modelName)
 			{
-				pGridData->m_prop.m_modelName = propValue;
-				pGridData->m_needUpdateModel = true;
-			}
-		}
-		else if (propName == _T("材质名称"))
-		{
-			CGridData* pGridData = (CGridData*)m_pEditorCtrls->m_treeCtrl.GetItemData(m_pEditorCtrls->m_hParentModelItem);
-			if (pGridData && propValue != pGridData->m_prop.m_materialName)
-			{
-				pGridData->m_prop.m_materialName = propValue;
+				pGridData->m_model.m_modelName = propValue;
 				pGridData->m_needUpdateModel = true;
 			}
 		}

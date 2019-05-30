@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "GridData.h"
 
-CGridProp::CGridProp()
+CGridModel::CGridModel()
 {
 }
 
-CGridProp::~CGridProp()
+CGridModel::~CGridModel()
 {
 }
 //------------------------------------------------------------------------
@@ -82,8 +82,7 @@ void CGridData::ClearAll()
 	m_circles.clear();
 	m_polygons.clear();
 
-	m_prop.m_modelName.Empty();
-	m_prop.m_materialName.Empty();
+	m_model.m_modelName.Empty();
 
 	m_place.m_plane = _T("XYÆ½Ãæ");
 	m_place.m_spaceInfo = SpatialInfo();
@@ -99,5 +98,5 @@ void CGridData::ClearAll()
 
 bool CGridData::operator==(const CGridData &rhs) const
 {
-	return m_prop.m_modelName == rhs.m_prop.m_modelName;
+	return m_model.m_modelName == rhs.m_model.m_modelName;
 }

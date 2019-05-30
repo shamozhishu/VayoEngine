@@ -1,13 +1,12 @@
 #pragma once
 
-class CGridProp
+class CGridModel
 {
 public:
-	CGridProp();
-	~CGridProp();
+	CGridModel();
+	~CGridModel();
 
 	CString m_modelName;
-	CString m_materialName;
 };
 
 class CGridPlace
@@ -87,7 +86,7 @@ public:
 	void ClearAll();
 	bool operator==(const CGridData &rhs) const;
 
-	CGridProp m_prop;
+	CGridModel m_model;
 	CGridPlace m_place;
 	bool m_needUpdateModel;
 	bool m_isTopCapTessAll;

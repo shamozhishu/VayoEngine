@@ -1,7 +1,7 @@
 #gridding
-@prop
-°å×Ó examples/°å×Ó 106673 3627
-@end_prop
+@model
+°å×Ó 106673 3627
+@end_model
 @place
 xy -420.5 -297 2.0 0.00 0.00 0.00 1.00 1.00 1.00
 @end_place

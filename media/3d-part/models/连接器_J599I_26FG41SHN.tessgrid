@@ -1,7 +1,7 @@
 #gridding
-@prop
-J599I/26FG41SHN examples/Բ̨ 2520 42
-@end_prop
+@model
+J599I/26FG41SHN 2520 42
+@end_model
 @place
 xy 0.0 0.0 15.5 0.00 0.00 0.00 1.00 1.00 1.00
 @end_place

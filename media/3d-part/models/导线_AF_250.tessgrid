@@ -1,7 +1,7 @@
 #gridding
-@prop
-AF-250 examples/ÏËÐ¾ 120 2
-@end_prop
+@model
+AF-250 120 2
+@end_model
 @place
 xy 0.0 0.0 5.00 0.00 0.00 0.00 1.00 1.00 1.00
 @end_place

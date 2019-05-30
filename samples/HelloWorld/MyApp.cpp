@@ -32,7 +32,7 @@ bool ModelViewer::startup()
 	{
 		TessGridHandler gridder;
 		TessGridBuilder builder;
-		builder.setProp(L"testmodel", L"examples/sphere");
+		builder.setModel(L"testmodel");
 		builder.setPlace(TessGridBuilder::EP_XY, Vector3df(0,0,2), Vector3df(0,0,0), Vector3df(1,1,1));
 		builder.setTopCap(-1, Vector3df(0,0,1), L"examples/sphere", false);
 		builder.setBottomCap(-1, Vector3df(0, 0, -1), L"examples/sphere", true);

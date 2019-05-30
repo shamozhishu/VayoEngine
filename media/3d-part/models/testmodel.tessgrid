@@ -1,7 +1,7 @@
 #gridding
-@prop
-testmodel examples/sphere 423 5
-@end_prop
+@model
+testmodel 423 5
+@end_model
 @place
 xy 0.00 0.00 2.00 0.00 0.00 0.00 1.00 1.00 1.00
 @end_place

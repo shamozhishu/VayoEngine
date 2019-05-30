@@ -1693,29 +1693,17 @@ TexturePtr GLRenderSystem::createTexture(const wstring& filename, Image* image, 
 	return new GLTexture(filename, image, generateMipLevels, this);
 }
 
-DisplayList* GLRenderSystem::createDisplayList(const wstring& name /*= L""*/)
+DisplayList* GLRenderSystem::createDisplayList()
 {
-	DisplayList* displayList = new GLDisplayList(name, this);
-	map<wstring, DisplayList*>::iterator it = _displayListSet.find(displayList->getName());
-	if (it != _displayListSet.end())
-	{
-		SAFE_DELETE(it->second);
-		_displayListSet.erase(it);
-	}
-	_displayListSet[displayList->getName()] = displayList;
+	DisplayList* displayList = new GLDisplayList(this);
+	_displayListSet.push_back(displayList);
 	return displayList;
 }
 
-Tesselator* GLRenderSystem::createTesselator(const wstring& name /*= L""*/)
+Tesselator* GLRenderSystem::createTesselator()
 {
-	Tesselator* tesselator = new GLTesselator(name);
-	map<wstring, Tesselator*>::iterator it = _tesselators.find(tesselator->getName());
-	if (it != _tesselators.end())
-	{
-		SAFE_DELETE(it->second);
-		_tesselators.erase(it);
-	}
-	_tesselators[tesselator->getName()] = tesselator;
+	Tesselator* tesselator = new GLTesselator();
+	_tesselators.push_back(tesselator);
 	return tesselator;
 }
 

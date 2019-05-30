@@ -46,7 +46,7 @@ TessGridHandler::TessGridHandler(unsigned int vertexCount, unsigned int contourC
 
 TessGridHandler::~TessGridHandler()
 {
-	Root::getSingleton().getActiveRenderer()->destroyTesselator(_tesselator->getName());
+	Root::getSingleton().getActiveRenderer()->destroyTesselator(_tesselator);
 }
 
 void TessGridHandler::reset(int vertexSize /*= 0*/, int contourSize /*= 0*/)
@@ -576,53 +576,22 @@ void TessGridHandler::stretching(const Matrix4x4& transform)
 			idx3 = newVertsNum - triNum - triNum;
 
 		if (allowSharedSubMesh)
-		{
 			_opDstObj->triangle(idx1, idx2, idx3);
-		}
-		else
-		{
-			tri.set(_stretchVBuffer[idx1]._position, _stretchVBuffer[idx2]._position, _stretchVBuffer[idx3]._position);
-			Vector3df norm = tri.getNormal().normalize();
-			if (_stretchVBuffer[idx1]._normal == Vector3df::Origin)
-				_stretchVBuffer[idx1]._normal = norm;
-			if (_stretchVBuffer[idx2]._normal == Vector3df::Origin)
-				_stretchVBuffer[idx2]._normal = norm;
-			if (_stretchVBuffer[idx3]._normal == Vector3df::Origin)
-				_stretchVBuffer[idx3]._normal = norm;
-
-			_opDstObj->normal(_stretchVBuffer[idx1]._normal);
-			_opDstObj->position(_stretchVBuffer[idx1]._position);
-
-			_opDstObj->normal(_stretchVBuffer[idx2]._normal);
-			_opDstObj->position(_stretchVBuffer[idx2]._position);
-
-			_opDstObj->normal(_stretchVBuffer[idx3]._normal);
-			_opDstObj->position(_stretchVBuffer[idx3]._position);
-		}
 
 		idx1 = idx3;
 		idx3 = idx1 + triNum;
 
 		if (allowSharedSubMesh)
-		{
 			_opDstObj->triangle(idx1, idx2, idx3);
-		}
 		else
 		{
 			tri.set(_stretchVBuffer[idx1]._position, _stretchVBuffer[idx2]._position, _stretchVBuffer[idx3]._position);
 			Vector3df norm = tri.getNormal().normalize();
-			if (_stretchVBuffer[idx1]._normal == Vector3df::Origin)
-				_stretchVBuffer[idx1]._normal = norm;
-			if (_stretchVBuffer[idx2]._normal == Vector3df::Origin)
-				_stretchVBuffer[idx2]._normal = norm;
-			if (_stretchVBuffer[idx3]._normal == Vector3df::Origin)
-				_stretchVBuffer[idx3]._normal = norm;
+			_stretchVBuffer[idx1]._normal = norm;
+			_stretchVBuffer[idx3]._normal = norm;
 
 			_opDstObj->normal(_stretchVBuffer[idx1]._normal);
 			_opDstObj->position(_stretchVBuffer[idx1]._position);
-
-			_opDstObj->normal(_stretchVBuffer[idx2]._normal);
-			_opDstObj->position(_stretchVBuffer[idx2]._position);
 
 			_opDstObj->normal(_stretchVBuffer[idx3]._normal);
 			_opDstObj->position(_stretchVBuffer[idx3]._position);
@@ -632,7 +601,13 @@ void TessGridHandler::stretching(const Matrix4x4& transform)
 	if (allowSharedSubMesh)
 		pSideSubMesh->setVertexList(_stretchVBuffer);
 	else
+	{
+		_opDstObj->normal(_stretchVBuffer[newVertsNum - triNum - triNum + 1]._normal);
+		_opDstObj->position(_stretchVBuffer[newVertsNum - triNum - triNum + 1]._position);
+		_opDstObj->normal(_stretchVBuffer[newVertsNum - triNum + 1]._normal);
+		_opDstObj->position(_stretchVBuffer[newVertsNum - triNum + 1]._position);
 		_opDstObj->end();
+	}
 }
 
 void TessGridHandler::endStretch(bool endlist /*= false*/)

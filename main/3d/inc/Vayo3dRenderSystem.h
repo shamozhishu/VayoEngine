@@ -52,14 +52,12 @@ public:
 	virtual ~RenderSystem();
 	virtual TexturePtr   createTexture(const wstring& filename, Image* image, bool generateMipLevels) = 0;
 
-	virtual DisplayList* createDisplayList(const wstring& name = L"") = 0;
-	virtual DisplayList* findDisplayList(const wstring& name);
-	virtual void         destroyDisplayList(const wstring& name);
+	virtual DisplayList* createDisplayList() = 0;
+	virtual void         destroyDisplayList(DisplayList* pDisplayList);
 	virtual void         destroyAllDisplayList();
 
-	virtual Tesselator*  createTesselator(const wstring& name = L"") = 0;
-	virtual Tesselator*  findTesselator(const wstring& name);
-	virtual void         destroyTesselator(const wstring& name);
+	virtual Tesselator*  createTesselator() = 0;
+	virtual void         destroyTesselator(Tesselator* pTesselator);
 	virtual void         destroyAllTesselators();
 
 	virtual bool init(unsigned char antiAliasFactor = 0, bool handleSRGB = false) = 0;
@@ -171,8 +169,8 @@ protected:
 	unsigned int                       _minVertCntForHwbuffer;
 	vector<LightData>                  _lightDataset;
 	vector<MaterialRendererPtr>        _materialRenderers;
-	map<wstring, DisplayList*>         _displayListSet;
-	map<wstring, Tesselator*>          _tesselators;
+	vector<DisplayList*>               _displayListSet;
+	vector<Tesselator*>                _tesselators;
 	map<SubMesh*, HardwareBufferLink*> _hardwareBufferMap;
 
 protected:

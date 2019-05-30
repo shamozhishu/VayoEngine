@@ -15,7 +15,7 @@
 class GLDisplayList : public DisplayList
 {
 public:
-	GLDisplayList(const wstring& name, GLRenderSystem* renderSys);
+	GLDisplayList(GLRenderSystem* renderSys);
 	~GLDisplayList();
 	void newList();
 	void endList(const wstring& lastMaterialName = L"");

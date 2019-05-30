@@ -17,8 +17,8 @@ public:
 	virtual ~Renderable();
 	virtual void        render() = 0;
 	virtual MaterialPtr getMaterial() const;
-	virtual void        setMaterial(MaterialPtr material);
-	virtual void        setMaterial(const wstring& name);
+	virtual void        setMaterial(MaterialPtr material) const;
+	virtual void        setMaterial(const wstring& name) const;
 	virtual void        getWorldTransform(Matrix4x4& mat) const;
 
 private:

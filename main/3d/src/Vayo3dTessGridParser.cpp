@@ -84,11 +84,11 @@ void __stdcall TessGridParser::tessCombineDataCB(const double newVertex[3], cons
 //----------------------------------------------------------------------------------
 //##解析.tessgrid格式模型文件##
 //----------------------------------------------------------------------------------
-inline ManualObject* TessGridParser::parseProp(wstringstream& strin, TessGridHandler& tess)
+inline ManualObject* TessGridParser::parseModel(wstringstream& strin, TessGridHandler& tess)
 {
 	wstring tag;
 	strin >> tag;
-	if (tag != L"@prop")
+	if (tag != L"@model")
 		return NULL;
 
 	strin >> tag;
@@ -100,12 +100,6 @@ inline ManualObject* TessGridParser::parseProp(wstringstream& strin, TessGridHan
 		return NULL;
 	}
 
-	strin >> tag;
-	if (tag != L"default_material")
-		pObj->setMaterial(tag);
-	else
-		pObj->setMaterial(L"");
-
 	unsigned int vertexCount, contourCount;
 	strin >> vertexCount >> contourCount;
 	tess._vertexList.clear();
@@ -114,7 +108,7 @@ inline ManualObject* TessGridParser::parseProp(wstringstream& strin, TessGridHan
 	tess._contourList.resize(contourCount);
 
 	strin >> tag;
-	if (tag != L"@end_prop")
+	if (tag != L"@end_model")
 		return NULL;
 
 	pObj->getMesh()->destroyAllSubMeshs();
@@ -549,7 +543,7 @@ bool TessGridParser::parseCircle(wstringstream& strin, TessGridHandler& tess, co
 
 bool TessGridParser::parseGridding(wstringstream& strin, TessGridHandler& tess)
 {
-	ManualObject* pObj = parseProp(strin, tess);
+	ManualObject* pObj = parseModel(strin, tess);
 	if (!pObj)
 		return false;
 
@@ -583,7 +577,11 @@ bool TessGridParser::parseGridding(wstringstream& strin, TessGridHandler& tess)
 			break;
 	}
 
-	return parseCapAndBody(strin, tess, pObj, tag);
+	bool bRet = parseCapAndBody(strin, tess, pObj, tag);
+	if (pObj->isUseDisplayList())
+		pObj->end(true);
+
+	return bRet;
 }
 
 NS_VAYO3D_END

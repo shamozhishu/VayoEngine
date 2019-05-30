@@ -14,11 +14,10 @@ void TessGridBuilder::building()
 	// gridding
 	_stream << L"#gridding\r\n";
 
-	// prop
-	_stream << L"@prop\r\n";
-	_stream << _prop.modelName << L" " << _prop.materialName << L" "
-		<< _prop.vertCnt << L" " << _prop.contourCnt << L"\r\n";
-	_stream << L"@end_prop\r\n";
+	// model
+	_stream << L"@model\r\n";
+	_stream << _model.modelName << L" " << _model.vertCnt << L" " << _model.contourCnt << L"\r\n";
+	_stream << L"@end_model\r\n";
 
 	// place
 	_stream << L"@place\r\n";
@@ -197,8 +196,8 @@ TessGridBuilder::TessGridBuilder()
 	: _hasBuildStream(false)
 	, _polyContourIdx(0)
 {
-	_prop.vertCnt = 0;
-	_prop.contourCnt = 0;
+	_model.vertCnt = 0;
+	_model.contourCnt = 0;
 }
 
 TessGridBuilder::~TessGridBuilder()
@@ -239,10 +238,9 @@ void TessGridBuilder::rebuild()
 		_stream.str(L"");
 		_stream.clear();
 		_polyContourIdx = 0;
-		_prop.modelName.clear();
-		_prop.materialName.clear();
-		_prop.vertCnt = 0;
-		_prop.contourCnt = 0;
+		_model.modelName.clear();
+		_model.vertCnt = 0;
+		_model.contourCnt = 0;
 		_place.place = EP_XY;
 		_place.spaceInfo._translation = Vector3df::Origin;
 		_place.spaceInfo._rotation = Vector3df::Origin;
@@ -255,10 +253,9 @@ void TessGridBuilder::rebuild()
 	}
 }
 
-void TessGridBuilder::setProp(const wstring& modelName, const wstring& materialName/*=L""*/)
+void TessGridBuilder::setModel(const wstring& modelName)
 {
-	_prop.modelName = modelName;
-	_prop.materialName = materialName.empty() ? L"default_material" : materialName;
+	_model.modelName = modelName;
 }
 
 void TessGridBuilder::setPlace(EPlace place, const Vector3df& pos/*=Vector3df::Origin*/, const Vector3df& rot/*=Vector3df::Origin*/, const Vector3df& scale/*=Vector3df(1,1,1)*/)
@@ -345,16 +342,16 @@ int TessGridBuilder::addCircle(float diameter, Vector2df pos, unsigned int cnt/*
 	cir.cnt = cnt;
 	cir.clockwise = clockwise;
 	_circles.push_back(cir);
-	_prop.vertCnt += cnt;
-	int curContour = (int)_prop.contourCnt;
-	_prop.contourCnt += 1;
+	_model.vertCnt += cnt;
+	int curContour = (int)_model.contourCnt;
+	_model.contourCnt += 1;
 	return curContour;
 }
 
 int TessGridBuilder::beginAddPoly()
 {
-	int curContour = (int)_prop.contourCnt;
-	_prop.contourCnt += 1;
+	int curContour = (int)_model.contourCnt;
+	_model.contourCnt += 1;
 	return curContour;
 }
 
@@ -369,9 +366,9 @@ void TessGridBuilder::addPolyPoint(Vector2df pos, float degree/*=0.0f*/, unsigne
 	_polygons.push_back(poly);
 
 	if (degree <= 0.0f || degree >= 360.0f)
-		_prop.vertCnt += 1;
+		_model.vertCnt += 1;
 	else
-		_prop.vertCnt += cnt;
+		_model.vertCnt += cnt;
 }
 
 void TessGridBuilder::endAddPoly()

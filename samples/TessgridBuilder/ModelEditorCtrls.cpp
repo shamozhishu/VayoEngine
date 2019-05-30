@@ -198,7 +198,7 @@ void CModelEditorCtrls::RefreshTreeCtrl()
 		if (!pGridData)
 			continue;
 
-		HTREEITEM rootTreeItem = m_treeCtrl.InsertItem(pGridData->m_prop.m_modelName, EICON_MODEL, EICON_MODEL, NULL);
+		HTREEITEM rootTreeItem = m_treeCtrl.InsertItem(pGridData->m_model.m_modelName, EICON_MODEL, EICON_MODEL, NULL);
 		m_treeCtrl.SetItemData(rootTreeItem, (DWORD_PTR)pGridData);
 		HTREEITEM treeItem = m_treeCtrl.InsertItem(_T("Ô²ÐÎÂÖÀª"), EICON_CIRCLECONTOUR, EICON_CIRCLECONTOUR, rootTreeItem);
 		m_treeCtrl.SetItemData(treeItem, (DWORD_PTR)pGridData);
@@ -417,9 +417,7 @@ bool CModelEditorCtrls::SetPropAndPlaceGridCtrlValue(const CGridData* pGridData)
 	if (!pGridData)
 		return false;
 
-	m_propGridCtrl.GetProperty(0)->GetSubItem(0)->SetValue(pGridData->m_prop.m_modelName.GetString());
-	m_propGridCtrl.GetProperty(0)->GetSubItem(1)->SetValue(pGridData->m_prop.m_materialName.GetString());
-
+	m_propGridCtrl.GetProperty(0)->GetSubItem(0)->SetValue(pGridData->m_model.m_modelName.GetString());
 	m_propGridCtrl.GetProperty(1)->GetSubItem(0)->SetValue(pGridData->m_place.m_plane.GetString());
 	m_propGridCtrl.GetProperty(1)->GetSubItem(1)->SetValue(pGridData->m_place.m_spaceInfo._translation._x);
 	m_propGridCtrl.GetProperty(1)->GetSubItem(2)->SetValue(pGridData->m_place.m_spaceInfo._translation._y);

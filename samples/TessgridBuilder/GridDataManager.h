@@ -22,7 +22,7 @@ public:
 private:
 	bool BuildModelData(const CGridData& gridData, bool isBuildManulObject);
 	bool ParseTessgridFile(wstringstream& filestream);
-	bool ParseProp(wstringstream& strin);
+	bool ParseModel(wstringstream& strin);
 	bool ParseCapAndBody(wstringstream& strin, const wstring& tag);
 	bool ParseCap(wstringstream& strin, bool topCap);
 	bool ParsePlace(wstringstream& strin);

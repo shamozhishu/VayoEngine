@@ -23,7 +23,7 @@ public:
 	wstringstream& getStream();
 	void save(const wstring& filename, bool append = true, bool fullPath = false);
 	void rebuild();
-	void setProp(const wstring& modelName, const wstring& materialName=L"");
+	void setModel(const wstring& modelName);
 	void setPlace(EPlace place, const Vector3df& pos=Vector3df::Origin, const Vector3df& rot=Vector3df::Origin, const Vector3df& scale=Vector3df(1,1,1));
 	void setTopCap(int idx, Vector3df norm, wstring materialName = L"", bool reverse = false);
 	void setTopCap(int lowerIdx, int upperIdx, Vector3df norm, wstring materialName = L"", bool reverse = false);
@@ -45,13 +45,12 @@ private:
 	void building();
 	DISALLOW_COPY_AND_ASSIGN(TessGridBuilder)
 
-	typedef struct tagProp
+	typedef struct tagModel
 	{
 		wstring modelName;
-		wstring materialName;
 		unsigned int vertCnt;
 		unsigned int contourCnt;
-	} Prop;
+	} Model;
 
 	typedef struct tagPlace
 	{
@@ -96,7 +95,7 @@ private:
 
 private:
 	wstringstream          _stream;
-	Prop                   _prop;
+	Model                  _model;
 	Place                  _place;
 	vector<Circle>         _circles;
 	vector<Polygon>        _polygons;

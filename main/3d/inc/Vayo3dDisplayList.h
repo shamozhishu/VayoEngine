@@ -12,7 +12,6 @@ NS_VAYO3D_BEGIN
 class DisplayList
 {
 public:
-	DisplayList(const wstring& name) : _name(name) {}
 	virtual ~DisplayList() {}
 	virtual void newList() = 0;
 	virtual void endList(const wstring& lastMaterialName = L"") = 0;
@@ -23,9 +22,6 @@ public:
 	virtual void normal(float x, float y, float z) = 0;
 	virtual void textureCoord(float u, float v) = 0;
 	virtual void colour(int r, int g, int b, int a = 255) = 0;
-
-protected:
-	PROPERTY_R_REF(wstring, _name, Name)
 };
 
 NS_VAYO3D_END

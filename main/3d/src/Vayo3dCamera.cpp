@@ -519,11 +519,11 @@ OrbitCamera::OrbitCamera(const wstring& name, SceneManager* oriSceneMgr)
 	, _arcball(0, 0)
 	, _zoomFactor(1.0f)
 {
+	_position.set(0, 0, 100);
 	_moveSpeed[0] = _moveSpeed[1] = _zoomSpeed[0] = _zoomSpeed[1] = 5.0f;
 	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_arcball.setBounds(size._width, size._height);
 	_arcball.updateScale(_zoomFactor, _zoomFactor, _zoomFactor);
-	_position.set(0, 0, 100);
 }
 
 OrbitCamera::~OrbitCamera()
@@ -567,11 +567,16 @@ void OrbitCamera::setLens(float fovY, float aspect, float zn, float zf)
 
 void OrbitCamera::lookAt(const Vector3df& pos, const Vector3df& target /*= Vector3df::Origin*/, const Vector3df& worldUp /*= Vector3df::YAxis*/)
 {
-	float zpos = max_(max_(pos._x, pos._y), pos._z);
-	_position.set(0, 0, zpos);
 	_affector.buildCameraLookAtMatrixRH(pos, target, worldUp);
 	_affector.setTranslation(Vector3df::Origin);
-	_needRefresh = true;
+	if (!isOrthogonal())
+	{
+		float zpos = max_(max_(abs(pos._x), abs(pos._y)), abs(pos._z));
+		_position.set(0, 0, zpos);
+		_affector.buildCameraLookAtMatrixRH(pos, target, worldUp);
+		_affector.setTranslation(Vector3df::Origin);
+		_needRefresh = true;
+	}
 }
 
 bool OrbitCamera::touchBegan(const Touch& touch, EMouseKeys key)
@@ -692,6 +697,7 @@ EagleEyeCamera::EagleEyeCamera(const wstring& name, SceneManager* oriSceneMgr)
 	, _canRot(true)
 	, _cursorZoom(false)
 {
+	_position.set(0, 0, 10000);
 	const Dimension2di& size = Root::getSingleton().getActiveDevice()->getScreenSize();
 	_nearWindowHeight = size._width;
 	_farWindowHeight = size._height;

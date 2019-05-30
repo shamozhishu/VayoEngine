@@ -1,7 +1,7 @@
 #gridding
-@prop
-J1784A/18B-25N10 examples/н╡уж 120 2
-@end_prop
+@model
+J1784A/18B-25N10 120 2
+@end_model
 @place
 xy 0.0 0.0 69.45 0.00 0.00 0.00 1.00 1.00 1.00
 @end_place

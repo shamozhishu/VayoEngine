@@ -15,18 +15,33 @@ void ManualObject::Section::render()
 {
 	RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
 	pRenderer->setMaterial(*getMaterial());
-	pRenderer->drawDisplayList(_displayList);
+	auto it = _displayLists.begin();
+	auto itEnd = _displayLists.end();
+	for (; it != itEnd; ++it)
+		pRenderer->drawDisplayList(*it);
+}
+
+void ManualObject::Section::getWorldTransform(Matrix4x4& mat) const
+{
+	SceneNode* sn = _parent->getParentNode();
+	if (sn)
+		mat = sn->getAbsTransform();
+	else
+		Renderable::getWorldTransform(mat);
 }
 
 ManualObject::Section::Section(ManualObject* parent)
 	: _parent(parent)
 {
-	_displayList = Root::getSingleton().getActiveRenderer()->createDisplayList();
 }
 
 ManualObject::Section::~Section()
 {
-	Root::getSingleton().getActiveRenderer()->destroyDisplayList(_displayList->getName());
+	RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
+	auto it = _displayLists.begin();
+	auto itEnd = _displayLists.end();
+	for (; it != itEnd; ++it)
+		pRenderer->destroyDisplayList(*it);
 }
 
 Reflex<ManualObject, const wstring&, SceneManager*> ManualObject::_dynReflex;
@@ -34,15 +49,12 @@ ManualObject::ManualObject(const wstring& name, SceneManager* oriSceneMgr)
 	: MovableObject(name, oriSceneMgr)
 	, _normalType(ENT_FACE)
 	, _opSubMesh(nullptr)
-	, _opIdxBuffer(nullptr)
 	, _opSection(nullptr)
-	, _displayList(nullptr)
+	, _opIdxBuffer(nullptr)
 	, _lastVertNum(0)
 	, _lastIdxNum(0)
-	, _listVertNum(-1)
-	, _listMaxVertCnt(2000000)
 	, _isSharedSubMesh(false)
-	, _isUseDisplayList(false)
+	, _isUseDisplayList(true)
 {
 	_meshData = Root::getSingleton().getMeshManager()->createEmptyMesh();
 }
@@ -53,69 +65,26 @@ ManualObject::~ManualObject()
 	auto it = _sections.begin();
 	auto itEnd = _sections.end();
 	for (; it != itEnd; ++it)
-		delete it->second;
+		delete *it;
 	_sections.clear();
 }
 
 void ManualObject::update(float dt)
 {
-	Root::getSingleton().getCurSceneMgr()->registerForRendering(this, getQueueID());
-}
-
-void ManualObject::render()
-{
-	RenderSystem* pRenderer = Root::getSingleton().getActiveRenderer();
-	if (_isUseDisplayList)
-	{
-		if (_sections.size() > 0)
-		{
-			// 设置所有子网格的公共材质,例如启用光照,因为类似glEnable(GL_LIGHTING)这类调用不能装入显示列表中.
-			pRenderer->setMaterial(*getMaterial());
-
-			if (_displayList->isEmpty())
-			{
-				_displayList->newList();
-				auto it = _sections.begin();
-				auto itEnd = _sections.end();
-				for (; it != itEnd; ++it)
-					it->second->render();
-				_displayList->endList();
-			}
-
-			pRenderer->drawDisplayList(_displayList);
-		}
-	}
-	else if (!_meshData->isEmptyMesh())
-	{
-		_meshData->computeNormals(_normalType);
-		SharedSubMesh* pSharedSubMesh = _meshData->getSharedSubMesh();
-		if (pSharedSubMesh)
-			pRenderer->drawMeshBuffer<ManualObject>(pSharedSubMesh, this, &ManualObject::setMaterialCB);
-
-		SubMesh* pSubMesh = nullptr;
-		const vector<SubMesh*>& subMeshList = _meshData->getSubMeshList();
-		vector<SubMesh*>::const_iterator cit = subMeshList.cbegin();
-		for (; cit != subMeshList.cend(); ++cit)
-			pRenderer->drawMeshBuffer<ManualObject>(*cit, this, &ManualObject::setMaterialCB);
-	}
-}
-
-void ManualObject::getWorldTransform(Matrix4x4& mat) const
-{
-	SceneNode* sn = getParentNode();
-	if (sn)
-		mat = sn->getAbsTransform();
-	else
-		Renderable::getWorldTransform(mat);
+	SceneManager* pSceneMgr = Root::getSingleton().getCurSceneMgr();
+	auto it = _sections.begin();
+	auto itEnd = _sections.end();
+	for (; it != itEnd; ++it)
+		pSceneMgr->registerForRendering(*it, getQueueID());
 }
 
 bool ManualObject::begin(EPrimitiveType primType, const wstring& materialName /*= L""*/, bool sharedSubMesh /*= false*/)
 {
 	if (_isUseDisplayList)
 	{
-		_opSection = getSection(materialName);
-		_opSection->_displayList->newList();
-		return _opSection->_displayList->beginDraw(primType);
+		_opSection = gainSection(materialName);
+		_opSection->_displayLists.back()->newList();
+		return _opSection->_displayLists.back()->beginDraw(primType);
 	}
 	else if (sharedSubMesh)
 	{
@@ -191,9 +160,9 @@ void ManualObject::end(bool endlist /*= false*/)
 {
 	if (_isUseDisplayList)
 	{
-		_opSection->_displayList->endDraw();
+		_opSection->_displayLists.back()->endDraw();
 		if (endlist)
-			_opSection->_displayList->endList();
+			_opSection->_displayLists.back()->endList();
 	}
 	else if (_isSharedSubMesh && _opIdxBuffer)
 	{
@@ -231,10 +200,7 @@ void ManualObject::position(const Vector3df& pos)
 void ManualObject::position(float x, float y, float z)
 {
 	if (_isUseDisplayList)
-	{
-		_opSection->_displayList->position(x, y, z);
-		++_listVertNum;
-	}
+		_opSection->_displayLists.back()->position(x, y, z);
 	else if (_isSharedSubMesh)
 		_meshData->getSharedSubMesh()->addPosition(Vector3df(x, y, z));
 	else if (_opSubMesh)
@@ -249,7 +215,7 @@ void ManualObject::normal(const Vector3df& norm)
 void ManualObject::normal(float x, float y, float z)
 {
 	if (_isUseDisplayList)
-		_opSection->_displayList->normal(x, y, z);
+		_opSection->_displayLists.back()->normal(x, y, z);
 	else if (_isSharedSubMesh)
 		_meshData->getSharedSubMesh()->addNormal(Vector3df(x, y, z));
 	else if (_opSubMesh)
@@ -264,7 +230,7 @@ void ManualObject::textureCoord(const Vector2df& uv)
 void ManualObject::textureCoord(float u, float v)
 {
 	if (_isUseDisplayList)
-		_opSection->_displayList->textureCoord(u, v);
+		_opSection->_displayLists.back()->textureCoord(u, v);
 	else if (_isSharedSubMesh)
 		_meshData->getSharedSubMesh()->addTexCoord(Vector2df(u, v));
 	else if (_opSubMesh)
@@ -279,7 +245,7 @@ void ManualObject::colour(const Colour& col)
 void ManualObject::colour(int r, int g, int b, int a /*= 255*/)
 {
 	if (_isUseDisplayList)
-		_opSection->_displayList->colour(r, g, b, a);
+		_opSection->_displayLists.back()->colour(r, g, b, a);
 	else if (_isSharedSubMesh)
 		_meshData->getSharedSubMesh()->addColor(Colour(a, r, g, b));
 	else if (_opSubMesh)
@@ -346,11 +312,7 @@ MeshPtr ManualObject::convertToMesh(EHardwareMapping mappingHint /*= EHM_NEVER*/
 	{
 		pCurSubMesh = *cit;
 		if (pCurSubMesh)
-		{
 			pCurSubMesh->setHardwareMappingHint(mappingHint);
-			if (pCurSubMesh->getMaterialName() == L"" && getMaterial()->_materialName != L"")
-				pCurSubMesh->setMaterialName(getMaterial()->_materialName);
-		}
 	}
 
 	SharedSubMesh* pSharedSubMesh = _meshData->getSharedSubMesh();
@@ -365,26 +327,34 @@ MeshPtr ManualObject::convertToMesh(EHardwareMapping mappingHint /*= EHM_NEVER*/
 	return _meshData;
 }
 
-void ManualObject::useDisplayList(bool isUse, unsigned int displayListMaxVertCnt /*= 2000000*/)
+void ManualObject::useDisplayList(bool isUse)
 {
 	_isUseDisplayList = isUse;
-	if (isUse)
-	{
-		_listMaxVertCnt = displayListMaxVertCnt;
-		if (!_displayList)
-			_displayList = Root::getSingleton().getActiveRenderer()->createDisplayList();
-	}
-	else
-	{
-		if (_displayList)
-			Root::getSingleton().getActiveRenderer()->destroyDisplayList(_displayList->getName());
-		_displayList = nullptr;
-	}
 }
 
 bool ManualObject::isUseDisplayList() const
 {
 	return _isUseDisplayList;
+}
+
+void ManualObject::setSectionMaterial(MaterialPtr material)
+{
+	auto it = _sections.begin();
+	auto itEnd = _sections.end();
+	for (; it != itEnd; ++it)
+		(*it)->setMaterial(material);
+}
+
+ManualObject::Section* ManualObject::getSection(unsigned int idx) const
+{
+	if (idx >= _sections.size())
+		return nullptr;
+	return _sections[idx];
+}
+
+void ManualObject::setSectionMaterial(const wstring& materialName)
+{
+	setSectionMaterial(Root::getSingleton().getMaterialManager()->findMaterial(materialName));
 }
 
 void ManualObject::generatePlane(float extent, float step, const wstring& materialName)
@@ -411,6 +381,9 @@ void ManualObject::generatePlane(float extent, float step, const wstring& materi
 		end();
 		s += texStep;
 	}
+
+	if (isUseDisplayList())
+		end(true);
 }
 
 void ManualObject::generateSphere(float fRadius, int iSlices, int iStacks, const wstring& materialName)
@@ -456,6 +429,9 @@ void ManualObject::generateSphere(float fRadius, int iSlices, int iStacks, const
 		end();
 		t -= dt;
 	}
+
+	if (isUseDisplayList())
+		end(true);
 }
 
 void ManualObject::generateTorus(float majorRadius, float minorRadius, int numMajor, int numMinor, const wstring& materialName)
@@ -504,49 +480,51 @@ void ManualObject::generateTorus(float majorRadius, float minorRadius, int numMa
 		}
 		end();
 	}
+
+	if (isUseDisplayList())
+		end(true);
 }
 
-ManualObject::Section* ManualObject::getSection(const wstring& materialName)
+ManualObject::Section* ManualObject::gainSection(const wstring& materialName)
 {
-	bool limit = _listVertNum >= _listMaxVertCnt;
-	auto it = _sections.find(materialName);
-	if (it == _sections.end() || limit)
+	bool switchMaterial = false;
+	if (_opSection && _opSection->getMaterial()->_materialName != materialName)
 	{
-		wstring materialname = materialName;
-		if (limit)
+		switchMaterial = true;
+		if (_opSection->_displayLists.size() > 0)
+			_opSection->_displayLists.back()->endList();
+	}
+
+	struct SCampare
+	{
+		SCampare(const wstring& materialname) : _materialname(materialname) {}
+		bool operator()(const Section* other)
 		{
-			_listVertNum = 0;
-			if (_opSection)
-				_opSection->_displayList->endList();
-
-			while (_sections.find(materialname) != _sections.end())
-				materialname += L"#";
+			if (_materialname == other->getMaterial()->_materialName)
+				return true;
+			else
+				return false;
 		}
+	private:
+		wstring _materialname;
+	};
 
+	auto it = std::find_if(_sections.begin(), _sections.end(), SCampare(materialName));
+	if (it == _sections.end())
+	{
 		_opSection = new Section(this);
 		_opSection->setMaterial(materialName);
-		_sections.insert(make_pair(materialname, _opSection));
+		_sections.push_back(_opSection);
+		_opSection->_displayLists.push_back(Root::getSingleton().getActiveRenderer()->createDisplayList());
+	}
+	else
+	{
+		_opSection = *it;
+		if (switchMaterial)
+			_opSection->_displayLists.push_back(Root::getSingleton().getActiveRenderer()->createDisplayList());
 	}
 
 	return _opSection;
-}
-
-void ManualObject::setMaterialCB(SubMesh* mb)
-{
-	MaterialPtr material = Root::getSingleton().getMaterialManager()->findMaterial(mb->getMaterialName());
-	if (material)
-		Root::getSingleton().getActiveRenderer()->setMaterial(*material);
-	else
-		Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
-}
-
-void ManualObject::setMaterialCB(SharedSubMesh* mb, unsigned idx)
-{
-	MaterialPtr material = Root::getSingleton().getMaterialManager()->findMaterial(mb->getMaterialName(idx));
-	if (material)
-		Root::getSingleton().getActiveRenderer()->setMaterial(*material);
-	else
-		Root::getSingleton().getActiveRenderer()->setMaterial(*getMaterial());
 }
 
 void ManualObject::serialize(XMLElement* outXml)

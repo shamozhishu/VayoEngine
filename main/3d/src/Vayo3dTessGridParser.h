@@ -19,7 +19,7 @@ class TessGridParser
 	//----------------------------------------------------------------------------------
 	//##解析.tessgrid格式模型文件##
 	//----------------------------------------------------------------------------------
-	static ManualObject* parseProp(wstringstream& strin, TessGridHandler& tess);
+	static ManualObject* parseModel(wstringstream& strin, TessGridHandler& tess);
 	static bool parseCapAndBody(wstringstream& strin, TessGridHandler& tess, ManualObject* pObj, const wstring& tag);
 	static bool onTesselating(TessGridHandler& tess, ManualObject* pObj, const Vector3df& norm, const wstring& materialname, bool reverse, int idx);
 	static bool parseCap(wstringstream& strin, TessGridHandler& tess, ManualObject* pObj);

@@ -12,7 +12,7 @@
 class GLTesselator : public Tesselator
 {
 public:
-	GLTesselator(const wstring& name);
+	GLTesselator();
 	~GLTesselator();
 	void beginPolygon(void* data);
 	void beginContour();

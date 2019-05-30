@@ -27,7 +27,6 @@ public:
 	typedef void(*TessErrorDataProc)   (unsigned int, void*);
 	typedef void(*TessCombineDataProc) (double[3], void*[4], float[4], void**, void*);
 public:
-	Tesselator(const wstring& name) : _name(name) {}
 	virtual ~Tesselator() {}
 	virtual void beginPolygon(void* data) = 0;
 	virtual void beginContour() = 0;
@@ -40,8 +39,6 @@ public:
 	virtual void setErrorCallback(TessErrorDataProc pError) = 0;
 	virtual void setCombineCallback(TessCombineDataProc pCombine) = 0;
 	virtual void setWindingProperty(ETessWinding value) = 0;
-protected:
-	PROPERTY_R_REF(wstring, _name, Name)
 };
 
 NS_VAYO3D_END

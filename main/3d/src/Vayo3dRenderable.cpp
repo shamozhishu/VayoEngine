@@ -26,7 +26,7 @@ MaterialPtr Renderable::getMaterial() const
 	return _material;
 }
 
-void Renderable::setMaterial(MaterialPtr material)
+void Renderable::setMaterial(MaterialPtr material) const
 {
 	if (!material)
 	{
@@ -38,7 +38,7 @@ void Renderable::setMaterial(MaterialPtr material)
 		_material = material;
 }
 
-void Renderable::setMaterial(const wstring& name)
+void Renderable::setMaterial(const wstring& name) const
 {
 	setMaterial(Root::getSingleton().getMaterialManager()->findMaterial(name));
 }

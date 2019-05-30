@@ -90,7 +90,7 @@ void bendWireway(const Vector3df& startCenterPos, const Vector3df& finishCenterP
 
 	// 建模
 	ManualObject* pLineObj = pSceneMgr->createObject<ManualObject>(modelName);
-	pLineObj->setMaterial(L"examples/线束");
+	pLineObj->setSectionMaterial(L"examples/线束");
 	parent->attachObject(pLineObj);
 	gridder.generatePipe(trailLine, pLineObj, 0, true, true, L"examples/线束");
 }
@@ -145,7 +145,7 @@ void combineModel(const wstring& connectorName, const wstring& rearCoverName, co
 
 	zOffset += rearCoverHeight;
 	zOffset /= 2.0f;
-	pRearCoverObj->getMaterial()->_materialType = EMT_TRANSPARENT_ALPHA_CHANNEL;
+	pRearCoverObj->getSection(0)->getMaterial()->_materialType = EMT_TRANSPARENT_ALPHA_CHANNEL;
 	SceneNode* pRearCoverNode = pRearCoverObj->getParentNode();
 	pRearCoverNode->setRotation(Vector3df(180, 0, 0));
 	pConnectorObj->getParentNode()->setPosition(Vector3df(0, 0, -zOffset));
@@ -160,7 +160,7 @@ void comWireway(float radius, float length, SceneNode* parent, const Vector3df& 
 	ManualObject* pObj = pSceneMgr->createObject<ManualObject>(L"comWireway()");
 	parent->createChildSceneNode()->attachObject(pObj);
 	pObj->getParentNode()->setPosition(pos);
-	pObj->setMaterial(L"examples/plane");
+	pObj->setSectionMaterial(L"examples/plane");
 
 	Vector3df tmpPos;
 	unsigned int j, cnt = 60;
@@ -215,17 +215,17 @@ void highlightModel(const wstring& modelName, bool hightlight)
 	Any defaultMaterialName = pObj->getUserDataBind().getUserData(L"DefaultMaterialName");
 	if (!defaultMaterialName.has_value())
 	{
-		pObj->getUserDataBind().setUserData(L"DefaultMaterialName", pObj->getMaterial()->_materialName);
-		defaultMaterialName = pObj->getMaterial()->_materialName;
+		pObj->getUserDataBind().setUserData(L"DefaultMaterialName", pObj->getSection(0)->getMaterial()->_materialName);
+		defaultMaterialName = pObj->getSection(0)->getMaterial()->_materialName;
 	}
 
 	if (hightlight)
 	{
-		pObj->setMaterial(L"examples/圆台高亮");
+		pObj->getSection(0)->setMaterial(L"examples/圆台高亮");
 	}
 	else
 	{
-		pObj->setMaterial(any_cast<wstring>(defaultMaterialName));
+		pObj->getSection(0)->setMaterial(any_cast<wstring>(defaultMaterialName));
 	}
 }
 
@@ -398,25 +398,19 @@ BoxModel::BoxModel(SceneManager* pSceneMgr)
 	pEnt->setMesh(Root::getSingleton().getMeshManager()->createCubeMesh(Vector3df(11, 11, 11), L"examples/描边"));
 	pEnt->getSubEntity(0)->setRenderPriority(1);
 	ManualObject* pObj = m_sceneMgr->findObject<ManualObject>(Language::getSingleton().getLanguageByID(25));
-	pObj->setMaterial(L"examples/箱子");
 	pObj->generateSphere(6, 30, 30, L"examples/箱子");
-	pObj->setRenderPriority(0);
+	pObj->getSection(0)->setRenderPriority(0);
 	pObj = m_sceneMgr->findObject<ManualObject>(Language::getSingleton().getLanguageByID(26));
-	pObj->setMaterial(L"examples/描边");
 	pObj->generateSphere(6.5f, 30, 30, L"examples/描边");
-	pObj->setRenderPriority(1);
+	pObj->getSection(0)->setRenderPriority(1);
 	pObj = m_sceneMgr->findObject<ManualObject>(Language::getSingleton().getLanguageByID(27));
-	pObj->setMaterial(L"examples/箱子");
 	pObj->generateSphere(6, 30, 30, L"examples/箱子");
-	pObj->setRenderPriority(0);
+	pObj->getSection(0)->setRenderPriority(0);
 	pObj = m_sceneMgr->findObject<ManualObject>(Language::getSingleton().getLanguageByID(28));
-	pObj->setMaterial(L"examples/描边");
 	pObj->generateSphere(6.5f, 30, 30, L"examples/描边");
-	pObj->setRenderPriority(1);
+	pObj->getSection(0)->setRenderPriority(1);
 
 	pObj = m_sceneMgr->createObject<ManualObject>(L"三角形");
-	pObj->getMaterial()->_lighting = false;
-	pObj->getMaterial()->_gouraudShading = false;
 	m_sceneMgr->getRootSceneNode()->attachObject(pObj);
 	pObj->begin(EPT_TRIANGLES);
 	pObj->colour(0xffff0000);
@@ -425,7 +419,9 @@ BoxModel::BoxModel(SceneManager* pSceneMgr)
 	pObj->position(-5, 0, 0);
 	pObj->colour(0xff0000ff);
 	pObj->position(5, 0, 0);
-	pObj->end();
+	pObj->end(true);
+	pObj->getSection(0)->getMaterial()->_lighting = false;
+	pObj->getSection(0)->getMaterial()->_gouraudShading = false;
 }
 
 BoxModel::~BoxModel()
