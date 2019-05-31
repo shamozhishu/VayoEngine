@@ -67,13 +67,13 @@ public:
 	FeatureManager();
 	~FeatureManager();
 	bool       init();
-	bool       parseFeature(const wstring& filename, bool fullPath = false);
-	bool       parseFeature(stringstream& filestream);
 	FeaturePtr createFeature(const wstring& name = L"");
 	FeaturePtr findFeature(const wstring& name);
 	void       destroyFeature(FeaturePtr feature);
 	void       destroyFeature(const wstring& name);
 	void       clearAllFeatures();
+	bool       parseFeature(const wstring& filename, bool fullPath = false);
+	bool       parseFeature(stringstream& filestream);
 
 private:
 	map<wstring, FeaturePtr>   _featurePool;

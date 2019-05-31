@@ -134,19 +134,24 @@ public:
 	MaterialManager();
 	~MaterialManager();
 	bool        init();
-	bool        parseMaterial(const wstring& filename, bool fullPath = false);
-	bool        parseMaterial(stringstream& filestream);
 	MaterialPtr createMaterial(const wstring& name = L"");
 	MaterialPtr findMaterial(const wstring& name);
 	void        destroyMaterial(const wstring& name);
 	void        destroyMaterial(MaterialPtr material);
 	void        clearAllMaterials();
+	bool        parseMaterial(const wstring& filename, bool fullPath = false);
+	bool        parseMaterial(stringstream& filestream);
+	void        saveMaterial(const wstring& name, stringstream& filestream);
+	void        saveMaterial(MaterialPtr material, stringstream& filestream);
+	void        saveMaterial(const wstring& name, const wstring& filename, bool append = true, bool fullPath = false);
+	void        saveMaterial(MaterialPtr material, const wstring& filename, bool append = true, bool fullPath = false);
 	void        registerCallback(unsigned int idx, ShaderConstantSetCallback callback);
 	void        unregisterCallback(unsigned int idx);
 
 private:
 	map<wstring, MaterialPtr>  _materialPool;
 	unordered_map<string, int> _attribsWordMap;
+	unordered_map<int, string> _attribsWordInvMap;
 	ShaderConstantSetCallback  _materialCallback[VAYO_MAX_SHADER_CALLBACK_NUM];
 };
 

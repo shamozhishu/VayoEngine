@@ -32,6 +32,63 @@ bool FeatureManager::init()
 	return true;
 }
 
+FeaturePtr FeatureManager::createFeature(const wstring& name /*= L""*/)
+{
+	static unsigned long long idx = 0;
+	wstring featureName;
+	if (name == L"" || name == L"default_feature")
+	{
+		std::wstringstream ss;
+		ss << L"Feature" << idx;
+		++idx;
+		featureName = ss.str();
+	}
+	else
+	{
+		map<wstring, FeaturePtr>::iterator it = _featurePool.find(name);
+		if (it != _featurePool.end())
+			return it->second;
+		featureName = name;
+	}
+
+	FeaturePtr featurePtr(new Feature(featureName));
+	_featurePool[featurePtr->_featureName] = featurePtr;
+	return featurePtr;
+}
+
+FeaturePtr FeatureManager::findFeature(const wstring& name)
+{
+	if (name == L"" || name == L"default_feature")
+		return nullptr;
+
+	map<wstring, FeaturePtr>::iterator it = _featurePool.find(name);
+	if (it != _featurePool.end())
+		return it->second;
+
+	return nullptr;
+}
+
+void FeatureManager::destroyFeature(FeaturePtr feature)
+{
+	if (feature)
+		destroyFeature(feature->_featureName);
+}
+
+void FeatureManager::destroyFeature(const wstring& name)
+{
+	if (name == L"")
+		return;
+
+	map<wstring, FeaturePtr>::iterator it = _featurePool.find(name);
+	if (it != _featurePool.end())
+		_featurePool.erase(it);
+}
+
+void FeatureManager::clearAllFeatures()
+{
+	_featurePool.clear();
+}
+
 bool FeatureManager::parseFeature(const wstring& filename, bool fullPath /*= false*/)
 {
 	wstring fileName = filename;
@@ -273,63 +330,6 @@ bool FeatureManager::parseFeature(stringstream& filestream)
 	} while (!filestream.eof());
 
 	return true;
-}
-
-FeaturePtr FeatureManager::createFeature(const wstring& name /*= L""*/)
-{
-	static unsigned long long idx = 0;
-	wstring featureName;
-	if (name == L"" || name == L"default_feature")
-	{
-		std::wstringstream ss;
-		ss << L"Feature" << idx;
-		++idx;
-		featureName = ss.str();
-	}
-	else
-	{
-		map<wstring, FeaturePtr>::iterator it = _featurePool.find(name);
-		if (it != _featurePool.end())
-			return it->second;
-		featureName = name;
-	}
-
-	FeaturePtr featurePtr(new Feature(featureName));
-	_featurePool[featurePtr->_featureName] = featurePtr;
-	return featurePtr;
-}
-
-FeaturePtr FeatureManager::findFeature(const wstring& name)
-{
-	if (name == L"" || name == L"default_feature")
-		return nullptr;
-
-	map<wstring, FeaturePtr>::iterator it = _featurePool.find(name);
-	if (it != _featurePool.end())
-		return it->second;
-
-	return nullptr;
-}
-
-void FeatureManager::destroyFeature(FeaturePtr feature)
-{
-	if (feature)
-		destroyFeature(feature->_featureName);
-}
-
-void FeatureManager::destroyFeature(const wstring& name)
-{
-	if (name == L"")
-		return;
-
-	map<wstring, FeaturePtr>::iterator it = _featurePool.find(name);
-	if (it != _featurePool.end())
-		_featurePool.erase(it);
-}
-
-void FeatureManager::clearAllFeatures()
-{
-	_featurePool.clear();
 }
 
 NS_VAYO2D_END

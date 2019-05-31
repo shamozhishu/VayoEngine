@@ -1,9 +1,10 @@
 #include "Vayo3dMaterialManager.h"
 #include "Vayo3dTextureManager.h"
-#include "VayoConfigManager.h"
 #include "Vayo3dRenderSystem.h"
-#include "VayoUtils.h"
+#include "VayoConfigManager.h"
 #include "Vayo3dRoot.h"
+#include "VayoFileIO.h"
+#include "VayoUtils.h"
 #include "VayoLog.h"
 
 NS_VAYO3D_BEGIN
@@ -15,6 +16,12 @@ MaterialManager::MaterialManager()
 	while (materialScriptAttribs[i].TheKey)
 	{
 		_attribsWordMap[materialScriptAttribs[i].TheKey] = materialScriptAttribs[i].TheValue;
+		++i;
+	}
+	i = 0;
+	while (materialScriptAttribs[i].TheKey)
+	{
+		_attribsWordInvMap[materialScriptAttribs[i].TheValue] = materialScriptAttribs[i].TheKey;
 		++i;
 	}
 }
@@ -32,6 +39,63 @@ bool MaterialManager::init()
 	for (unsigned i = 0; i < len; ++i)
 		parseMaterial(allFilePath[i], true);
 	return true;
+}
+
+MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
+{
+	static unsigned long long idx = 0;
+	wstring materialName;
+	if (name == L"" || name == L"default_material")
+	{
+		std::wstringstream ss;
+		ss << L"Material" << idx;
+		++idx;
+		materialName = ss.str();
+	}
+	else
+	{
+		map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
+		if (it != _materialPool.end())
+			return it->second;
+		materialName = name;
+	}
+
+	MaterialPtr materialPtr(new Material(materialName));
+	_materialPool[materialPtr->_materialName] = materialPtr;
+	return materialPtr;
+}
+
+MaterialPtr MaterialManager::findMaterial(const wstring& name)
+{
+	if (name == L"" || name == L"default_material")
+		return nullptr;
+
+	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
+	if (it != _materialPool.end())
+		return it->second;
+
+	return nullptr;
+}
+
+void MaterialManager::destroyMaterial(const wstring& name)
+{
+	if (name == L"")
+		return;
+
+	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
+	if (it != _materialPool.end())
+		_materialPool.erase(it);
+}
+
+void MaterialManager::destroyMaterial(MaterialPtr material)
+{
+	if (material)
+		destroyMaterial(material->_materialName);
+}
+
+void MaterialManager::clearAllMaterials()
+{
+	_materialPool.clear();
 }
 
 bool MaterialManager::parseMaterial(const wstring& filename, bool fullPath /*= false*/)
@@ -614,61 +678,165 @@ bool MaterialManager::parseMaterial(stringstream& filestream)
 	return true;
 }
 
-MaterialPtr MaterialManager::createMaterial(const wstring& name /*= L""*/)
+void MaterialManager::saveMaterial(const wstring& name, stringstream& filestream)
 {
-	static unsigned long long idx = 0;
-	wstring materialName;
-	if (name == L"" || name == L"default_material")
-	{
-		std::wstringstream ss;
-		ss << L"Material" << idx;
-		++idx;
-		materialName = ss.str();
-	}
-	else
-	{
-		map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
-		if (it != _materialPool.end())
-			return it->second;
-		materialName = name;
-	}
-
-	MaterialPtr materialPtr(new Material(materialName));
-	_materialPool[materialPtr->_materialName] = materialPtr;
-	return materialPtr;
+	saveMaterial(findMaterial(name), filestream);
 }
 
-MaterialPtr MaterialManager::findMaterial(const wstring& name)
+void MaterialManager::saveMaterial(MaterialPtr material, stringstream& filestream)
 {
-	if (name == L"" || name == L"default_material")
-		return nullptr;
-
-	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
-	if (it != _materialPool.end())
-		return it->second;
-
-	return nullptr;
-}
-
-void MaterialManager::destroyMaterial(const wstring& name)
-{
-	if (name == L"")
+	if (!material)
 		return;
 
-	map<wstring, MaterialPtr>::iterator it = _materialPool.find(name);
-	if (it != _materialPool.end())
-		_materialPool.erase(it);
+	filestream << "material " << w2a_(material->_materialName);
+	filestream << "\r\n{";
+
+	if (material->_materialType != EMT_SOLID)
+		filestream << "\r\n\ttype " << _attribsWordInvMap[material->_materialType];
+
+	if (material->_ambientColor != Colour(255, 255, 255, 255))
+		filestream << "\r\n\tambient_color " << material->_ambientColor.getRed()
+		<< " " << material->_ambientColor.getGreen() << " "
+		<< material->_ambientColor.getBlue() << " " << material->_ambientColor.getAlpha();
+
+	if (material->_diffuseColor != Colour(255, 255, 255, 255))
+		filestream << "\r\n\tdiffuse_color " << material->_diffuseColor.getRed()
+		<< " " << material->_diffuseColor.getGreen() << " "
+		<< material->_diffuseColor.getBlue() << " " << material->_diffuseColor.getAlpha();
+
+	if (material->_specularColor != Colour(0, 0, 0, 0))
+		filestream << "\r\n\tspecular_color " << material->_specularColor.getRed()
+		<< " " << material->_specularColor.getGreen() << " "
+		<< material->_specularColor.getBlue() << " " << material->_specularColor.getAlpha();
+
+	if (material->_emissiveColor != Colour(0, 0, 0, 0))
+		filestream << "\r\n\temissive_color " << material->_emissiveColor.getRed()
+		<< " " << material->_emissiveColor.getGreen() << " "
+		<< material->_emissiveColor.getBlue() << " " << material->_emissiveColor.getAlpha();
+
+	if (material->_shininess != 0.0f)
+		filestream << "\r\n\tshininess " << material->_shininess;
+
+	if (material->_thickness != 1.0f)
+		filestream << "\r\n\tthickness " << material->_thickness;
+
+	if (material->_alphaRef != 0.0f)
+		filestream << "\r\n\talpha_ref " << material->_alphaRef;
+
+	if (material->_antiAliasing != EAAM_ON)
+		filestream << "\r\n\tanti_aliasing " << _attribsWordInvMap[material->_antiAliasing];
+
+	if (material->_stencilMask != 0xFF)
+		filestream << "\r\n\tstencil_mask " << material->_stencilMask;
+
+	if (material->_stencilFuncMask != 0xFF)
+		filestream << "\r\n\tstencil_func_mask " << material->_stencilFuncMask;
+
+	if (material->_stencilRef != 0)
+		filestream << "\r\n\tstencil_ref " << material->_stencilRef;
+
+	if (material->_stencilFunc != ESF_NEVER)
+		filestream << "\r\n\tstencil_func " << _attribsWordInvMap[material->_stencilFunc];
+
+	if (material->_stencilFail != ESO_KEEP)
+		filestream << "\r\n\tstencil_fail " << _attribsWordInvMap[material->_stencilFail];
+
+	if (material->_depthFail != ESO_KEEP)
+		filestream << "\r\n\tdepth_fail " << _attribsWordInvMap[material->_depthFail];
+
+	if (material->_stencilDepthPass != ESO_KEEP)
+		filestream << "\r\n\tstencil_depth_pass " << _attribsWordInvMap[material->_stencilDepthPass];
+
+	if (material->_wireframe != false)
+		filestream << "\r\n\twireframe " << "on";
+
+	if (material->_clockwise != false)
+		filestream << "\r\n\tclockwise " << "on";
+
+	if (material->_gouraudShading != true)
+		filestream << "\r\n\tgouraud_shading " << "off";
+
+	if (material->_lighting != true)
+		filestream << "\r\n\tlighting " << "off";
+
+	if (material->_zBuffer != true)
+		filestream << "\r\n\tzbuffer " << "off";
+
+	if (material->_zWriteEnable != true)
+		filestream << "\r\n\tzwrite_enable " << "off";
+
+	if (material->_stencilBuffer != false)
+		filestream << "\r\n\tstencil_buffer " << "on";
+
+	if (material->_backfaceCulling != true)
+		filestream << "\r\n\tbackface_culling " << "off";
+
+	if (material->_useMipMaps != true)
+		filestream << "\r\n\tuse_mip_maps " << "off";
+
+	if (material->_fogEnable != false)
+		filestream << "\r\n\tfog_enable " << "on";
+
+	if (material->_vertexSource != L"")
+		filestream << "\r\n\tvertex_program " << w2a_(material->_vertexSource);
+
+	if (material->_fragmentSource != L"")
+		filestream << "\r\n\tfragment_program " << w2a_(material->_fragmentSource);
+
+	if (material->_shaderCallback != 0)
+		filestream << "\r\n\tshader_constant_set_callback " << material->_shaderCallback;
+
+	for (int i = 0; i < MATERIAL_MAX_TEXTURES; ++i)
+	{
+		if (material->_textureLayer[i]._texture)
+		{
+			filestream << "\r\n\r\n\ttexture_unit " << i;
+			filestream << "r\n\t{\r\n\t\ttexture " << w2a_(material->_textureLayer[i]._texture->getFileName());
+
+			if (material->_textureLayer[i]._trilinearFilter)
+				filestream << "\r\n\t\tfiltering " << "trilinear_filter";
+			else if (!material->_textureLayer[i]._bilinearFilter)
+				filestream << "\r\n\t\tfiltering " << "nearest_filter";
+
+			if (material->_textureLayer[i]._textureWrapU != ETC_REPEAT)
+				filestream << "\r\n\t\ttex_address_mode " << aTextureClampNames[material->_textureLayer[i]._textureWrapU];
+
+			filestream << "\r\n\t}";
+		}
+	}
+
+	filestream << "\r\n}\r\n";
 }
 
-void MaterialManager::destroyMaterial(MaterialPtr material)
+void MaterialManager::saveMaterial(const wstring& name, const wstring& filename, bool append /*= true*/, bool fullPath /*= false*/)
 {
-	if (material)
-		destroyMaterial(material->_materialName);
+	saveMaterial(findMaterial(name), filename, append, fullPath);
 }
 
-void MaterialManager::clearAllMaterials()
+void MaterialManager::saveMaterial(MaterialPtr material, const wstring& filename, bool append /*= true*/, bool fullPath /*= false*/)
 {
-	_materialPool.clear();
+	if (!material)
+		return;
+
+	wstring fileName = filename;
+	trim(fileName);
+	if (fileName == L"" || fileName.substr(fileName.rfind(L'.')) != L".material")
+	{
+		Log::wprint(ELL_ERROR, L"材质脚本[%s]文件扩展名必须是[.material]", fileName.c_str());
+		return;
+	}
+
+	wstring filePath;
+	if (fullPath)
+		filePath = fileName;
+	else
+		filePath = ConfigManager::getSingleton().getConfig()._3d.materialsPath + fileName;
+
+	WriteFile fout(filePath, append);
+	stringstream ss;
+	saveMaterial(material, ss);
+	string string = ansiToUtf8(ss.str());
+	fout.write(string.data(), string.size());
 }
 
 void MaterialManager::registerCallback(unsigned int idx, ShaderConstantSetCallback callback)
