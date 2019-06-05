@@ -160,9 +160,12 @@ void ManualObject::end(bool endlist /*= false*/)
 {
 	if (_isUseDisplayList)
 	{
-		_opSection->_displayLists.back()->endDraw();
-		if (endlist)
-			_opSection->_displayLists.back()->endList();
+		if (_opSection && _opSection->_displayLists.size() > 0)
+		{
+			_opSection->_displayLists.back()->endDraw();
+			if (endlist)
+				_opSection->_displayLists.back()->endList();
+		}
 	}
 	else if (_isSharedSubMesh && _opIdxBuffer)
 	{
