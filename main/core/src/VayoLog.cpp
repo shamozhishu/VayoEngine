@@ -11,8 +11,9 @@ NS_VAYO_BEGIN
 VayoLogPrint(VayoLog.log)
 static Log* s_pLog = NULL;
 
-void Log::print(ELogLevel level, const char* szFormat, ...)
+inline void Log::print(ELogLevel level, const char* szFormat, ...)
 {
+#if defined(_DEBUG) || defined(VAYO_ENABLE_LOG_PRINT)
 	char szArgMessage[2048] = { 0 };
 	va_list args;
 	va_start(args, szFormat);
@@ -30,10 +31,12 @@ void Log::print(ELogLevel level, const char* szFormat, ...)
 		if (s_pLog->_fout)
 			s_pLog->_fout << ansiToUtf8(szArgMessage) << std::endl;
 	}
+#endif
 }
 
-void Log::wprint(ELogLevel level, const wchar_t* szFormat, ...)
+inline void Log::wprint(ELogLevel level, const wchar_t* szFormat, ...)
 {
+#if defined(_DEBUG) || defined(VAYO_ENABLE_LOG_PRINT)
 	wchar_t szArgMessage[2048] = {0};
 	va_list args;
 	va_start(args, szFormat);
@@ -51,6 +54,7 @@ void Log::wprint(ELogLevel level, const wchar_t* szFormat, ...)
 		if (s_pLog->_fout)
 			s_pLog->_fout << unicodeToUtf8(szArgMessage) << std::endl;
 	}
+#endif
 }
 
 Log::Log(bool hasConsole /*= true*/, const string& logFileName /*= ""*/)

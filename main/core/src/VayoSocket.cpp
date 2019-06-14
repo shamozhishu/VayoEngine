@@ -1,6 +1,7 @@
 #include "VayoSocket.h"
-#include "rc5/RC5.hpp"
 #include "zlib/zlib.h"
+#include "rc5/RC5.hpp"
+#include "VayoLog.h"
 #pragma comment(lib, "wsock32.lib")
 
 #define NET_MAX_CACHE_SIZE	(1024 * 512)
@@ -162,18 +163,20 @@ CircularBuffer::~CircularBuffer(void)
 void CircularBuffer::reset(void)
 {
 	_wpos = _rpos = 0;
-	_isFull = false;
-	_isEmpty = true;
+	_bufferState = BUFFER_EMPTY;
 }
 
 // 写入指定长度的数据
 bool CircularBuffer::pushData(char *data, int len)
 {
+	if (len <= 0)
+		return false;
+
 	int cur_w_pos = _wpos;
 	int cur_r_pos = _rpos;
 
 	// 如果上次为满的标记，并且读写指针相等，则为真的满了
-	if (_isFull && cur_w_pos == cur_r_pos)
+	if (_bufferState == BUFFER_FULL && cur_w_pos == cur_r_pos)
 		return false;
 
 	int cur_w_len = cur_r_pos > cur_w_pos ? (cur_r_pos - cur_w_pos) : (_capacity - cur_w_pos + cur_r_pos);
@@ -194,7 +197,7 @@ bool CircularBuffer::pushData(char *data, int len)
 	}
 
 	_wpos = (cur_w_pos + len) % _capacity;
-	_isFull = (_wpos == cur_r_pos);
+	_bufferState = (_wpos == cur_r_pos) ? BUFFER_FULL : BUFFER_FILLPART;
 
 	return true;
 }
@@ -202,11 +205,14 @@ bool CircularBuffer::pushData(char *data, int len)
 // 从环形buffer中读取数据
 bool CircularBuffer::popData(char *data, int len)
 {
+	if (len <= 0)
+		return false;
+
 	int cur_r_pos = _rpos;
 	int cur_w_pos = _wpos;
 
 	// 如果队列未满，且读写指针相等
-	if (_isEmpty && cur_w_pos == cur_r_pos)
+	if (_bufferState == BUFFER_EMPTY && cur_w_pos == cur_r_pos)
 		return false;
 
 	int cur_r_len = cur_w_pos > cur_r_pos ? (cur_w_pos - cur_r_pos) : (_capacity - cur_r_pos + cur_w_pos);
@@ -229,17 +235,17 @@ bool CircularBuffer::popData(char *data, int len)
 		memcpy(data + r_len, _cacheData, len - r_len);
 	}
 	_rpos = (cur_r_pos + len) % _capacity;
-	_isEmpty = (_rpos == cur_w_pos);
+	_bufferState = (_rpos == cur_w_pos) ? BUFFER_EMPTY : BUFFER_FILLPART;
 	return true;
 }
 
 // 获得当前缓冲区数据大小
 int	CircularBuffer::getSize(void)
 {
-	if (_isFull)
+	if (_bufferState == BUFFER_FULL)
 		return _capacity;
 
-	if (_isEmpty)
+	if (_bufferState == BUFFER_EMPTY)
 		return 0;
 
 	int cur_r_pos = _rpos;
@@ -261,7 +267,11 @@ Connector::Connector(void)
 	_thread = NULL;
 	_readBuff = new CircularBuffer(NET_MAX_CACHE_SIZE);   // 读缓存
 	_writeBuff = new CircularBuffer(NET_MAX_CACHE_SIZE);  // 写缓存
-	reset();
+	resetState();
+#ifdef _WIN32
+	WSADATA wsaData;
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
 }
 
 // 析构函数释放对应的内存
@@ -278,10 +288,13 @@ Connector::~Connector(void)
 	// 删除对应的buff
 	delete _readBuff;
 	delete _writeBuff;
+#ifdef _WIN32
+	WSACleanup();
+#endif
 }
 
 // 重置状态
-void Connector::reset(void)
+void Connector::resetState(void)
 {
 	_socketid = INVALID_VALUE;
 	_status = SOCKET_STATUS_INIT;
@@ -333,23 +346,24 @@ bool Connector::setServerAddr(const char *sip, int port)
 }
 
 // 连接服务器
-int Connector::connectServer(void)
+bool Connector::connectServer(void)
 {
 	if (!canConnect())
-		return 1;
+		return false;
 
 	_socketid = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socketid == INVALID_VALUE)
-		return 2; // 创建socket失败
+		return false; // 创建socket失败
 
 	// 设置地址重用
 	char yes = 1;
 	int optlen = sizeof(yes);
-	setsockopt(_socketid, SOL_SOCKET, SO_REUSEADDR, &yes, optlen);
+	if (setsockopt(_socketid, SOL_SOCKET, SO_REUSEADDR, &yes, optlen) < 0)
+		return false;
 
 	// 设置非阻塞模式
 	u_long ulon = 1;
-	ioctlsocket((SOCKET)_socketid, FIONBIO, (unsigned long*)&ulon);
+	ioctlsocket(_socketid, FIONBIO, (unsigned long*)&ulon);
 
 	// 异步处理，这里无需进行判定
 	if (::connect(_socketid, (struct sockaddr *)&_sockaddr, sizeof(_sockaddr)) != INVALID_VALUE)
@@ -370,7 +384,7 @@ int Connector::connectServer(void)
 	// 设定timeout
 	_surplusRecvTime = TIMEOUT_RECV;
 
-	return 0;
+	return true;
 }
 
 // 关闭连接
@@ -380,7 +394,7 @@ void Connector::closeSocket(void)
 		return;
 
 	closesocket(_socketid);
-	reset();
+	resetState();
 }
 
 // 发送消息包
@@ -429,43 +443,49 @@ void Connector::checkSocketSignal(void)
 {
 	if (_shutdown)
 	{
-		handleClose(1);
+		handleClose(SO_CLOSE);
 		return;
 	}
 
 	// 超时时间
 	timeval tm;
-	tm.tv_sec = 0;
 	if (isSendConnect())
+	{
 		tm.tv_sec = 5;
-	tm.tv_usec = 50 * 1000;
+		tm.tv_usec = 0;
+	}
+	else
+	{
+		tm.tv_sec = 0;
+		tm.tv_usec = 50 * 1000;
+	}
 
 	// 读set
-	fd_set	rset;
+	fd_set rset;
 	FD_ZERO(&rset);
 	FD_SET((unsigned int)_socketid, &rset);
 
 	// 写set
-	fd_set	wset;
+	fd_set wset;
 	FD_ZERO(&wset);
 	FD_SET((unsigned int)_socketid, &wset);
 
-	int iret = select(_socketid, &rset, &wset, NULL, &tm);
-	if (iret == -1)           // socket错误
+	int iret = select(_socketid + 1, &rset, &wset, NULL, &tm);
+	if (iret == -1) // select错误
 	{
-		handleClose(2);
+		handleClose(SO_SELECT_ERR);
 		return;
 	}
 
-	if (iret == 0)            // socket没有变化
+	if (iret == 0) // select没有变化
 	{
 		if (isSendConnect())
-			handleClose(3);
+			handleClose(SO_SELECT_UNCHANGE);
 
 		if (checkSocketError(_socketid) == 0)
 			return;
 
-		handleClose(4);
+		handleClose(SO_SELECT_UNCHANGE);
 		return;
 	}
 
@@ -486,6 +506,16 @@ void Connector::handleClose(int errorCode)
 
 	// 将socket置为关闭状态
 	_status = SOCKET_STATUS_CLOSED;
+
+	switch (errorCode)
+	{
+	case SO_CLOSE: Log::print(ELL_INFORMATION, "SOCKET CLOSE"); break;
+	case SO_SELECT_ERR: Log::print(ELL_INFORMATION, "SOCKET SELECT ERROR"); break;
+	case SO_SELECT_UNCHANGE: Log::print(ELL_INFORMATION, "SOCKET SELECT UNCHANGE"); break;
+	case SO_NOBLOCK_READ: Log::print(ELL_INFORMATION, "SOCKET NOBLOCK READ"); break;
+	case SO_NOBLOCK_WRITE: Log::print(ELL_INFORMATION, "SOCKET NOBLOCK WRITE"); break;
+	default: break;
+	}
 }
 
 // socket可读
@@ -503,7 +533,7 @@ void Connector::handleRead(void)
 	if (rsize <= 0)
 	{
 		if (!checkSocketWouldblock())
-			handleClose(5);
+			handleClose(SO_NOBLOCK_READ);
 		return;
 	}
 
@@ -556,7 +586,7 @@ void Connector::handleWrite(void)
 			// 未发送完并且socket出错了，这里需要处理
 			if (checkSocketWouldblock())
 				continue;
-			handleClose(6);
+			handleClose(SO_NOBLOCK_WRITE);
 			break;
 		}
 
@@ -580,14 +610,14 @@ void Connector::handleMessage(void)
 	if (data_size <= hlen)
 		return;
 
-	int msize = 0;
 	// 需要先读取长度
 	if (_nextMessageHead == 0)
 	{
 		if (!_readBuff->popData((char*)&_nextMessageHead, hlen))
 			return;
-		msize &= 0x0000ffff; // 得到数据长度
 	}
+
+	int msize = _nextMessageHead & 0x0000ffff; // 得到数据长度
 
 	// 没有完整的包
 	if (msize > data_size - hlen)
@@ -609,7 +639,7 @@ void Connector::handleMessage(void)
 			return;
 
 		// 消息处理函数
-		_mcb((Cmd::t_NullCmd*)msg, msize);
+		_mcb((Cmd::t_NullCmd*)msg, unzipedlen);
 		SAFE_DELETE_ARRAY(msg);
 	}
 	else
@@ -617,6 +647,8 @@ void Connector::handleMessage(void)
 		// 处理未压缩的消息包
 		_mcb((Cmd::t_NullCmd*)data, msize);
 	}
+
+	_nextMessageHead = 0;
 }
 
 NS_VAYO_END

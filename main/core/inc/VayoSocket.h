@@ -16,6 +16,7 @@ NS_VAYO_BEGIN
  */
 class _VayoExport CircularBuffer
 {
+	enum EBufferState { BUFFER_EMPTY, BUFFER_FULL, BUFFER_FILLPART };
 public:
 	CircularBuffer(int capacity);
 	~CircularBuffer(void);
@@ -26,12 +27,11 @@ public:
 	int     getSize(void);                          // 获得当前数据大小
 
 private:
-	int     _wpos;          // 当前写位置
-	int     _rpos;          // 当前读位置
-	int     _capacity;      // 缓冲区的容量
-	char    *_cacheData;    // 数据首指针
-	bool    _isFull;        // 队列满
-	bool    _isEmpty;       // 队列空
+	int          _wpos;        // 当前写位置
+	int          _rpos;        // 当前读位置
+	int          _capacity;    // 缓冲区的容量
+	char        *_cacheData;   // 数据首指针
+	EBufferState _bufferState; // 缓冲区状态
 };
 
 #define INVALID_VALUE   -1                      // 无效值
@@ -50,6 +50,7 @@ typedef void(*FuncMessageCallBack)(Cmd::t_NullCmd*, int);
 // 连接器对象类
 class _VayoExport Connector
 {
+	enum { SO_CLOSE, SO_SELECT_ERR, SO_SELECT_UNCHANGE, SO_NOBLOCK_READ, SO_NOBLOCK_WRITE };
 public:
 	// 构造函数相关的
 	Connector(void);
@@ -71,7 +72,7 @@ public:
 	void close(void) { _shutdown = true; };
 
 	// 连接服务器
-	int	 connectServer(void);
+	bool connectServer(void);
 
 	// 发送消息包
 	bool sendPacket(Cmd::t_NullCmd *cmd, int len);
@@ -88,13 +89,13 @@ public:
 
 private:
 	void closeSocket(void);                     // 关闭连接
-	void reset(void);                           // 重置状态
+	void resetState(void);                      // 重置状态
 
 	// 此处定义socket相关的函数
 	void handleRead(void);                      // 消息包处理函数
 	void handleWrite(void);                     // 处理接收数据
 	void handleClose(int errorCode);            // 客户端连接断开，errorCode为断开的错误码
-	void handleMessage(void);                   // 这个是子类必须要重载的方法
+	void handleMessage(void);                   // 处理消息包
 
 	// 状态判定函数
 	bool canConnect(void) { return _status == SOCKET_STATUS_INIT || isClosed(); }
@@ -121,7 +122,7 @@ private:
 	std::string         _encyptKey;         // 加解秘钥
 	double              _surplusRecvTime;   // 记录接收超时时间
 
-	int                 _socketid;          // socket描述符
+	SOCKET              _socketid;          // socket描述符
 	struct sockaddr_in  _sockaddr;          // 服务器地址
 
 	CircularBuffer      *_readBuff;         // 读缓存

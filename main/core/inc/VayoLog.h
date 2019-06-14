@@ -20,8 +20,8 @@ enum ELogLevel
 class _VayoExport Log
 {
 public:
-	static void print(ELogLevel level, const char* szFormat, ...);
-	static void wprint(ELogLevel level, const wchar_t* szFormat, ...);
+	static inline void print(ELogLevel level, const char* szFormat, ...);
+	static inline void wprint(ELogLevel level, const wchar_t* szFormat, ...);
 	Log(bool hasConsole = true, const string& logFileName = "");
 	~Log();
 
