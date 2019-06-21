@@ -151,7 +151,6 @@ public:
 private:
 	map<wstring, MaterialPtr>  _materialPool;
 	unordered_map<string, int> _attribsWordMap;
-	unordered_map<int, string> _attribsWordInvMap;
 	ShaderConstantSetCallback  _materialCallback[VAYO_MAX_SHADER_CALLBACK_NUM];
 };
 

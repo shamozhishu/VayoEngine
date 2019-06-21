@@ -193,7 +193,7 @@ wstring getExeFileDirectory()
 	GetModuleFileName(NULL, exeFullPath, MAX_PATH);
 	strPath = (wstring)exeFullPath;
 	size_t pos = strPath.find_last_of(L'\\', strPath.length());
-	return strPath.substr(0, pos);
+	return strPath.substr(0, pos + 1);
 }
 
 bool findFileDir(vector<wstring>& arrFilePath, const wstring& strCurPath, const wstring& fileFormat)

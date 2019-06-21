@@ -9,6 +9,12 @@
 
 NS_VAYO3D_BEGIN
 
+const char* stencil_func[] = { "never", "less", "lequal", "greater", "gequal", "equal", "notequal", "always" };
+const char* stencil_op[] = { "keep", "zero", "replace", "incr", "oncr_wrap", "decr", "decr_wrap", "invert" };
+const char* material_type[] = { "solid", "solid_2_layer", "lightmap", "lightmap_add", "lightmap_m2", "lightmap_m4",
+"lightmap_lighting", "lightmap_lighting_m2", "lightmap_lighting_m4", "sphere_map", "reflection_2_layer",
+"transparent_add_color", "transparent_alpha_channel", "transparent_vertex_alpha", "transparent_reflection_2_layer" };
+
 MaterialManager::MaterialManager()
 {
 	memset(_materialCallback, 0, sizeof(_materialCallback));
@@ -16,12 +22,6 @@ MaterialManager::MaterialManager()
 	while (materialScriptAttribs[i].TheKey)
 	{
 		_attribsWordMap[materialScriptAttribs[i].TheKey] = materialScriptAttribs[i].TheValue;
-		++i;
-	}
-	i = 0;
-	while (materialScriptAttribs[i].TheKey)
-	{
-		_attribsWordInvMap[materialScriptAttribs[i].TheValue] = materialScriptAttribs[i].TheKey;
 		++i;
 	}
 }
@@ -692,7 +692,7 @@ void MaterialManager::saveMaterial(MaterialPtr material, stringstream& filestrea
 	filestream << "\r\n{";
 
 	if (material->_materialType != EMT_SOLID)
-		filestream << "\r\n\ttype " << _attribsWordInvMap[material->_materialType];
+		filestream << "\r\n\ttype " << material_type[material->_materialType];
 
 	if (material->_ambientColor != Colour(255, 255, 255, 255))
 		filestream << "\r\n\tambient_color " << material->_ambientColor.getRed()
@@ -724,7 +724,17 @@ void MaterialManager::saveMaterial(MaterialPtr material, stringstream& filestrea
 		filestream << "\r\n\talpha_ref " << material->_alphaRef;
 
 	if (material->_antiAliasing != EAAM_ON)
-		filestream << "\r\n\tanti_aliasing " << _attribsWordInvMap[material->_antiAliasing];
+	{
+		filestream << "\r\n\tanti_aliasing ";
+		switch (material->_antiAliasing)
+		{
+		case EAAM_OFF: filestream << "off"; break;
+		case EAAM_LINE_SMOOTH: filestream << "line_smooth"; break;
+		case EAAM_POINT_SMOOTH: filestream << "point_smooth"; break;
+		case EAAM_ALPHA_TO_COVERAGE: filestream << "alpha_to_coverage"; break;
+		default: filestream << "on"; break;
+		}
+	}
 
 	if (material->_stencilMask != 0xFF)
 		filestream << "\r\n\tstencil_mask " << material->_stencilMask;
@@ -736,16 +746,16 @@ void MaterialManager::saveMaterial(MaterialPtr material, stringstream& filestrea
 		filestream << "\r\n\tstencil_ref " << material->_stencilRef;
 
 	if (material->_stencilFunc != ESF_NEVER)
-		filestream << "\r\n\tstencil_func " << _attribsWordInvMap[material->_stencilFunc];
+		filestream << "\r\n\tstencil_func " << stencil_func[material->_stencilFunc];
 
 	if (material->_stencilFail != ESO_KEEP)
-		filestream << "\r\n\tstencil_fail " << _attribsWordInvMap[material->_stencilFail];
+		filestream << "\r\n\tstencil_fail " << stencil_op[material->_stencilFail];
 
 	if (material->_depthFail != ESO_KEEP)
-		filestream << "\r\n\tdepth_fail " << _attribsWordInvMap[material->_depthFail];
+		filestream << "\r\n\tdepth_fail " << stencil_op[material->_depthFail];
 
 	if (material->_stencilDepthPass != ESO_KEEP)
-		filestream << "\r\n\tstencil_depth_pass " << _attribsWordInvMap[material->_stencilDepthPass];
+		filestream << "\r\n\tstencil_depth_pass " << stencil_op[material->_stencilDepthPass];
 
 	if (material->_wireframe != false)
 		filestream << "\r\n\twireframe " << "on";
