@@ -17,8 +17,8 @@ using namespace std;
 #define VAYO_MATH_PI_DIV_180         (0.017453292519943296)
 #define VAYO_MATH_INV_PI_DIV_180     (57.2957795130823229)
 
-#define VayoDegToRad(x)	             ((x)*VAYO_MATH_PI_DIV_180)
-#define VayoRadToDeg(x)	             ((x)*VAYO_MATH_INV_PI_DIV_180)
+#define VayoDegToRad(x)	             ((float)((x)*VAYO_MATH_PI_DIV_180))
+#define VayoRadToDeg(x)	             ((float)((x)*VAYO_MATH_INV_PI_DIV_180))
 
 #define ROUNDING_ERROR_SINT          0
 #define ROUNDING_ERROR_UINT          0u
